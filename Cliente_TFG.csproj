@@ -55,6 +55,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Pages\paginaBiblioteca.xaml.cs">
+      <DependentUpon>paginaBiblioteca.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\paginaJuegoBiblioteca.xaml.cs">
+      <DependentUpon>paginaJuegoBiblioteca.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\paginaJuegoTienda.xaml.cs">
+      <DependentUpon>paginaJuegoTienda.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\paginaPerfil.xaml.cs">
+      <DependentUpon>paginaPerfil.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\paginaTienda.xaml.cs">
+      <DependentUpon>paginaTienda.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Cabezera.xaml.cs">
+      <DependentUpon>Cabezera.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ErrorWindow.xaml.cs">
+      <DependentUpon>ErrorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -67,6 +91,38 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\paginaBiblioteca.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\paginaJuegoBiblioteca.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\paginaJuegoTienda.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\paginaPerfil.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\paginaTienda.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Cabezera.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -93,6 +149,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="classes\" />
+    <Folder Include="res\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
