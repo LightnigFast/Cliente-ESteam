@@ -5,8 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Cliente_TFG.UserControls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             d:DesignHeight="60" d:DesignWidth="1280">
+    
+    <Grid Background="Black">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--GRID PARA LOS BOTONES DE TIENDA, BIBLIOTECA Y AMIGOS-->
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             
+            <!--BOTON PARA LA BIBLIOTECA-->
+            <Button Grid.Column="0" x:Name="botonBiblioteca" Content="Biblioteca" Click="biblioteca_click"/>
+
+            <!--BOTON PARA LA TIENDA-->
+            <Button Grid.Column="1" x:Name="botonTienda" Content="Tienda" Click="tienda_click"/>
+            
+            <!--BOTON PARA LOS AMIGOS-->
+            <Button Grid.Column="2" x:Name="botonAmigos" Content="Amigos" Click="amigos_click"/>
+
+        </Grid>
+
+
+
     </Grid>
 </UserControl>

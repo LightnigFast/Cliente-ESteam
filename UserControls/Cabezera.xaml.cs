@@ -20,9 +20,35 @@ namespace Cliente_TFG.UserControls
     /// </summary>
     public partial class Cabezera : UserControl
     {
+        public event RoutedEventHandler BibliotecaPresionado;
+        public event RoutedEventHandler TiendaPresionado;
+        public event RoutedEventHandler AmigosPresionado;
+
         public Cabezera()
         {
             InitializeComponent();
         }
+
+
+        //BIBLIOTECA CLICK
+        public void biblioteca_click(object sender, RoutedEventArgs e)
+        {
+            BibliotecaPresionado?.Invoke(this, e);
+        }
+
+
+        //TIENDA CLICK
+        public void tienda_click(object sender, RoutedEventArgs e)
+        {
+            TiendaPresionado?.Invoke(this, e);
+        }
+
+        //AMIGOS CLICK
+        public void amigos_click(object sender, RoutedEventArgs e)
+        {
+            AmigosPresionado?.Invoke(this, e);
+        }
+
+
     }
 }

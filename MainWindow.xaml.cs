@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cliente_TFG.Pages;
+using Cliente_TFG.UserControls;
 
 namespace Cliente_TFG
 {
@@ -23,6 +25,27 @@ namespace Cliente_TFG
         public MainWindow()
         {
             InitializeComponent();
+
+            Cabecera_top.BibliotecaPresionado += boton_biblioteca_presionado;
+            Cabecera_top.TiendaPresionado += boton_tienda_presionado;
+            Cabecera_top.AmigosPresionado += boton_amigos_presionado;
+
+
+        }
+
+        private void boton_biblioteca_presionado(object sender, RoutedEventArgs e)
+        {
+            framePrincipal.Navigate(new paginaBiblioteca());
+        }
+
+        private void boton_tienda_presionado(object sender, RoutedEventArgs e)
+        {
+            framePrincipal.Navigate(new paginaTienda());
+        }
+
+        private void boton_amigos_presionado(object sender, RoutedEventArgs e)
+        {
+            framePrincipal.Navigate(new paginaAmigos());
         }
     }
 }
