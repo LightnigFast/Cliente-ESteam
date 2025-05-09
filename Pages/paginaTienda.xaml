@@ -5,10 +5,39 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Cliente_TFG.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="720" d:DesignWidth="1280"
       Title="paginaTienda">
 
-    <Grid Background="AliceBlue">
-        
-    </Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent">
+        <WrapPanel HorizontalAlignment="Center">
+            <!--GRID PARA LA CATEGORIA-->
+            <Grid x:Name="panelControlador" Background="Blue" Width="1150" Height="35" VerticalAlignment="Top" Margin="0,30,0,0">
+
+            </Grid>
+
+            <!--GRID PARA JUEGOS DESTACADOS-->
+            <Grid Name="panelJuegosDestacados" Background="Green" Width="1150" Height="350" VerticalAlignment="Top" Margin="0,70,0,0">
+
+            </Grid>
+
+            <!--GRID PARA JUEGOS CON OFERTAS ESPECIALES-->
+            <Grid Name="panelOfertasEspaciales" Background="red" Width="1150" Height="350" VerticalAlignment="Top" Margin="0,70,0,0">
+
+            </Grid>
+
+            <!--GRID PARA JUEGOS CON CIERTA CANTIDAD DE OFERTA-->
+            <Grid Name="panelOfertaEspecifica" Background="Yellow" Width="1150" Height="150" VerticalAlignment="Top" Margin="0,70,0,0">
+
+            </Grid>
+
+            <!--GRID PARA NUEVOS LANZAMIENTOS-->
+            <Grid Name="panelNuevosLanzamientos" Background="Orange" Width="1150" Height="800" VerticalAlignment="Top" Margin="0,70,0,0">
+
+            </Grid>
+
+        </WrapPanel>
+       
+
+    </ScrollViewer>
+
 </Page>
