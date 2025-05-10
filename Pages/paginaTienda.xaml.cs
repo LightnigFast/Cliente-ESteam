@@ -32,14 +32,15 @@ namespace Cliente_TFG.Pages
 
             imagenesCarrusel = new string[]
             {
-                "https://cdn.akamai.steamstatic.com/steam/apps/730/capsule_616x353.jpg",
-                "https://cdn.akamai.steamstatic.com/steam/apps/570/capsule_616x353.jpg",
-                "https://cdn.akamai.steamstatic.com/steam/apps/440/capsule_616x353.jpg"
+                "https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_616x353.jpg",
+                "https://cdn.akamai.steamstatic.com/steam/apps/2669320/capsule_616x353.jpg",
+                "https://cdn.akamai.steamstatic.com/steam/apps/1451190/capsule_616x353.jpg"
             };
 
             MostrarImagenActual();
             CargarOfertas();
-            CargarOfertasEspeciales();
+            CargarOfertasDeterminadoPrecio();
+            CargarNuevosLanzamientos();
         }
 
         //PARTE PARA EL CARRUSEL
@@ -139,7 +140,7 @@ namespace Cliente_TFG.Pages
         }
 
         //PARTE PARA LAS OFERTAS ESPECIFICAS
-        private void CargarOfertasEspeciales()
+        private void CargarOfertasDeterminadoPrecio()
         {
             string[] urls = new string[]
             {
@@ -200,6 +201,82 @@ namespace Cliente_TFG.Pages
                 panelOfertaEspecifica.Children.Add(contenedor);
             }
         }
+
+        //PARTE PARA LOS NUEVOS LANZAMIENTOS
+        private void CargarNuevosLanzamientos()
+        {
+            string[] urls = new string[]
+            {
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1850570/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/227300/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2161700/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/582010/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/489830/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/105600/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/304930/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/capsule_231x87.jpg"
+            };
+
+            
+
+
+            for (int i = 0; i < urls.Length; i++)
+            {
+                Thickness margenFila = new Thickness(0, i == 0 ? 0 : 5, 0, i == urls.Length - 1 ? 0 : 5);
+                //IMAGEN
+                Image img = new Image
+                {
+                    Source = new BitmapImage(new Uri(urls[i])),
+                    Stretch = Stretch.UniformToFill,
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
+                Grid.SetRow(img, i);
+                Grid.SetColumn(img, 0);
+                img.Margin = margenFila;
+                panelNuevosLanzamientos.Children.Add(img);
+
+                //TEXTO DEL CONTENIDO (titulo y género)
+                Label textoContenido = new Label
+                {
+                    Content = "Half-Life 2\nAcción, Ciencia ficción",
+                    FontSize = 16,
+                    Foreground = Brushes.White,
+                    HorizontalContentAlignment = HorizontalAlignment.Left,
+                    VerticalContentAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
+                    Padding = new Thickness(10, 0, 0, 0)
+                };
+
+
+
+                Grid.SetRow(textoContenido, i);
+                Grid.SetColumn(textoContenido, 1);
+                textoContenido.Margin = margenFila;
+                panelNuevosLanzamientos.Children.Add(textoContenido);
+
+                //TEXTO DEL PRECIO
+                Label textoPrecio = new Label
+                {
+                    Content = "15,99€",
+                    FontSize = 16,
+                    HorizontalContentAlignment = HorizontalAlignment.Left,
+                    VerticalContentAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
+                    Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12")
+                };
+                Grid.SetRow(textoPrecio, i);
+                Grid.SetColumn(textoPrecio, 2);
+                textoPrecio.Margin = margenFila;
+                panelNuevosLanzamientos.Children.Add(textoPrecio);
+            }
+        }
+
 
     }
 }

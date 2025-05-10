@@ -84,8 +84,24 @@
             </Grid>
 
             <!--GRID PARA NUEVOS LANZAMIENTOS-->
-            <Grid Name="panelNuevosLanzamientos" Background="Orange" Width="1150" Height="1200" VerticalAlignment="Top" Margin="0,70,0,0">
-                
+            <Grid Name="panelNuevosLanzamientos" Background="Transparent" Width="1150" Height="1000" VerticalAlignment="Top" Margin="0,70,0,70">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
             </Grid>
 
         </StackPanel>
