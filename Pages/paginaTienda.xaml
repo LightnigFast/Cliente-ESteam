@@ -73,13 +73,19 @@
             </Grid>
 
             <!--GRID PARA JUEGOS CON CIERTA CANTIDAD DE OFERTA-->
-            <Grid Name="panelOfertaEspecifica" Background="Yellow" Width="1150" Height="150" VerticalAlignment="Top" Margin="0,70,0,0">
+            <Grid Name="panelOfertaEspecifica" Background="Transparent" Width="1150" Height="130" VerticalAlignment="Top" Margin="0,70,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
             </Grid>
 
             <!--GRID PARA NUEVOS LANZAMIENTOS-->
-            <Grid Name="panelNuevosLanzamientos" Background="Orange" Width="1150" Height="800" VerticalAlignment="Top" Margin="0,70,0,0">
-
+            <Grid Name="panelNuevosLanzamientos" Background="Orange" Width="1150" Height="1200" VerticalAlignment="Top" Margin="0,70,0,0">
+                
             </Grid>
 
         </StackPanel>

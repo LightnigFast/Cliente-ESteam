@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -37,7 +38,8 @@ namespace Cliente_TFG.Pages
             };
 
             MostrarImagenActual();
-            CargarImagenesOfertas();
+            CargarOfertas();
+            CargarOfertasEspeciales();
         }
 
         //PARTE PARA EL CARRUSEL
@@ -66,7 +68,7 @@ namespace Cliente_TFG.Pages
         }
 
         //PARTE DE LAS OFERTES ESPECIALES
-        private void CargarImagenesOfertas()
+        private void CargarOfertas()
         {
             string[] urls = new string[]
             {
@@ -111,10 +113,19 @@ namespace Cliente_TFG.Pages
                 };
 
                 //STACKPANEL PARA METER LA IMAGEN Y EL PRECIO
+                Thickness margen;
+
+                if (col == 0) //primera columna
+                    margen = new Thickness(0, 0, 5, 0);
+                else if (col == columnas - 1) //última columna
+                    margen = new Thickness(5, 0, 0, 0);
+                else
+                    margen = new Thickness(5, 0, 5, 0);
+
                 StackPanel contenedor = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Margin = new Thickness(5)
+                    Margin = margen
                 };
 
                 contenedor.Children.Add(img);
@@ -127,7 +138,68 @@ namespace Cliente_TFG.Pages
 
         }
 
+        //PARTE PARA LAS OFERTAS ESPECIFICAS
+        private void CargarOfertasEspeciales()
+        {
+            string[] urls = new string[]
+            {
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1200/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/400/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/620/capsule_231x87.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_231x87.jpg"
+            };
 
+            int columnas = 4;
+
+            for (int i = 0; i < urls.Length; i++)
+            {
+                int col = i % columnas;
+
+                //CREO LA IMAGEN
+                Image img = new Image
+                {
+                    Source = new BitmapImage(new Uri(urls[i])),
+                    Stretch = Stretch.UniformToFill,
+                    Margin = new Thickness(0)
+                };
+
+                //TEXTO DEL PRECIO
+                TextBlock textoPrecio = new TextBlock
+                {
+                    Text = "15,99" + "€ ",
+                    Height = 25,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextAlignment = TextAlignment.Right,
+                    FontSize = 17,
+                    Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12"),
+                    Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
+
+                };
+
+                //STACKPANEL PARA METER LA IMAGEN Y EL PRECIO
+                Thickness margen;
+
+                if (col == 0) //primera columna
+                    margen = new Thickness(0, 0, 5, 0);
+                else if (col == columnas - 1) //última columna
+                    margen = new Thickness(5, 0, 0, 0);
+                else
+                    margen = new Thickness(5, 0, 5, 0);
+
+                StackPanel contenedor = new StackPanel
+                {
+                    Orientation = Orientation.Vertical,
+                    Margin = margen
+                };
+
+                contenedor.Children.Add(img);
+                contenedor.Children.Add(textoPrecio);
+
+                Grid.SetColumn(contenedor, col);
+                panelOfertaEspecifica.Children.Add(contenedor);
+            }
+        }
 
     }
 }
