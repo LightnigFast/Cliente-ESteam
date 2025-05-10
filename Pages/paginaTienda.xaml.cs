@@ -37,8 +37,10 @@ namespace Cliente_TFG.Pages
             };
 
             MostrarImagenActual();
+            CargarImagenesOfertas();
         }
 
+        //PARTE PARA EL CARRUSEL
         private void MostrarImagenActual()
         {
             imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
@@ -50,6 +52,7 @@ namespace Cliente_TFG.Pages
             {
                 indiceActual--;
                 MostrarImagenActual();
+
             }
         }
 
@@ -61,6 +64,70 @@ namespace Cliente_TFG.Pages
                 MostrarImagenActual();
             }
         }
+
+        //PARTE DE LAS OFERTES ESPECIALES
+        private void CargarImagenesOfertas()
+        {
+            string[] urls = new string[]
+            {
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/23400/header.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/620/header.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/570/header.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/440/header.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/header.jpg",
+                "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/header.jpg"
+            };
+
+            int columnas = 3;
+
+
+
+            for (int i = 0; i < urls.Length; i++)
+            {
+                int row = i / columnas;
+                int col = i % columnas;
+
+                //CREO LA IMAGEN
+                Image img = new Image
+                {
+                    Source = new BitmapImage(new Uri(urls[i])),
+                    Stretch = Stretch.UniformToFill,
+                    Height = 160,
+                    Margin = new Thickness(0)
+                };
+
+                //TEXTO DEL PRECIO
+                TextBlock textoPrecio = new TextBlock
+                {
+                    Text = "15,99" + "€ ",
+                    Height = 25,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextAlignment = TextAlignment.Right,
+                    FontSize = 17,
+                    Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12"),
+                    Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
+
+                };
+
+                //STACKPANEL PARA METER LA IMAGEN Y EL PRECIO
+                StackPanel contenedor = new StackPanel
+                {
+                    Orientation = Orientation.Vertical,
+                    Margin = new Thickness(5)
+                };
+
+                contenedor.Children.Add(img);
+                contenedor.Children.Add(textoPrecio);
+
+                Grid.SetRow(contenedor, row);
+                Grid.SetColumn(contenedor, col);
+                panelOfertasEspaciales.Children.Add(contenedor);
+            }
+
+        }
+
+
 
     }
 }
