@@ -25,6 +25,7 @@ namespace Cliente_TFG.Pages
 
         private string[] imagenesCarrusel;
         private int indiceActual = 0;
+        private (Brush) colorRatonEncima = new BrushConverter().ConvertFromString("#533939");
 
 
         public paginaTienda()
@@ -206,10 +207,19 @@ namespace Cliente_TFG.Pages
                 contenedor.Children.Add(img);
                 contenedor.Children.Add(textoPrecio);
 
+                //EVENTO MOUSE ENTER Y EXIT PARA ESTE STACKPANEL
+                contenedor.MouseEnter += (s, e) => JuegoEnter(s, e, textoPrecio);
+                contenedor.MouseLeave += (s, e) => JuegoExit(s, e, textoPrecio);
+
                 Grid.SetColumn(contenedor, col);
                 panelOfertaEspecifica.Children.Add(contenedor);
+
             }
+
+            //PARTE PARA LOS EVENTOS DE RATON
+            panelOfertaEspecifica.MouseLeftButtonDown += JuegoClick;
         }
+
 
         //PARTE PARA LOS NUEVOS LANZAMIENTOS
         private void CargarNuevosLanzamientos()
@@ -284,6 +294,27 @@ namespace Cliente_TFG.Pages
                 textoPrecio.Margin = margenFila;
                 panelNuevosLanzamientos.Children.Add(textoPrecio);
             }
+        }
+
+
+
+
+        //EVENTO DE CLICK
+        private void JuegoClick(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show("¡Has hecho clic en el Grid!");
+        }
+
+        //EVENTO ENTER
+        private void JuegoEnter(object sender, MouseEventArgs e, TextBlock textoPrecio)
+        {
+            textoPrecio.Background = (Brush)new BrushConverter().ConvertFromString("#997878");
+        }
+
+        //EVENTO EXIT
+        private void JuegoExit(object sender, MouseEventArgs e, TextBlock textoPrecio)
+        {
+            textoPrecio.Background = (Brush)new BrushConverter().ConvertFromString("#533939");
         }
 
 
