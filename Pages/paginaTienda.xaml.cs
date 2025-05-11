@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Cliente_TFG.Pages
 {
@@ -30,6 +31,17 @@ namespace Cliente_TFG.Pages
         {
             InitializeComponent();
 
+            
+
+            CargarCarrusel();
+            CargarOfertas();
+            CargarOfertasDeterminadoPrecio();
+            CargarNuevosLanzamientos();
+        }
+
+        //PARTE PARA EL CARRUSEL
+        private void CargarCarrusel()
+        {
             imagenesCarrusel = new string[]
             {
                 "https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_616x353.jpg",
@@ -37,35 +49,32 @@ namespace Cliente_TFG.Pages
                 "https://cdn.akamai.steamstatic.com/steam/apps/1451190/capsule_616x353.jpg"
             };
 
-            MostrarImagenActual();
-            CargarOfertas();
-            CargarOfertasDeterminadoPrecio();
-            CargarNuevosLanzamientos();
-        }
+            //ASIGNA EVENTOS
+            BtnAnterior.Click += (s, e) =>
+            {
+                indiceActual = (indiceActual - 1 + imagenesCarrusel.Length) % imagenesCarrusel.Length;
+                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
+            };
 
-        //PARTE PARA EL CARRUSEL
-        private void MostrarImagenActual()
-        {
+            BtnSiguiente.Click += (s, e) =>
+            {
+                indiceActual = (indiceActual + 1) % imagenesCarrusel.Length;
+                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
+            };
+
+
+            //IMAGEN INICIAL
             imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
-        }
 
-        private void BtnAnterior_Click(object sender, RoutedEventArgs e)
-        {
-            if (indiceActual > 0)
+            //TIMER AUTOMÁTICO
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(5);
+            timer.Tick += (s, e) =>
             {
-                indiceActual--;
-                MostrarImagenActual();
-
-            }
-        }
-
-        private void BtnSiguiente_Click(object sender, RoutedEventArgs e)
-        {
-            if (indiceActual < imagenesCarrusel.Length - 1)
-            {
-                indiceActual++;
-                MostrarImagenActual();
-            }
+                indiceActual = (indiceActual + 1) % imagenesCarrusel.Length;
+                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
+            };
+            timer.Start();
         }
 
         //PARTE DE LAS OFERTES ESPECIALES
