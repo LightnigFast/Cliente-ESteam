@@ -25,8 +25,8 @@ namespace Cliente_TFG.Pages
 
         private string[] imagenesCarrusel;
         private int indiceActual = 0;
-        private (Brush) colorRatonEncima = new BrushConverter().ConvertFromString("#533939");
-
+        private Brush colorRatonEncima = (Brush)new BrushConverter().ConvertFromString("#997878");
+        private Brush colorTextBlock = (Brush)new BrushConverter().ConvertFromString("#533939");
 
         public paginaTienda()
         {
@@ -119,7 +119,7 @@ namespace Cliente_TFG.Pages
                     TextAlignment = TextAlignment.Right,
                     FontSize = 17,
                     Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12"),
-                    Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
+                    Background = colorTextBlock
 
                 };
 
@@ -141,6 +141,13 @@ namespace Cliente_TFG.Pages
 
                 contenedor.Children.Add(img);
                 contenedor.Children.Add(textoPrecio);
+
+                //EVENTO DE CLICK
+                contenedor.MouseLeftButtonDown += JuegoClick;
+
+                //EVENTO MOUSE ENTER Y EXIT PARA ESTE STACKPANEL
+                contenedor.MouseEnter += (s, e) => JuegoEnter(s, e, textoPrecio);
+                contenedor.MouseLeave += (s, e) => JuegoExit(s, e, textoPrecio);
 
                 Grid.SetRow(contenedor, row);
                 Grid.SetColumn(contenedor, col);
@@ -184,7 +191,7 @@ namespace Cliente_TFG.Pages
                     TextAlignment = TextAlignment.Right,
                     FontSize = 17,
                     Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12"),
-                    Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
+                    Background = colorTextBlock,
 
                 };
 
@@ -207,6 +214,9 @@ namespace Cliente_TFG.Pages
                 contenedor.Children.Add(img);
                 contenedor.Children.Add(textoPrecio);
 
+                //EVENTO DE CLICK
+                contenedor.MouseLeftButtonDown += JuegoClick;
+
                 //EVENTO MOUSE ENTER Y EXIT PARA ESTE STACKPANEL
                 contenedor.MouseEnter += (s, e) => JuegoEnter(s, e, textoPrecio);
                 contenedor.MouseLeave += (s, e) => JuegoExit(s, e, textoPrecio);
@@ -216,8 +226,6 @@ namespace Cliente_TFG.Pages
 
             }
 
-            //PARTE PARA LOS EVENTOS DE RATON
-            panelOfertaEspecifica.MouseLeftButtonDown += JuegoClick;
         }
 
 
@@ -238,12 +246,25 @@ namespace Cliente_TFG.Pages
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/capsule_231x87.jpg"
             };
 
-            
+
 
 
             for (int i = 0; i < urls.Length; i++)
             {
                 Thickness margenFila = new Thickness(0, i == 0 ? 0 : 5, 0, i == urls.Length - 1 ? 0 : 5);
+
+                //GRID CONTENEDOR DE LA FILA
+                Grid filaGrid = new Grid
+                {
+                    Background = Brushes.Transparent, // Necesario para que el click funcione
+                    Margin = margenFila,
+                    Cursor = Cursors.Hand // Opcional: cambia el cursor
+                };
+
+                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(231) }); // Imagen
+                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Texto
+                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100) }); // Precio
+
                 //IMAGEN
                 Image img = new Image
                 {
@@ -251,12 +272,10 @@ namespace Cliente_TFG.Pages
                     Stretch = Stretch.UniformToFill,
                     HorizontalAlignment = HorizontalAlignment.Left
                 };
-                Grid.SetRow(img, i);
                 Grid.SetColumn(img, 0);
-                img.Margin = margenFila;
-                panelNuevosLanzamientos.Children.Add(img);
+                filaGrid.Children.Add(img);
 
-                //TEXTO DEL CONTENIDO (titulo y género)
+                //TEXTO DEL CONTENIDO
                 Label textoContenido = new Label
                 {
                     Content = "Half-Life 2\nAcción, Ciencia ficción",
@@ -264,36 +283,47 @@ namespace Cliente_TFG.Pages
                     Foreground = Brushes.White,
                     HorizontalContentAlignment = HorizontalAlignment.Left,
                     VerticalContentAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
+                    Background = colorTextBlock,
                     Padding = new Thickness(10, 0, 0, 0)
                 };
-
-
-
-                Grid.SetRow(textoContenido, i);
                 Grid.SetColumn(textoContenido, 1);
-                textoContenido.Margin = margenFila;
-                panelNuevosLanzamientos.Children.Add(textoContenido);
+                filaGrid.Children.Add(textoContenido);
 
-                //TEXTO DEL PRECIO
+                //PRECIO
                 Label textoPrecio = new Label
                 {
                     Content = "15,99€",
                     FontSize = 16,
                     HorizontalContentAlignment = HorizontalAlignment.Left,
                     VerticalContentAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch,
                     Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
                     Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12")
                 };
-                Grid.SetRow(textoPrecio, i);
                 Grid.SetColumn(textoPrecio, 2);
-                textoPrecio.Margin = margenFila;
-                panelNuevosLanzamientos.Children.Add(textoPrecio);
+                filaGrid.Children.Add(textoPrecio);
+
+                //EVENTO DE CLICK
+                filaGrid.MouseLeftButtonDown += JuegoClick;
+
+                //EVENTO MOUSE ENTER Y EXIT PARA ESTE STACKPANEL
+                filaGrid.MouseEnter += (s, e) =>
+                {
+                    textoContenido.Background = colorRatonEncima;
+                    textoPrecio.Background = colorRatonEncima;
+                };
+                filaGrid.MouseLeave += (s, e) =>
+                {
+                    textoContenido.Background = colorTextBlock;
+                    textoPrecio.Background = colorTextBlock;
+                };
+
+
+                //AÑADIR LA FILA AL GRID PRINCIPAL
+                Grid.SetRow(filaGrid, i);
+                Grid.SetColumnSpan(filaGrid, 3);
+                panelNuevosLanzamientos.Children.Add(filaGrid);
             }
+
         }
 
 
@@ -308,13 +338,13 @@ namespace Cliente_TFG.Pages
         //EVENTO ENTER
         private void JuegoEnter(object sender, MouseEventArgs e, TextBlock textoPrecio)
         {
-            textoPrecio.Background = (Brush)new BrushConverter().ConvertFromString("#997878");
+            textoPrecio.Background = colorRatonEncima;
         }
 
         //EVENTO EXIT
         private void JuegoExit(object sender, MouseEventArgs e, TextBlock textoPrecio)
         {
-            textoPrecio.Background = (Brush)new BrushConverter().ConvertFromString("#533939");
+            textoPrecio.Background = colorTextBlock;
         }
 
 
