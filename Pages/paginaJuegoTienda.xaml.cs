@@ -35,6 +35,7 @@ namespace Cliente_TFG.Pages
         {
             InitializeComponent();
             CargarCarrusel();
+            CargarDescripccionLarga();
         }
 
         //PARTE DEL CARRUSEL
@@ -223,6 +224,24 @@ namespace Cliente_TFG.Pages
             element.BeginAnimation(UIElement.OpacityProperty, fadeInAnimation);
         }
 
+        
+        
+        
+        
+        //PARTE PARA LA DESCRIPCCION LARGA
+        private void CargarDescripccionLarga()
+        {
+            // Contenido HTML recibido
+            string htmlContent = "For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. This is Counter-Strike 2.<br><br>A free upgrade to CS:GO, Counter-Strike 2 marks the largest technical leap in Counter-Strike\u2019s history. Built on the Source 2 engine, Counter-Strike 2 is modernized with realistic physically-based rendering, state of the art networking, and upgraded Community Workshop tools.<br><br>In addition to the classic objective-focused gameplay that Counter-Strike pioneered in 1999, Counter-Strike 2 features:<br><br><ul class=\"bb_ul\"><li>All-new CS Ratings with the updated Premier mode<br></li><li>Global and Regional leaderboards<br></li><li>Upgraded and overhauled maps<br></li><li>Game-changing dynamic smoke grenades<br></li><li>Tick-rate-independent gameplay<br></li><li>Redesigned visual effects and audio<br></li><li>All items from CS:GO moving forward to CS2</li></ul>";
 
+            // Convertir los saltos de línea "<br>" a "\n" y las listas "<ul>" a un formato adecuado
+            string formattedText = htmlContent.Replace("<br>", "\n").Replace("<ul class=\"bb_ul\">", "").Replace("</ul>", "").Replace("<li>", "• ").Replace("</li>", "\n");
+
+            // Mostrar el texto formateado en el TextBlock
+            textBlock.Text = formattedText;
+
+
+
+        }
     }
 }

@@ -28,6 +28,11 @@
 
                     </StackPanel>
                 </ScrollViewer>
+                
+                <!--GRID PARA LA DESCRIPCCION LARGA-->
+                <TextBlock Name="textBlock" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="0,30,20,0"
+                           Foreground="White" FontSize="13"/>
+
             </StackPanel>
         </ScrollViewer>
         
