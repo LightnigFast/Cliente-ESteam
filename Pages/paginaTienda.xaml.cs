@@ -26,7 +26,11 @@ namespace Cliente_TFG.Pages
     public partial class paginaTienda : Page
     {
 
-        private List<string> imagenesCarrusel = new List<string>();
+        private string[] imagenesCarrusel;
+
+        private List<string> imagenesCarrusel2 = new List<string>();
+        private List<string> nombresCarrusel = new List<string>();
+        private DispatcherTimer carruselTimer;
         private int indiceActual = 0;
 
         /*
@@ -38,14 +42,16 @@ namespace Cliente_TFG.Pages
         {
             InitializeComponent();
 
-            CargarCarrusel();
+            CargarDatosJson();
+
+            //CargarCarrusel();
             CargarOfertas();
             CargarOfertasDeterminadoPrecio();
             CargarNuevosLanzamientos();
         }
 
-        //PARTE PARA EL CARRUSEL
-        private async void CargarCarrusel()
+        //METODO PARA CARGAR LOS DATOS DEL JSON
+        private async void CargarDatosJson()
         {
             using (HttpClient client = new HttpClient())
             {
@@ -54,56 +60,87 @@ namespace Cliente_TFG.Pages
                     string json = await client.GetStringAsync("http://127.0.0.1:5000/store/carrusel");
                     var juegos = JsonConvert.DeserializeObject<List<JuegoCarrusel>>(json);
 
-                    //FILTRA SOLO JUEGOS CON AL MENOS UNA IMAGEN
+                    imagenesCarrusel2.Clear();
+
                     foreach (var juego in juegos)
                     {
                         if (juego.capturas_miniatura != null && juego.capturas_miniatura.Count > 0)
                         {
-                            imagenesCarrusel.Add("https://cdn.akamai.steamstatic.com/steam/apps/" + juego.app_id + "/capsule_616x353.jpg");
-                            //carruselTituloJuego.Text = juego.nombre;
+                            imagenesCarrusel2.Add(juego.capturas_miniatura[0]);
+                            nombresCarrusel.Add(juego.nombre);
                         }
                     }
 
-                    if (imagenesCarrusel.Count == 0)
+                    if (imagenesCarrusel2.Count == 0)
                     {
                         MessageBox.Show("No se encontraron imágenes en el carrusel.");
-                        return;
                     }
-
-                    
-
-;
-                    //ASIGNA EVENTOS
-                    BtnAnterior.Click += (s, e) =>
+                    else
                     {
-                        indiceActual = (indiceActual - 1 + imagenesCarrusel.Count) % imagenesCarrusel.Count;
-                        imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
-                    };
-
-                    BtnSiguiente.Click += (s, e) =>
-                    {
-                        indiceActual = (indiceActual + 1) % imagenesCarrusel.Count;
-                        imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
-                    };
-
-                    //IMAGEN INICIAL
-                    imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
-
-                    //TIMER AUTOMÁTICO
-                    DispatcherTimer timer = new DispatcherTimer();
-                    timer.Interval = TimeSpan.FromSeconds(5);
-                    timer.Tick += (s, e) =>
-                    {
-                        indiceActual = (indiceActual + 1) % imagenesCarrusel.Count;
-                        imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
-                    };
-                    timer.Start();
+                        CargarCarrusel();
+                    }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al cargar el carrusel: {ex.Message}");
+                    MessageBox.Show($"Error al cargar datos del carrusel: {ex.Message}");
                 }
             }
+        }
+
+
+        //PARTE PARA EL CARRUSEL
+        private void CargarCarrusel()
+        {
+            imagenesCarrusel = new string[]
+            {
+                "https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_616x353.jpg",
+                "https://cdn.akamai.steamstatic.com/steam/apps/2669320/capsule_616x353.jpg",
+                "https://cdn.akamai.steamstatic.com/steam/apps/1451190/capsule_616x353.jpg"
+            };
+
+            //INICIALIZA TIMER SI NO EXISTE
+            if (carruselTimer == null)
+            {
+                carruselTimer = new DispatcherTimer();
+                carruselTimer.Interval = TimeSpan.FromSeconds(5);
+                carruselTimer.Tick += (s, e) =>
+                {
+                    indiceActual = (indiceActual + 1) % imagenesCarrusel2.Count;
+                    imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel2[indiceActual]));
+                    carruselTituloJuego.Text = nombresCarrusel[indiceActual];
+                };
+            }
+
+            //ASIGNA EVENTOS
+            BtnAnterior.Click += (s, e) =>
+            {
+                indiceActual = (indiceActual - 1 + imagenesCarrusel2.Count) % imagenesCarrusel2.Count;
+                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel2[indiceActual]));
+                carruselTituloJuego.Text = nombresCarrusel[indiceActual];
+                ReiniciarTimer();
+            };
+
+            BtnSiguiente.Click += (s, e) =>
+            {
+                indiceActual = (indiceActual + 1) % imagenesCarrusel2.Count;
+                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel2[indiceActual]));
+                carruselTituloJuego.Text = nombresCarrusel[indiceActual];
+                ReiniciarTimer();
+            };
+
+            //IMAGEN INICIAL
+            imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel2[indiceActual]));
+            carruselTituloJuego.Text = nombresCarrusel[indiceActual];
+
+            //INICIA EL TIMER
+            carruselTimer.Start();
+        }
+
+        //MÉTODO PARA REINICIAR EL TIMER
+        private void ReiniciarTimer()
+        {
+            carruselTimer.Stop();
+            carruselTimer.Start();
         }
 
         public class JuegoCarrusel
