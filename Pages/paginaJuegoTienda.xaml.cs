@@ -15,6 +15,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Cliente_TFG.Classes;
+using Newtonsoft.Json;
+
 
 namespace Cliente_TFG.Pages
 {
@@ -34,8 +37,20 @@ namespace Cliente_TFG.Pages
         public paginaJuegoTienda()
         {
             InitializeComponent();
+
+            //PARTE IZQUIERDA
             CargarCarrusel();
             CargarDescripccionLarga();
+            CargarCategoriasGeneros();
+
+            //PARTE DERECHA
+            CargarImagenPrincipal();
+            CargarPrecio();
+            CargarBotonCompra();
+            CargarDescripccionCorta();
+            CargarFechaLanzamiento();
+            CargarDesarrolador();
+
         }
 
         //PARTE DEL CARRUSEL
@@ -65,9 +80,11 @@ namespace Cliente_TFG.Pages
             };
 
             //LIMPIO PRIMERO EL CONTENIDO POR SI ACASO
+            
             panelCarrusel.Children.Clear();
             stackMiniaturas.Children.Clear();
             imagenesCarrusel.Clear();
+            
 
             for (int i = 0; i < capturas.Length; i++)
             {
@@ -224,10 +241,7 @@ namespace Cliente_TFG.Pages
             element.BeginAnimation(UIElement.OpacityProperty, fadeInAnimation);
         }
 
-        
-        
-        
-        
+
         //PARTE PARA LA DESCRIPCCION LARGA
         private void CargarDescripccionLarga()
         {
@@ -235,13 +249,206 @@ namespace Cliente_TFG.Pages
             string htmlContent = "For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. This is Counter-Strike 2.<br><br>A free upgrade to CS:GO, Counter-Strike 2 marks the largest technical leap in Counter-Strike\u2019s history. Built on the Source 2 engine, Counter-Strike 2 is modernized with realistic physically-based rendering, state of the art networking, and upgraded Community Workshop tools.<br><br>In addition to the classic objective-focused gameplay that Counter-Strike pioneered in 1999, Counter-Strike 2 features:<br><br><ul class=\"bb_ul\"><li>All-new CS Ratings with the updated Premier mode<br></li><li>Global and Regional leaderboards<br></li><li>Upgraded and overhauled maps<br></li><li>Game-changing dynamic smoke grenades<br></li><li>Tick-rate-independent gameplay<br></li><li>Redesigned visual effects and audio<br></li><li>All items from CS:GO moving forward to CS2</li></ul>";
 
             // Convertir los saltos de línea "<br>" a "\n" y las listas "<ul>" a un formato adecuado
-            string formattedText = htmlContent.Replace("<br>", "\n").Replace("<ul class=\"bb_ul\">", "").Replace("</ul>", "").Replace("<li>", "• ").Replace("</li>", "\n");
+            string formattedText = htmlContent.Replace("<br>", "\n").Replace("<ul class=\"bb_ul\">", "").Replace("</ul>", "").Replace("<li>", "   • ").Replace("</li>", "\n");
 
             // Mostrar el texto formateado en el TextBlock
-            textBlock.Text = formattedText;
-
+            textDescripccionLarga.Text = formattedText;
+            textDescripccionLarga.Foreground = AppTheme.Actual.TextoPrincipal;
+            gridDescripccionLarga.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
 
 
         }
+
+
+        //PARTE PARA LAS CATEGORIAS Y GENEROS
+        private void CargarCategoriasGeneros()
+        {
+            string jsonPrueba = @"
+            {
+                ""categorias"": [
+                ""Multi-player"",
+                ""Valve Anti-Cheat enabled"",
+                ""Stats"",
+                ""Cross-Platform Multiplayer"",
+                ""Steam Trading Cards"",
+                ""Steam Workshop"",
+                ""In-App Purchases"",
+                ""Remote Play on Phone"",
+                ""Remote Play on Tablet"",
+                ""Remote Play on TV"",
+                ""Steam Timeline""
+                ],
+                ""generos"": [
+                ""Action"",
+                ""Free To Play""
+                ]
+            }";
+
+            var datos = JsonConvert.DeserializeObject<DatosJuego>(jsonPrueba);
+
+            //LIMPIAR EL GRID
+            gridCategoriasGeneros.Children.Clear();
+            gridCategoriasGeneros.RowDefinitions.Clear();
+
+            //AÑADO UNA FILA PARA ENCABEZADOS
+            gridCategoriasGeneros.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            TextBlock headerCategoria = new TextBlock
+            {
+                Text = "Categorías:",
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(5),
+                Foreground = AppTheme.Actual.TextoPrincipal,
+                Padding = new Thickness(20, 20, 0, 0),
+            };
+            Grid.SetColumn(headerCategoria, 0);
+            Grid.SetRow(headerCategoria, 0);
+            gridCategoriasGeneros.Children.Add(headerCategoria);
+
+            TextBlock headerGenero = new TextBlock
+            {
+                Text = "Géneros:",
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(5),
+                Foreground = AppTheme.Actual.TextoPrincipal,
+                Padding = new Thickness(20, 20, 0, 0),
+            };
+            Grid.SetColumn(headerGenero, 1);
+            Grid.SetRow(headerGenero, 0);
+            gridCategoriasGeneros.Children.Add(headerGenero);
+
+            //CALCULAR FILAS NECESARIAS
+            int maxFilas = Math.Max(datos.categorias.Count, datos.generos.Count);
+
+            for (int i = 0; i < maxFilas; i++)
+            {
+                gridCategoriasGeneros.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                if (i < datos.categorias.Count)
+                {
+                    TextBlock txtCategoria = new TextBlock
+                    {
+                        Text = datos.categorias[i],
+                        Margin = new Thickness(5),
+                        Padding = new Thickness(20, 0, 0, 0),
+                        Foreground = AppTheme.Actual.TextoPrincipal
+                    };
+                    Grid.SetColumn(txtCategoria, 0);
+                    Grid.SetRow(txtCategoria, i + 1); //+1 PORQUE LA FILA 0 ES PARA ENCABEZADO
+                    gridCategoriasGeneros.Children.Add(txtCategoria);
+                }
+
+                if (i < datos.generos.Count)
+                {
+                    TextBlock txtGenero = new TextBlock
+                    {
+                        Text = datos.generos[i],
+                        Margin = new Thickness(5),
+                        Padding = new Thickness(20,0,0,0),
+                        Foreground = AppTheme.Actual.TextoPrincipal
+                    };
+                    Grid.SetColumn(txtGenero, 1);
+                    Grid.SetRow(txtGenero, i + 1); //+1 PORQUE LA FILA 0 ES PARA ENCABEZADO
+                    gridCategoriasGeneros.Children.Add(txtGenero);
+                }
+            }
+
+
+            gridCategoriasGeneros.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
+        }
+
+        public class DatosJuego
+        {
+            public List<string> categorias { get; set; }
+            public List<string> generos { get; set; }
+        }
+
+
+
+
+        //PARTE PARA LA IMAGEN PRINCIPAL
+        private void CargarImagenPrincipal()
+        {
+            string source = "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/header.jpg";
+
+            Image imagenPrincipal = new Image
+            {
+                Source = new BitmapImage(new Uri(source)),
+                Stretch = Stretch.UniformToFill,
+                Margin = new Thickness(0)
+            };
+
+            panelImagenPrincipalJuego.Children.Add(imagenPrincipal);
+        }
+
+        //PARTE PARA EL TEXTO DEL PRECIO
+        private void CargarPrecio()
+        {
+            string precio = "Free to play";
+
+            textoPrecio.Text = precio;
+            textoPrecio.Foreground = AppTheme.Actual.TextoPrincipal;
+            textoPrecio.FontSize = 22;
+            textoPrecio.FontWeight = FontWeights.Bold;
+
+        }
+
+        //PARTE PARA EL BOTON DE COMPRA
+        private void CargarBotonCompra()
+        {
+            string textoBoton = "AÑADIR A BIBLIOTECA";
+
+            botonCompra.Content = textoBoton;
+            botonCompra.Height = 40;
+
+        }
+
+        //PARTE PARA LA DESCRIPCCION CORTA
+        private void CargarDescripccionCorta()
+        {
+            // Contenido HTML recibido
+            string htmlContent = "For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. This is Counter-Strike 2.";
+
+            // Convertir los saltos de línea "<br>" a "\n" y las listas "<ul>" a un formato adecuado
+            string formattedText = htmlContent.Replace("<br>", "\n").Replace("<ul class=\"bb_ul\">", "").Replace("</ul>", "").Replace("<li>", "   • ").Replace("</li>", "\n");
+
+            // Mostrar el texto formateado en el TextBlock
+            textDescripccionCorta.Text = formattedText;
+            textDescripccionCorta.Foreground = AppTheme.Actual.TextoPrincipal;
+
+        }
+
+        //PARTE PARA LA FECHA DE LANZAMIENTO CORTA
+        private void CargarFechaLanzamiento()
+        {
+            // Contenido HTML recibido
+            string fechaLanzamiento = "12 AUG, 2023";
+
+            //MOSTRAR TEXTOS
+            textLanzamiento.Text = "Fecha de lanzamiento: ";
+            textLanzamiento.Foreground = AppTheme.Actual.TextoPrincipal;
+
+            textFechaLanzamiento.Text += fechaLanzamiento;
+            textFechaLanzamiento.Foreground = AppTheme.Actual.TextoPrincipal;
+
+        }
+
+        //PARTE PARA LA FECHA DE LANZAMIENTO CORTA
+        private void CargarDesarrolador()
+        {
+            // Contenido HTML recibido
+            string desarrolador = "Valve";
+
+            //MOSTRAR TEXTOS
+            textEtiquetaDesarrollador.Text = "Desarrollador: ";
+            textEtiquetaDesarrollador.Foreground = AppTheme.Actual.TextoPrincipal;
+
+            textDesarrollador.Text += desarrolador;
+            textDesarrollador.Foreground = AppTheme.Actual.TextoPrincipal;
+
+        }
+
     }
 }
