@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cliente_TFG.Classes;
 using Cliente_TFG.Pages;
 using Cliente_TFG.UserControls;
 
@@ -25,6 +26,7 @@ namespace Cliente_TFG
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = AppTheme.Actual;
 
             Cabecera_top.BibliotecaPresionado += boton_biblioteca_presionado;
             Cabecera_top.TiendaPresionado += boton_tienda_presionado;

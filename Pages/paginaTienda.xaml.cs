@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cliente_TFG.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Policy;
@@ -25,14 +26,15 @@ namespace Cliente_TFG.Pages
 
         private string[] imagenesCarrusel;
         private int indiceActual = 0;
+
+        /*
         private Brush colorRatonEncima = (Brush)new BrushConverter().ConvertFromString("#997878");
         private Brush colorTextBlock = (Brush)new BrushConverter().ConvertFromString("#533939");
+        */
 
         public paginaTienda()
         {
             InitializeComponent();
-
-            
 
             CargarCarrusel();
             CargarOfertas();
@@ -118,8 +120,8 @@ namespace Cliente_TFG.Pages
                     VerticalAlignment = VerticalAlignment.Center,
                     TextAlignment = TextAlignment.Right,
                     FontSize = 17,
-                    Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12"),
-                    Background = colorTextBlock
+                    Foreground = AppTheme.Actual.TextoPrecio,
+                    Background = AppTheme.Actual.FondoPanel
 
                 };
 
@@ -190,8 +192,8 @@ namespace Cliente_TFG.Pages
                     VerticalAlignment = VerticalAlignment.Center,
                     TextAlignment = TextAlignment.Right,
                     FontSize = 17,
-                    Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12"),
-                    Background = colorTextBlock,
+                    Foreground = AppTheme.Actual.TextoPrecio,
+                    Background = AppTheme.Actual.FondoPanel,
 
                 };
 
@@ -280,10 +282,10 @@ namespace Cliente_TFG.Pages
                 {
                     Content = "Half-Life 2\nAcción, Ciencia ficción",
                     FontSize = 16,
-                    Foreground = Brushes.White,
+                    Foreground = AppTheme.Actual.TextoPrincipal,
                     HorizontalContentAlignment = HorizontalAlignment.Left,
                     VerticalContentAlignment = VerticalAlignment.Center,
-                    Background = colorTextBlock,
+                    Background = AppTheme.Actual.FondoPanel,
                     Padding = new Thickness(10, 0, 0, 0)
                 };
                 Grid.SetColumn(textoContenido, 1);
@@ -296,8 +298,8 @@ namespace Cliente_TFG.Pages
                     FontSize = 16,
                     HorizontalContentAlignment = HorizontalAlignment.Left,
                     VerticalContentAlignment = VerticalAlignment.Center,
-                    Background = (Brush)new BrushConverter().ConvertFromString("#533939"),
-                    Foreground = (Brush)new BrushConverter().ConvertFromString("#baee12")
+                    Background = AppTheme.Actual.FondoPanel,
+                    Foreground = AppTheme.Actual.TextoPrecio,
                 };
                 Grid.SetColumn(textoPrecio, 2);
                 filaGrid.Children.Add(textoPrecio);
@@ -308,13 +310,13 @@ namespace Cliente_TFG.Pages
                 //EVENTO MOUSE ENTER Y EXIT PARA ESTE STACKPANEL
                 filaGrid.MouseEnter += (s, e) =>
                 {
-                    textoContenido.Background = colorRatonEncima;
-                    textoPrecio.Background = colorRatonEncima;
+                    textoContenido.Background = AppTheme.Actual.RatonEncima;
+                    textoPrecio.Background = AppTheme.Actual.RatonEncima;
                 };
                 filaGrid.MouseLeave += (s, e) =>
                 {
-                    textoContenido.Background = colorTextBlock;
-                    textoPrecio.Background = colorTextBlock;
+                    textoContenido.Background = AppTheme.Actual.FondoPanel;
+                    textoPrecio.Background = AppTheme.Actual.FondoPanel;
                 };
 
 
@@ -333,19 +335,75 @@ namespace Cliente_TFG.Pages
         private void JuegoClick(object sender, MouseButtonEventArgs e)
         {
             MessageBox.Show("¡Has hecho clic en el Grid!");
+            AppTheme.Alternar();
+            RefrescarTemas(); // ACTUALIZA LOS COLORES AL CAMBIAR EL TEMA
         }
 
         //EVENTO ENTER
         private void JuegoEnter(object sender, MouseEventArgs e, TextBlock textoPrecio)
         {
-            textoPrecio.Background = colorRatonEncima;
+            textoPrecio.Background = AppTheme.Actual.RatonEncima;
         }
 
         //EVENTO EXIT
         private void JuegoExit(object sender, MouseEventArgs e, TextBlock textoPrecio)
         {
-            textoPrecio.Background = colorTextBlock;
+            textoPrecio.Background = AppTheme.Actual.FondoPanel;
         }
+
+        private void RefrescarTemas()
+        {
+            // REFRESCA PANEL DE OFERTAS ESPECIALES
+            foreach (var child in panelOfertasEspaciales.Children)
+            {
+                if (child is StackPanel stack)
+                {
+                    if (stack.Children.OfType<TextBlock>().FirstOrDefault() is TextBlock textoPrecio)
+                    {
+                        textoPrecio.Foreground = AppTheme.Actual.TextoPrecio;
+                        textoPrecio.Background = AppTheme.Actual.FondoPanel;
+                    }
+                }
+            }
+
+            // REFRESCA PANEL DE OFERTAS ESPECÍFICAS
+            foreach (var child in panelOfertaEspecifica.Children)
+            {
+                if (child is StackPanel stack)
+                {
+                    if (stack.Children.OfType<TextBlock>().FirstOrDefault() is TextBlock textoPrecio)
+                    {
+                        textoPrecio.Foreground = AppTheme.Actual.TextoPrecio;
+                        textoPrecio.Background = AppTheme.Actual.FondoPanel;
+                    }
+                }
+            }
+
+            // REFRESCA PANEL DE NUEVOS LANZAMIENTOS
+            foreach (var child in panelNuevosLanzamientos.Children)
+            {
+                if (child is Grid filaGrid)
+                {
+                    foreach (var elem in filaGrid.Children)
+                    {
+                        if (elem is Label lbl)
+                        {
+                            if (lbl.Content?.ToString()?.Contains("€") == true) // Es el precio
+                            {
+                                lbl.Background = AppTheme.Actual.FondoPanel;
+                                lbl.Foreground = AppTheme.Actual.TextoPrecio;
+                            }
+                            else // Es el contenido
+                            {
+                                lbl.Background = AppTheme.Actual.FondoPanel;
+                                lbl.Foreground = AppTheme.Actual.TextoPrincipal;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
 
     }
