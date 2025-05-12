@@ -1,7 +1,9 @@
 ﻿using Cliente_TFG.Classes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +26,7 @@ namespace Cliente_TFG.Pages
     public partial class paginaTienda : Page
     {
 
-        private string[] imagenesCarrusel;
+        private List<string> imagenesCarrusel = new List<string>();
         private int indiceActual = 0;
 
         /*
@@ -43,41 +45,73 @@ namespace Cliente_TFG.Pages
         }
 
         //PARTE PARA EL CARRUSEL
-        private void CargarCarrusel()
+        private async void CargarCarrusel()
         {
-            imagenesCarrusel = new string[]
+            using (HttpClient client = new HttpClient())
             {
-                "https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_616x353.jpg",
-                "https://cdn.akamai.steamstatic.com/steam/apps/2669320/capsule_616x353.jpg",
-                "https://cdn.akamai.steamstatic.com/steam/apps/1451190/capsule_616x353.jpg"
-            };
+                try
+                {
+                    string json = await client.GetStringAsync("http://127.0.0.1:5000/store/carrusel");
+                    var juegos = JsonConvert.DeserializeObject<List<JuegoCarrusel>>(json);
 
-            //ASIGNA EVENTOS
-            BtnAnterior.Click += (s, e) =>
-            {
-                indiceActual = (indiceActual - 1 + imagenesCarrusel.Length) % imagenesCarrusel.Length;
-                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
-            };
+                    //FILTRA SOLO JUEGOS CON AL MENOS UNA IMAGEN
+                    foreach (var juego in juegos)
+                    {
+                        if (juego.capturas_miniatura != null && juego.capturas_miniatura.Count > 0)
+                        {
+                            imagenesCarrusel.Add("https://cdn.akamai.steamstatic.com/steam/apps/" + juego.app_id + "/capsule_616x353.jpg");
+                            //carruselTituloJuego.Text = juego.nombre;
+                        }
+                    }
 
-            BtnSiguiente.Click += (s, e) =>
-            {
-                indiceActual = (indiceActual + 1) % imagenesCarrusel.Length;
-                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
-            };
+                    if (imagenesCarrusel.Count == 0)
+                    {
+                        MessageBox.Show("No se encontraron imágenes en el carrusel.");
+                        return;
+                    }
 
+                    
 
-            //IMAGEN INICIAL
-            imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
+;
+                    //ASIGNA EVENTOS
+                    BtnAnterior.Click += (s, e) =>
+                    {
+                        indiceActual = (indiceActual - 1 + imagenesCarrusel.Count) % imagenesCarrusel.Count;
+                        imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
+                    };
 
-            //TIMER AUTOMÁTICO
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(5);
-            timer.Tick += (s, e) =>
-            {
-                indiceActual = (indiceActual + 1) % imagenesCarrusel.Length;
-                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
-            };
-            timer.Start();
+                    BtnSiguiente.Click += (s, e) =>
+                    {
+                        indiceActual = (indiceActual + 1) % imagenesCarrusel.Count;
+                        imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
+                    };
+
+                    //IMAGEN INICIAL
+                    imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
+
+                    //TIMER AUTOMÁTICO
+                    DispatcherTimer timer = new DispatcherTimer();
+                    timer.Interval = TimeSpan.FromSeconds(5);
+                    timer.Tick += (s, e) =>
+                    {
+                        indiceActual = (indiceActual + 1) % imagenesCarrusel.Count;
+                        imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
+                    };
+                    timer.Start();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al cargar el carrusel: {ex.Message}");
+                }
+            }
+        }
+
+        public class JuegoCarrusel
+        {
+            public int app_id { get; set; }
+            public List<string> capturas_miniatura { get; set; }
+            public bool f2p { get; set; }
+            public string nombre { get; set; }
         }
 
         //PARTE DE LAS OFERTES ESPECIALES
@@ -350,6 +384,9 @@ namespace Cliente_TFG.Pages
         {
             textoPrecio.Background = AppTheme.Actual.FondoPanel;
         }
+
+
+
 
         private void RefrescarTemas()
         {
