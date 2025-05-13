@@ -17,6 +17,7 @@ namespace Cliente_TFG.Classes
         private Brush textoSecundario;
         private Brush textoPrecio;
         private Brush ratonEncima;
+        private Brush fondoDescuento;
         private Brush fondoPanel;
 
         public Brush Fondo { get => fondo; set { fondo = value; OnPropertyChanged(); } }
@@ -24,6 +25,7 @@ namespace Cliente_TFG.Classes
         public Brush TextoPrecio { get => textoPrecio; set { textoPrecio = value; OnPropertyChanged(); } }
         public Brush TextoSecundario { get => textoSecundario; set { textoSecundario = value; OnPropertyChanged(); } }
         public Brush RatonEncima { get => ratonEncima; set { ratonEncima = value; OnPropertyChanged(); } }
+        public Brush FondoDescuento { get => fondoDescuento; set { fondoDescuento = value; OnPropertyChanged(); } }
         public Brush FondoPanel { get => fondoPanel; set { fondoPanel = value; OnPropertyChanged(); } }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -44,6 +46,7 @@ namespace Cliente_TFG.Classes
             TextoPrecio = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#baee12")),
             TextoSecundario = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CCCCCC")),
             RatonEncima = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#997878")),
+            FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4c6b22")),
             FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#533939"))
         };
 
@@ -54,6 +57,7 @@ namespace Cliente_TFG.Classes
             TextoPrecio = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#baee12")),
             TextoSecundario = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#333333")),
             RatonEncima = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D3BABA")),
+            FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4c6b22")),
             FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0"))
         };
 
@@ -72,6 +76,7 @@ namespace Cliente_TFG.Classes
             Actual.TextoPrecio = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#baee12"));
             Actual.TextoSecundario = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CCCCCC"));
             Actual.RatonEncima = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#997878"));
+            Actual.FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4c6b22"));
             Actual.FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#533939"));
         }
 
@@ -82,6 +87,7 @@ namespace Cliente_TFG.Classes
             Actual.TextoPrecio = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#baee12"));
             Actual.TextoSecundario = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#333333"));
             Actual.RatonEncima = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D3BABA"));
+            Actual.FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4c6b22"));
             Actual.FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0"));
         }
 

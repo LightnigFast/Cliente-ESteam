@@ -391,10 +391,14 @@ namespace Cliente_TFG.Pages
                 //TEXTO DEL DESCUENTO (IZQUIERDA)
                 TextBlock textoNombre = new TextBlock
                 {
-                    Text = descuentoOfertas[i] + "%",
+                    Text = "-" + descuentoOfertas[i] + "%",
                     FontSize = 15,
                     FontWeight = FontWeights.Bold,
-                    Foreground = AppTheme.Actual.TextoPrincipal,
+                    Foreground = AppTheme.Actual.TextoPrecio,
+                    Background = AppTheme.Actual.FondoDescuento,
+                    Width = 40,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Margin = new Thickness(0, 0, 10, 0),
                     VerticalAlignment = VerticalAlignment.Center,
                     TextTrimming = TextTrimming.CharacterEllipsis
                 };
@@ -405,7 +409,9 @@ namespace Cliente_TFG.Pages
                 {
                     Text = precioOfertas[i],
                     FontSize = 15,
-                    Foreground = AppTheme.Actual.TextoPrecio,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = AppTheme.Actual.TextoPrincipal,
+                    Padding = new Thickness(0, 0, 5, 0),
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Right
                 };
