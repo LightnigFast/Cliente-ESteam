@@ -27,7 +27,7 @@ namespace Cliente_TFG.Pages
     public partial class paginaTienda : Page
     {
 
-
+        //CARRUSEL
         private List<string> imagenesCarrusel = new List<string>();
         private List<List<string>> miniaturasCarrusel = new List<List<string>>();
         private List<string> nombresCarrusel = new List<string>();
@@ -35,21 +35,29 @@ namespace Cliente_TFG.Pages
         private DispatcherTimer carruselTimer;
         private int indiceActual = 0;
 
+        //OFERTAS
+        private List<string> imagenesOfertas = new List<string>();
+        private List<string> precioOfertas = new List<string>();
+        private List<string> descuentoOfertas = new List<string>();
 
         public paginaTienda()
         {
             InitializeComponent();
+            //CARGO LOS COLORES LO PRIMERO DE TODO
+            carruselTituloJuego.Foreground = AppTheme.Actual.TextoPrincipal;
+            carruselPrecioJuego.Foreground = AppTheme.Actual.TextoPrincipal;
 
-            CargarDatosJson();
+            CargarDatosJsonCarrusel();
+            CargarDatosJsonOfertas();
 
             //CargarCarrusel();
-            CargarOfertas();
+            //CargarOfertas();
             CargarOfertasDeterminadoPrecio();
             CargarNuevosLanzamientos();
         }
 
         //METODO PARA CARGAR LOS DATOS DEL JSON
-        private async void CargarDatosJson()
+        private async void CargarDatosJsonCarrusel()
         {
             using (HttpClient client = new HttpClient())
             {
@@ -65,7 +73,18 @@ namespace Cliente_TFG.Pages
                         if (juego.capturas_miniatura != null && juego.capturas_miniatura.Count > 0)
                         {
                             string imagenGrande = "https://cdn.akamai.steamstatic.com/steam/apps/" + juego.app_id + "/capsule_616x353.jpg";
-                            imagenesCarrusel.Add(imagenGrande);
+                            string fallback = juego.header_image;
+                            if (await ImagenExiste(imagenGrande))
+                            {
+                                imagenesCarrusel.Add(imagenGrande);
+                            }
+                            else
+                            {
+                                imagenesCarrusel.Add(fallback);
+                            }
+
+
+
                             miniaturasCarrusel.Add(juego.capturas_miniatura);
                             nombresCarrusel.Add(juego.nombre);
                             if (string.IsNullOrEmpty(juego.precio?.precio_inicial) || juego.precio.precio_inicial == "0")
@@ -161,8 +180,6 @@ namespace Cliente_TFG.Pages
             };
             */
 
-            carruselTituloJuego.Foreground = AppTheme.Actual.TextoPrincipal;
-            carruselPrecioJuego.Foreground = AppTheme.Actual.TextoPrincipal;
 
             //INICIALIZA TIMER SI NO EXISTE
             if (carruselTimer == null)
@@ -215,9 +232,9 @@ namespace Cliente_TFG.Pages
             carruselTituloJuego.Text = nombresCarrusel[indiceActual];
             carruselPrecioJuego.Text = precioCarrusel[indiceActual];
             CargarMiniaturas(indiceActual);
-            AplicarFadeIn(imagenTiendaGrande);
-            AplicarFadeIn(carruselTituloJuego);
-            AplicarFadeIn(carruselPrecioJuego);
+            //AplicarFadeIn(imagenTiendaGrande);
+            //AplicarFadeIn(carruselTituloJuego);
+            //AplicarFadeIn(carruselPrecioJuego);
 
             //INICIA EL TIMER
             carruselTimer.Start();
@@ -279,7 +296,23 @@ namespace Cliente_TFG.Pages
                 carruselMiniaturasImagenes.Children.Add(img);
             }
 
-            AplicarFadeIn(carruselMiniaturasImagenes);
+            //AplicarFadeIn(carruselMiniaturasImagenes);
+        }
+
+        private async Task<bool> ImagenExiste(string url)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    var response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Head, url));
+                    return response.IsSuccessStatusCode;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
         }
 
 
@@ -295,6 +328,7 @@ namespace Cliente_TFG.Pages
             public List<string> capturas_miniatura { get; set; }
             public bool f2p { get; set; }
             public string nombre { get; set; }
+            public string header_image { get; set; }
             public Precio precio { get; set; }
         }
 
@@ -304,9 +338,16 @@ namespace Cliente_TFG.Pages
             public List<JuegoCarrusel> juegos { get; set; }
         }
 
+
+
+
+
+
         //PARTE DE LAS OFERTES ESPECIALES
         private void CargarOfertas()
         {
+            
+            /*
             string[] urls = new string[]
             {
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/23400/header.jpg",
@@ -316,12 +357,11 @@ namespace Cliente_TFG.Pages
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/header.jpg",
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/header.jpg"
             };
+            */
 
             int columnas = 3;
 
-
-
-            for (int i = 0; i < urls.Length; i++)
+            for (int i = 0; i < imagenesOfertas.Count; i++)
             {
                 int row = i / columnas;
                 int col = i % columnas;
@@ -329,32 +369,58 @@ namespace Cliente_TFG.Pages
                 //CREO LA IMAGEN
                 Image img = new Image
                 {
-                    Source = new BitmapImage(new Uri(urls[i])),
+                    Source = new BitmapImage(new Uri(imagenesOfertas[i])),
                     Stretch = Stretch.UniformToFill,
                     Height = 160,
                     Margin = new Thickness(0)
                 };
 
-                //TEXTO DEL PRECIO
-                TextBlock textoPrecio = new TextBlock
+                //CREA UN GRID CON DOS COLUMNAS
+                Grid infoHorizontal = new Grid
                 {
-                    Text = "15,99" + "€ ",
-                    Height = 25,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    TextAlignment = TextAlignment.Right,
-                    FontSize = 17,
-                    Foreground = AppTheme.Actual.TextoPrecio,
-                    Background = AppTheme.Actual.FondoPanel
-
+                    Background = AppTheme.Actual.FondoPanel,
+                    Margin = new Thickness(0, 0, 0, 0),
+                    Height = 30,
                 };
 
-                //STACKPANEL PARA METER LA IMAGEN Y EL PRECIO
-                Thickness margen;
+                //DEFINICIÓN DE COLUMNAS
+                infoHorizontal.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); //Nombre
+                infoHorizontal.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); //Precio
 
-                if (col == 0) //primera columna
+                //TEXTO DEL DESCUENTO (IZQUIERDA)
+                TextBlock textoNombre = new TextBlock
+                {
+                    Text = descuentoOfertas[i] + "%",
+                    FontSize = 15,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = AppTheme.Actual.TextoPrincipal,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextTrimming = TextTrimming.CharacterEllipsis
+                };
+                Grid.SetColumn(textoNombre, 0);
+
+                //TEXTO DEL PRECIO (DERECHA)
+                TextBlock textoPrecio = new TextBlock
+                {
+                    Text = precioOfertas[i],
+                    FontSize = 15,
+                    Foreground = AppTheme.Actual.TextoPrecio,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Right
+                };
+                Grid.SetColumn(textoPrecio, 1);
+
+                //AÑADE LOS TEXTBLOCK AL GRID
+                infoHorizontal.Children.Add(textoNombre);
+                infoHorizontal.Children.Add(textoPrecio);
+
+
+                //CONTENEDOR VERTICAL GENERAL
+                Thickness margen;
+                if (col == 0)
                     margen = new Thickness(0, 0, 5, 0);
-                else if (col == columnas - 1) //última columna
+                else if (col == columnas - 1)
                     margen = new Thickness(5, 0, 0, 0);
                 else
                     margen = new Thickness(5, 0, 5, 0);
@@ -366,21 +432,89 @@ namespace Cliente_TFG.Pages
                 };
 
                 contenedor.Children.Add(img);
-                contenedor.Children.Add(textoPrecio);
+                contenedor.Children.Add(infoHorizontal);
 
-                //EVENTO DE CLICK
+                //EVENTOS
                 contenedor.MouseLeftButtonDown += JuegoClick;
-
-                //EVENTO MOUSE ENTER Y EXIT PARA ESTE STACKPANEL
-                contenedor.MouseEnter += (s, e) => JuegoEnter(s, e, textoPrecio);
-                contenedor.MouseLeave += (s, e) => JuegoExit(s, e, textoPrecio);
+                contenedor.MouseEnter += (s, e) => JuegoEnterOferta(s, e, infoHorizontal);
+                contenedor.MouseLeave += (s, e) => JuegoExitOferta(s, e, infoHorizontal);
 
                 Grid.SetRow(contenedor, row);
                 Grid.SetColumn(contenedor, col);
                 panelOfertasEspaciales.Children.Add(contenedor);
+                AplicarFadeIn(contenedor);
             }
-
         }
+
+        private async void CargarDatosJsonOfertas()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    string json = await client.GetStringAsync("http://127.0.0.1:5000/store/ofertas");
+                    var response = JsonConvert.DeserializeObject<CarruselResponseOferta>(json);
+
+
+                    foreach (var juegoOferta in response.juegos)
+                    {
+                        imagenesOfertas.Add(juegoOferta.header_image);
+                        if (string.IsNullOrEmpty(juegoOferta.precio?.precio_inicial) || juegoOferta.precio.precio_inicial == "0")
+                        {
+                            precioCarrusel.Add("Free To Play");
+                        }
+                        else
+                        {
+
+                            double precioEuros = double.Parse(juegoOferta.precio.precio_inicial) / 100.0;
+                            double descuento = double.Parse(juegoOferta.precio.descuento);
+                            double precioFinal = precioEuros * (1 - (descuento / 100.0));
+
+                            precioOfertas.Add(precioFinal.ToString("0.00") + " € ");
+                            descuentoOfertas.Add(descuento.ToString());
+                        }
+                        
+                    }
+
+                    if (imagenesOfertas.Count == 0)
+                    {
+                        MessageBox.Show("No se encontraron imágenes para las ofertas.");
+                    }
+                    else
+                    {
+                        //SI AL MENOS UNA IMAGEN ESTA DISPONIBLE, MUESTRO LAS OFERTAS
+                        CargarOfertas();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al cargar datos del carrusel: {ex.Message}");
+                }
+            }
+        }
+
+        public class CarruselResponseOferta
+        {
+            public List<JuegoOferta> juegos { get; set; }
+        }
+
+        public class JuegoOferta
+        {
+            public int app_id { get; set; }
+            public string header_image { get; set; }
+            public string nombre { get; set; }
+            public PrecioOferta precio { get; set; }
+        }
+
+        public class PrecioOferta
+        {
+            public string descuento { get; set; }
+            public string precio_inicial { get; set; }
+        }
+
+
+
+
 
         //PARTE PARA LAS OFERTAS ESPECIFICAS
         private void CargarOfertasDeterminadoPrecio()
@@ -575,7 +709,17 @@ namespace Cliente_TFG.Pages
             textoPrecio.Background = AppTheme.Actual.FondoPanel;
         }
 
+        //EVENTO ENTER
+        private void JuegoEnterOferta(object sender, MouseEventArgs e, Grid stackHorizontal)
+        {
+            stackHorizontal.Background = AppTheme.Actual.RatonEncima;
+        }
 
+        //EVENTO EXIT
+        private void JuegoExitOferta(object sender, MouseEventArgs e, Grid stackHorizontal)
+        {
+            stackHorizontal.Background = AppTheme.Actual.FondoPanel;
+        }
 
 
         private void RefrescarTemas()
