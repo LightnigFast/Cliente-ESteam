@@ -46,6 +46,9 @@ namespace Cliente_TFG.Pages
             //CARGO LOS COLORES LO PRIMERO DE TODO
             carruselTituloJuego.Foreground = AppTheme.Actual.TextoPrincipal;
             carruselPrecioJuego.Foreground = AppTheme.Actual.TextoPrincipal;
+            
+            //DESHABILITAR ESTO PARA EVITAR ERRORES EN LA CARGA DEL PRORGAMA
+            carruselMiniaturasImagenes.IsEnabled = false;
 
             CargarDatosJsonCarrusel();
             CargarDatosJsonOfertas();
@@ -199,7 +202,9 @@ namespace Cliente_TFG.Pages
 
                 };
             }
-
+            //VUELVO A ACTIVARLO PARA QUE FUNCIONEN LOS EVENTOS
+            carruselMiniaturasImagenes.IsEnabled = true;
+            
             //ASIGNA EVENTOS
             BtnAnterior.Click += (s, e) =>
             {
@@ -292,10 +297,9 @@ namespace Cliente_TFG.Pages
                     AplicarFadeIn(imagenTiendaGrande);
                     carruselTimer.Start();
                 };
-
+                
                 carruselMiniaturasImagenes.Children.Add(img);
             }
-
             //AplicarFadeIn(carruselMiniaturasImagenes);
         }
 
