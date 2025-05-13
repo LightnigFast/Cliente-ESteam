@@ -49,10 +49,13 @@
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
                 
                 <!--Botón izquierdo-->
-                <Button Name="BtnAnterior" Grid.Column="0" Content="◀" Width="40" Height="30" VerticalAlignment="Center" Margin="10,0"/>
+                <Button Name="BtnAnterior" Content="◀" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>
+                
+                <!--PANEL PARA LOS BOTONES QUE TE SERVIRAN PARA IR A UN JUEGO DEL CARRUSEL-->
+                <StackPanel x:Name="botonesCarrusel" Orientation="Horizontal" VerticalAlignment="Center" Margin="5"/>
 
                 <!--Botón derecho-->
-                <Button x:Name="BtnSiguiente" Grid.Column="1" Content="▶" Width="40" Height="30" VerticalAlignment="Center" Margin="10,0"/>
+                <Button x:Name="BtnSiguiente" Content="▶" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>
             </StackPanel>
 
 

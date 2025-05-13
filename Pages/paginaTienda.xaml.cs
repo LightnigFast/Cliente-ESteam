@@ -95,6 +95,39 @@ namespace Cliente_TFG.Pages
                                 AplicarFadeIn(carruselPrecioJuego);
                             }
                         }
+
+                        //CREO LOS BOTONES PARA NAVEGAR POR EL CARRUSEL
+                        int index = imagenesCarrusel.Count - 1; //ÍNDICE ACTUAL DEL JUEGO QUE ACABO DE AÑADIR
+                        Button btn = new Button
+                        {
+                            //Content = (index + 1).ToString(),
+                            Margin = new Thickness(2),
+                            Padding = new Thickness(5),
+                            Width = 30,
+                            Height = 20,
+                            FontSize = 18,
+                            Background = Brushes.Transparent,
+                            Foreground = AppTheme.Actual.TextoPrincipal,
+                            BorderBrush = AppTheme.Actual.TextoPrincipal,
+                            Cursor = Cursors.Hand
+                        };
+
+                        //EVENTO CLICK PARA NAVEGAR A ESE JUEGO
+                        btn.Click += (s, e) =>
+                        {
+                            indiceActual = index;
+                            imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[index]));
+                            carruselTituloJuego.Text = nombresCarrusel[index];
+                            carruselPrecioJuego.Text = precioCarrusel[index];
+                            CargarMiniaturas(index);
+                            AplicarFadeIn(imagenTiendaGrande);
+                            AplicarFadeIn(carruselTituloJuego);
+                            AplicarFadeIn(carruselPrecioJuego);
+                            ReiniciarTimer();
+                        };
+
+                        botonesCarrusel.Children.Add(btn);
+
                     }
 
                     if (imagenesCarrusel.Count == 0)
@@ -222,14 +255,33 @@ namespace Cliente_TFG.Pages
                 {
                     Source = new BitmapImage(new Uri(miniatura)),
                     Stretch = System.Windows.Media.Stretch.Uniform,
-                    Height = 110, 
-                    Margin = new Thickness(5)
+                    Height = 110,
+                    Margin = new Thickness(5),
+                    Cursor = Cursors.Hand
                 };
-                carruselMiniaturasImagenes.Children.Add(img);
-                AplicarFadeIn(carruselMiniaturasImagenes);
 
+                //EVENTO PARA CAMBIAR LA IMAGEN GRANDE AL PASAR EL RATÓN
+                img.MouseEnter += (s, e) =>
+                {
+                    imagenTiendaGrande.Source = new BitmapImage(new Uri(miniatura));
+                    AplicarFadeIn(imagenTiendaGrande);
+                    carruselTimer.Stop();
+                };
+
+                //EVENTO PARA VOLVER A LA IMAGEN DEL CARRUSEL AL SALIR
+                img.MouseLeave += (s, e) =>
+                {
+                    imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceJuego]));
+                    AplicarFadeIn(imagenTiendaGrande);
+                    carruselTimer.Start();
+                };
+
+                carruselMiniaturasImagenes.Children.Add(img);
             }
+
+            AplicarFadeIn(carruselMiniaturasImagenes);
         }
+
 
         public class Precio
         {
