@@ -18,7 +18,7 @@
             <!--GRID PARA JUEGOS DESTACADOS-->
             <Grid Name="panelJuegosDestacados" Background="Transparent" Width="1150" Height="366" VerticalAlignment="Top" Margin="0,70,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="6*"/>
                     <ColumnDefinition Width="4*"/>
                 </Grid.ColumnDefinitions>
 
@@ -34,12 +34,14 @@
                     </Grid.RowDefinitions>
 
                     <!--TITULO DEL JUEGO-->
-                    <TextBlock x:Name="carruselTituloJuego" Grid.Row="0" Height="70" Background="Red"/>
+                    <TextBlock x:Name="carruselTituloJuego" Grid.Row="0" Height="70" FontSize="22" FontWeight="Bold" Background="Transparent"
+                               VerticalAlignment="Center" Padding="20"/>
 
-                    <WrapPanel Name="carruselImagenes" Grid.Row="1" Background="Blue"/>
+                    <WrapPanel Name="carruselMiniaturasImagenes" Grid.Row="1" HorizontalAlignment="Left" Margin="20,0,0,0" Background="Transparent"/>
 
                     <!--PRECIO DEL JUEGO-->
-                    <TextBlock x:Name="carruselPrecioJuego" Grid.Row="2" Height="50" Background="Yellow"/>
+                    <TextBlock x:Name="carruselPrecioJuego" Grid.Row="2" Height="50" Margin="0,0,20,0" Padding="20" Background="Transparent"
+                               VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="22" FontWeight="Bold"/>
                 </Grid>
             </Grid>
 

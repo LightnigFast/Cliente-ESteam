@@ -13,6 +13,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -26,17 +27,14 @@ namespace Cliente_TFG.Pages
     public partial class paginaTienda : Page
     {
 
-        private string[] imagenesCarrusel;
 
-        private List<string> imagenesCarrusel2 = new List<string>();
+        private List<string> imagenesCarrusel = new List<string>();
+        private List<List<string>> miniaturasCarrusel = new List<List<string>>();
         private List<string> nombresCarrusel = new List<string>();
+        private List<string> precioCarrusel = new List<string>();
         private DispatcherTimer carruselTimer;
         private int indiceActual = 0;
 
-        /*
-        private Brush colorRatonEncima = (Brush)new BrushConverter().ConvertFromString("#997878");
-        private Brush colorTextBlock = (Brush)new BrushConverter().ConvertFromString("#533939");
-        */
 
         public paginaTienda()
         {
@@ -58,25 +56,54 @@ namespace Cliente_TFG.Pages
                 try
                 {
                     string json = await client.GetStringAsync("http://127.0.0.1:5000/store/carrusel");
-                    var juegos = JsonConvert.DeserializeObject<List<JuegoCarrusel>>(json);
+                    var response = JsonConvert.DeserializeObject<CarruselResponse>(json);
 
-                    imagenesCarrusel2.Clear();
+                    bool primeraImagenCargada = false;
 
-                    foreach (var juego in juegos)
+                    foreach (var juego in response.juegos)
                     {
                         if (juego.capturas_miniatura != null && juego.capturas_miniatura.Count > 0)
                         {
-                            imagenesCarrusel2.Add(juego.capturas_miniatura[0]);
+                            string imagenGrande = "https://cdn.akamai.steamstatic.com/steam/apps/" + juego.app_id + "/capsule_616x353.jpg";
+                            imagenesCarrusel.Add(imagenGrande);
+                            miniaturasCarrusel.Add(juego.capturas_miniatura);
                             nombresCarrusel.Add(juego.nombre);
+                            if (string.IsNullOrEmpty(juego.precio?.precio_inicial) || juego.precio.precio_inicial == "0")
+                            {
+                                precioCarrusel.Add("Free To Play");
+                            }
+                            else
+                            {
+                                double precioEuros = double.Parse(juego.precio.precio_inicial) / 100.0;
+                                precioCarrusel.Add(precioEuros.ToString("0.00") + " €");
+                            }
+
+
+
+                            //MUESTRO LA PRIMERA IMAGEN INMEDIATAMENTE NADA MAS TENENRLA
+                            if (!primeraImagenCargada)
+                            {
+                                //SIGNO LA PRIMERA IAMGEN Y EL TITULO
+                                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[0]));
+                                carruselTituloJuego.Text = nombresCarrusel[0];
+                                carruselPrecioJuego.Text = precioCarrusel[0];
+                                CargarMiniaturas(indiceActual);
+
+                                primeraImagenCargada = true;
+                                AplicarFadeIn(imagenTiendaGrande);
+                                AplicarFadeIn(carruselTituloJuego);
+                                AplicarFadeIn(carruselPrecioJuego);
+                            }
                         }
                     }
 
-                    if (imagenesCarrusel2.Count == 0)
+                    if (imagenesCarrusel.Count == 0)
                     {
                         MessageBox.Show("No se encontraron imágenes en el carrusel.");
                     }
                     else
                     {
+                        //SI AL MENOS UNA IMAGEN ESTA DISPONIBLE, MUESTRO EL CARRUSEL
                         CargarCarrusel();
                     }
                 }
@@ -88,49 +115,76 @@ namespace Cliente_TFG.Pages
         }
 
 
+
         //PARTE PARA EL CARRUSEL
         private void CargarCarrusel()
         {
+            /*
             imagenesCarrusel = new string[]
             {
                 "https://cdn.akamai.steamstatic.com/steam/apps/2488620/capsule_616x353.jpg",
                 "https://cdn.akamai.steamstatic.com/steam/apps/2669320/capsule_616x353.jpg",
                 "https://cdn.akamai.steamstatic.com/steam/apps/1451190/capsule_616x353.jpg"
             };
+            */
+
+            carruselTituloJuego.Foreground = AppTheme.Actual.TextoPrincipal;
+            carruselPrecioJuego.Foreground = AppTheme.Actual.TextoPrincipal;
 
             //INICIALIZA TIMER SI NO EXISTE
             if (carruselTimer == null)
             {
                 carruselTimer = new DispatcherTimer();
-                carruselTimer.Interval = TimeSpan.FromSeconds(5);
+                carruselTimer.Interval = TimeSpan.FromSeconds(7);
                 carruselTimer.Tick += (s, e) =>
                 {
-                    indiceActual = (indiceActual + 1) % imagenesCarrusel2.Count;
-                    imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel2[indiceActual]));
+                    indiceActual = (indiceActual + 1) % imagenesCarrusel.Count;
+                    imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
                     carruselTituloJuego.Text = nombresCarrusel[indiceActual];
+                    carruselPrecioJuego.Text = precioCarrusel[indiceActual];
+                    CargarMiniaturas(indiceActual);
+                    AplicarFadeIn(imagenTiendaGrande);
+                    AplicarFadeIn(carruselTituloJuego);
+                    AplicarFadeIn(carruselPrecioJuego);
+
                 };
             }
 
             //ASIGNA EVENTOS
             BtnAnterior.Click += (s, e) =>
             {
-                indiceActual = (indiceActual - 1 + imagenesCarrusel2.Count) % imagenesCarrusel2.Count;
-                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel2[indiceActual]));
+                indiceActual = (indiceActual - 1 + imagenesCarrusel.Count) % imagenesCarrusel.Count;
+                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
                 carruselTituloJuego.Text = nombresCarrusel[indiceActual];
+                carruselPrecioJuego.Text = precioCarrusel[indiceActual];
+                CargarMiniaturas(indiceActual);
+                AplicarFadeIn(imagenTiendaGrande);
+                AplicarFadeIn(carruselTituloJuego);
+                AplicarFadeIn(carruselPrecioJuego);
                 ReiniciarTimer();
             };
 
             BtnSiguiente.Click += (s, e) =>
             {
-                indiceActual = (indiceActual + 1) % imagenesCarrusel2.Count;
-                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel2[indiceActual]));
+                indiceActual = (indiceActual + 1) % imagenesCarrusel.Count;
+                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
                 carruselTituloJuego.Text = nombresCarrusel[indiceActual];
+                carruselPrecioJuego.Text = precioCarrusel[indiceActual];
+                CargarMiniaturas(indiceActual);
+                AplicarFadeIn(imagenTiendaGrande);
+                AplicarFadeIn(carruselTituloJuego);
+                AplicarFadeIn(carruselPrecioJuego);
                 ReiniciarTimer();
             };
 
             //IMAGEN INICIAL
-            imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel2[indiceActual]));
+            imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceActual]));
             carruselTituloJuego.Text = nombresCarrusel[indiceActual];
+            carruselPrecioJuego.Text = precioCarrusel[indiceActual];
+            CargarMiniaturas(indiceActual);
+            AplicarFadeIn(imagenTiendaGrande);
+            AplicarFadeIn(carruselTituloJuego);
+            AplicarFadeIn(carruselPrecioJuego);
 
             //INICIA EL TIMER
             carruselTimer.Start();
@@ -143,12 +197,59 @@ namespace Cliente_TFG.Pages
             carruselTimer.Start();
         }
 
+        //METODO PARA QUE TODO SE VEA MAS NATURAL CON UNA TRASICION FADEIN
+        private void AplicarFadeIn(UIElement elemento)
+        {
+            var fadeIn = new DoubleAnimation
+            {
+                From = 0,
+                To = 1,
+                Duration = TimeSpan.FromMilliseconds(500),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
+            elemento.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+        }
+
+
+        //CARGO LAS IMAGENES DE LAS MINIATURAS
+        private void CargarMiniaturas(int indiceJuego)
+        {
+            carruselMiniaturasImagenes.Children.Clear();
+
+            foreach (var miniatura in miniaturasCarrusel[indiceJuego])
+            {
+                Image img = new Image
+                {
+                    Source = new BitmapImage(new Uri(miniatura)),
+                    Stretch = System.Windows.Media.Stretch.Uniform,
+                    Height = 110, 
+                    Margin = new Thickness(5)
+                };
+                carruselMiniaturasImagenes.Children.Add(img);
+                AplicarFadeIn(carruselMiniaturasImagenes);
+
+            }
+        }
+
+        public class Precio
+        {
+            public string descuento { get; set; }
+            public string precio_inicial { get; set; }
+        }
+
         public class JuegoCarrusel
         {
             public int app_id { get; set; }
             public List<string> capturas_miniatura { get; set; }
             public bool f2p { get; set; }
             public string nombre { get; set; }
+            public Precio precio { get; set; }
+        }
+
+        //NUEVA CLASE CONTENEDORA
+        public class CarruselResponse
+        {
+            public List<JuegoCarrusel> juegos { get; set; }
         }
 
         //PARTE DE LAS OFERTES ESPECIALES
