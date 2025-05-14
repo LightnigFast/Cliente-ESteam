@@ -26,6 +26,7 @@ namespace Cliente_TFG.Pages
     /// </summary>
     public partial class paginaTienda : Page
     {
+        private MainWindow ventanaPrincipal;
 
         //CARRUSEL
         private List<string> imagenesCarrusel = new List<string>();
@@ -40,13 +41,15 @@ namespace Cliente_TFG.Pages
         private List<string> precioOfertas = new List<string>();
         private List<string> descuentoOfertas = new List<string>();
 
-        public paginaTienda()
+        public paginaTienda(MainWindow mainWindow)
         {
             InitializeComponent();
             //CARGO LOS COLORES LO PRIMERO DE TODO
             carruselTituloJuego.Foreground = AppTheme.Actual.TextoPrincipal;
             carruselPrecioJuego.Foreground = AppTheme.Actual.TextoPrincipal;
-            
+
+            ventanaPrincipal = mainWindow;
+
             //DESHABILITAR ESTO PARA EVITAR ERRORES EN LA CARGA DEL PRORGAMA
             carruselMiniaturasImagenes.IsEnabled = false;
 
@@ -112,9 +115,11 @@ namespace Cliente_TFG.Pages
                                 CargarMiniaturas(indiceActual);
 
                                 primeraImagenCargada = true;
+                                
                                 AplicarFadeIn(imagenTiendaGrande);
                                 AplicarFadeIn(carruselTituloJuego);
                                 AplicarFadeIn(carruselPrecioJuego);
+                                panelJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
                             }
                         }
 
@@ -204,8 +209,26 @@ namespace Cliente_TFG.Pages
             }
             //VUELVO A ACTIVARLO PARA QUE FUNCIONEN LOS EVENTOS
             carruselMiniaturasImagenes.IsEnabled = true;
-            
+
             //ASIGNA EVENTOS
+            panelJuegosDestacados.MouseDown += async (s, e) =>
+            {
+                var paginaJuegoTienda = new paginaJuegoTienda();
+                await AplicarFadeOutAsync(panelJuegosDestacados);
+                ventanaPrincipal.framePrincipal.Navigate(paginaJuegoTienda);
+            };
+
+
+            panelJuegosDestacados.MouseEnter += (s, e) =>
+            {
+                panelJuegosDestacados.Background = AppTheme.Actual.RatonEncima;
+            };
+
+            panelJuegosDestacados.MouseLeave += (s, e) =>
+            {
+                panelJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
+            };
+
             BtnAnterior.Click += (s, e) =>
             {
                 indiceActual = (indiceActual - 1 + imagenesCarrusel.Count) % imagenesCarrusel.Count;
@@ -263,6 +286,20 @@ namespace Cliente_TFG.Pages
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
             };
             elemento.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+        }
+
+        private async Task AplicarFadeOutAsync(UIElement elemento)
+        {
+            var fadeOut = new DoubleAnimation
+            {
+                From = 1,
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(500),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
+            elemento.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+
+            await Task.Delay(500); //ESPERA A QUE TERMINE LA ANIMACIÓN
         }
 
 

@@ -32,7 +32,15 @@ namespace Cliente_TFG
             Cabecera_top.TiendaPresionado += boton_tienda_presionado;
             Cabecera_top.AmigosPresionado += boton_amigos_presionado;
 
+            CargarPrimeraVentana();
 
+
+        }
+
+        private void CargarPrimeraVentana()
+        {
+            var paginaTienda = new paginaTienda(this);
+            framePrincipal.Navigate(paginaTienda);
         }
 
         private void boton_biblioteca_presionado(object sender, RoutedEventArgs e)
@@ -42,7 +50,7 @@ namespace Cliente_TFG
 
         private void boton_tienda_presionado(object sender, RoutedEventArgs e)
         {
-            framePrincipal.Navigate(new paginaTienda());
+            framePrincipal.Navigate(new paginaTienda(this));
         }
 
         private void boton_amigos_presionado(object sender, RoutedEventArgs e)

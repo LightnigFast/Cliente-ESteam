@@ -29,7 +29,7 @@
         <usercontrols:Cabezera x:Name="Cabecera_top" Grid.Row="0" Margin="0,0,0,0"/>
         
         <!--FRAME DONDE IRAN CAMBIANDO TODAS LAS PAGINAS DE NUESTRA APP, PONGO POR DEFECTO EL DE LA TIENDA-->
-        <Frame x:Name="framePrincipal" Grid.Row="1" Source="/Pages/paginaTienda.xaml" NavigationUIVisibility="Hidden" Background="Transparent"/>
+        <Frame x:Name="framePrincipal" Grid.Row="1"  NavigationUIVisibility="Hidden" Background="Transparent"/>
 
     </Grid>
 </Window>
