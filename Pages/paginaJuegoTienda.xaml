@@ -35,8 +35,9 @@
 
                 <!--GRID PARA LA DESCRIPCCION LARGA-->
                 <Grid x:Name="gridDescripccionLarga" Margin="0,50,0,0">
-                    <TextBlock Name="textDescripccionLarga" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="20"
-                               FontSize="13"/>
+                    
+
+                    <StackPanel x:Name="panelDescripcionLarga" Margin="10" />
                 </Grid>
                 
                 
@@ -57,7 +58,16 @@
                 <Grid x:Name="panelImagenPrincipalJuego" Margin="10,10,10,0" />
                 
                 <!--TEXTO CON EL PRECIO-->
-                <TextBlock x:Name="textoPrecio" Margin="0,20,0,0" Padding="10"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock x:Name="textoPrecio" Grid.Column="0" Margin="0,20,0,0" Padding="10"/>
+                    <TextBlock x:Name="textoDescuento" Grid.Column="1" Margin="10,20,0,0"/>
+                </Grid>
+                
                 
                 <!--BOTON PARA COMPRAR O AÑADIR A LA BIBLIOTECA-->
                 <Button x:Name="botonCompra" Margin="10,10,10,0" />

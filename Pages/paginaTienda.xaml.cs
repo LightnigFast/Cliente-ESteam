@@ -29,6 +29,7 @@ namespace Cliente_TFG.Pages
         private MainWindow ventanaPrincipal;
 
         //CARRUSEL
+        private List<int> appidCarrusel = new List<int>();
         private List<string> imagenesCarrusel = new List<string>();
         private List<List<string>> miniaturasCarrusel = new List<List<string>>();
         private List<string> nombresCarrusel = new List<string>();
@@ -89,7 +90,7 @@ namespace Cliente_TFG.Pages
                                 imagenesCarrusel.Add(fallback);
                             }
 
-
+                            appidCarrusel.Add(juego.app_id);
 
                             miniaturasCarrusel.Add(juego.capturas_miniatura);
                             nombresCarrusel.Add(juego.nombre);
@@ -213,7 +214,7 @@ namespace Cliente_TFG.Pages
             //ASIGNA EVENTOS
             panelJuegosDestacados.MouseDown += async (s, e) =>
             {
-                var paginaJuegoTienda = new paginaJuegoTienda();
+                var paginaJuegoTienda = new paginaJuegoTienda(ventanaPrincipal, appidCarrusel[indiceActual]);
                 await AplicarFadeOutAsync(panelJuegosDestacados);
                 ventanaPrincipal.framePrincipal.Navigate(paginaJuegoTienda);
             };

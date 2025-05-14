@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +17,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Cliente_TFG.Classes;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
+using static Cliente_TFG.Pages.paginaTienda;
 
 
 namespace Cliente_TFG.Pages
@@ -26,6 +29,9 @@ namespace Cliente_TFG.Pages
     /// </summary>
     public partial class paginaJuegoTienda : Page
     {
+        private MainWindow ventanaPrincipal;
+        private int appid;
+
         private int indiceActual = 0;
         private DispatcherTimer timerCarrusel;
         private List<Image> imagenesCarrusel = new List<Image>();
@@ -33,15 +39,36 @@ namespace Cliente_TFG.Pages
         private int imagenesCargadas = 0; //CONTADOR PARA LAS IMAGENES CARGADAS
         private bool animacionCompletada = false;
 
+        private List<string> miniaturas = new List<string>();
+        private List<string> categorias = new List<string>();
+        private List<string> generos = new List<string>();
+        private string desarrollador;
+        private string descripcionCorta;
+        private string descripcionDetallada;
+        private string fechaLanzamiento;
+        private string imagenCabecera;
+        private string nombreJuego;
+        private string descuento;
+        private string precioInicial;
 
-        public paginaJuegoTienda()
+
+
+        public paginaJuegoTienda(MainWindow ventanaPrincipal, int appid)
         {
             InitializeComponent();
+            this.ventanaPrincipal = ventanaPrincipal;
+            this.appid = appid;
 
-            //PARTE IZQUIERDA
-            CargarCarrusel();
-            CargarDescripccionLarga();
-            CargarCategoriasGeneros();
+            // LLAMADA ASÍNCRONA CORRECTA
+            _ = InicializarPaginaAsync();
+
+
+        }
+
+        private async Task InicializarPaginaAsync()
+        {
+            //CARGAR LOS DATOS
+            await CargarDatosJson();
 
             //PARTE DERECHA
             CargarImagenPrincipal();
@@ -51,11 +78,18 @@ namespace Cliente_TFG.Pages
             CargarFechaLanzamiento();
             CargarDesarrolador();
 
+            //PARTE IZQUIERDA
+            CargarCarrusel();
+            CargarDescripccionLarga();
+            CargarCategoriasGeneros();
+
+            
         }
 
         //PARTE DEL CARRUSEL
         private async void CargarCarrusel()
         {
+            /*
             string[] capturas = new string[]
             {
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/ss_796601d9d67faf53486eeb26d0724347cea67ddc.1920x1080.jpg?t=1729703045",
@@ -78,6 +112,7 @@ namespace Cliente_TFG.Pages
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/ss_18e9ea2715f0407ee05e206073927a648db60d73.1920x1080.jpg?t=1729703045",
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/ss_2514675f364079b754b820cbc8b2e7c331d56a26.1920x1080.jpg?t=1729703045"
             };
+            */
 
             //LIMPIO PRIMERO EL CONTENIDO POR SI ACASO
             
@@ -86,7 +121,7 @@ namespace Cliente_TFG.Pages
             imagenesCarrusel.Clear();
             
 
-            for (int i = 0; i < capturas.Length; i++)
+            for (int i = 0; i < miniaturas.Count; i++)
             {
                 // IMAGEN PRINCIPAL GRANDE DEL CARRUSEL
                 Image imagen = new Image
@@ -101,7 +136,7 @@ namespace Cliente_TFG.Pages
                 imagenesCarrusel.Add(imagen);
 
                 // Cargar imagen de forma asíncrona
-                var bitmap = await CargarImagenAsync(capturas[i]);
+                var bitmap = await CargarImagenAsync(miniaturas[i]);
                 imagen.Source = bitmap;
 
                 // IMAGENES DE LAS MINIATURAS
@@ -125,7 +160,7 @@ namespace Cliente_TFG.Pages
                 imagenesCargadas++;
 
                 //SI TODAS LAS IAMGENES SE HAN CARGADO, MUESTRO EL STACKPANEL DE LAS MINIATURAS
-                if (imagenesCargadas == capturas.Length || imagenesCargadas >= 6)
+                if (imagenesCargadas == miniaturas.Count || imagenesCargadas >= 6)
                 {
                     if (!animacionCompletada)
                     {
@@ -245,47 +280,104 @@ namespace Cliente_TFG.Pages
         //PARTE PARA LA DESCRIPCCION LARGA
         private void CargarDescripccionLarga()
         {
-            // Contenido HTML recibido
-            string htmlContent = "For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. This is Counter-Strike 2.<br><br>A free upgrade to CS:GO, Counter-Strike 2 marks the largest technical leap in Counter-Strike\u2019s history. Built on the Source 2 engine, Counter-Strike 2 is modernized with realistic physically-based rendering, state of the art networking, and upgraded Community Workshop tools.<br><br>In addition to the classic objective-focused gameplay that Counter-Strike pioneered in 1999, Counter-Strike 2 features:<br><br><ul class=\"bb_ul\"><li>All-new CS Ratings with the updated Premier mode<br></li><li>Global and Regional leaderboards<br></li><li>Upgraded and overhauled maps<br></li><li>Game-changing dynamic smoke grenades<br></li><li>Tick-rate-independent gameplay<br></li><li>Redesigned visual effects and audio<br></li><li>All items from CS:GO moving forward to CS2</li></ul>";
+            panelDescripcionLarga.Children.Clear();
 
-            // Convertir los saltos de línea "<br>" a "\n" y las listas "<ul>" a un formato adecuado
-            string formattedText = htmlContent.Replace("<br>", "\n").Replace("<ul class=\"bb_ul\">", "").Replace("</ul>", "").Replace("<li>", "   • ").Replace("</li>", "\n");
+            string html = System.Net.WebUtility.HtmlDecode(descripcionDetallada);
 
-            // Mostrar el texto formateado en el TextBlock
-            textDescripccionLarga.Text = formattedText;
-            textDescripccionLarga.Foreground = AppTheme.Actual.TextoPrincipal;
-            gridDescripccionLarga.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(html);
 
+            //EVITO PROCESAR NODOS DE TEXTO REDUNDANTES
+            foreach (var node in doc.DocumentNode.DescendantsAndSelf())
+            {
+                //FILTRO LAS IMAGENES
+                if (node.Name == "img" && node.Attributes["src"] != null)
+                {
+                    string imageUrl = node.Attributes["src"].Value;
+                    try
+                    {
+                        Image img = new Image
+                        {
+                            Source = new BitmapImage(new Uri(imageUrl)),
+                            Height = 370,
+                            Margin = new Thickness(0, 10, 0, 10),
+                            Stretch = Stretch.Uniform
+                        };
+                        panelDescripcionLarga.Children.Add(img);
+                    }
+                    catch
+                    {
+                        //SI HAY ERRORES EN LAS IMAGENES
+                    }
+                }
+                //FILTRO ENCABEZADOS, PARRAFOS Y LISTAS
+                else if (node.Name == "h1" || node.Name == "h2" || node.Name == "p" || node.Name == "li")
+                {
+                    string text = HtmlEntity.DeEntitize(node.InnerText.Trim());
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        TextBlock tb = new TextBlock();
+                        tb.TextWrapping = TextWrapping.Wrap;
+                        tb.Foreground = AppTheme.Actual.TextoPrincipal;
+                        tb.Margin = new Thickness(10, 5, 10, 5);
 
+                        if (node.Name == "h1")
+                        {
+                            tb.Text = text.ToUpper();
+                            tb.FontSize = 26;
+                            tb.FontWeight = FontWeights.Bold;
+                            tb.Margin = new Thickness(10, 20, 10, 10);
+                        }
+                        else if (node.Name == "h2")
+                        {
+                            tb.Text = text.ToUpper();
+                            tb.FontSize = 20;
+                            tb.FontWeight = FontWeights.SemiBold;
+                            tb.Margin = new Thickness(10, 15, 10, 5);
+                        }
+                        else if (node.Name == "li")
+                        {
+                            tb.Text = "   • " + text;
+                        }
+                        else // p
+                        {
+                            tb.Text = text;
+                        }
+
+                        panelDescripcionLarga.Children.Add(tb);
+                    }
+                }
+                //FILTRO NODOS QUE PUEDE QUE NO ESTEN DENTRO DE UN ENCABEZADO O PARRAFO
+                else if (node.NodeType == HtmlAgilityPack.HtmlNodeType.Text)
+                {
+                    string text = node.InnerText.Trim();
+                    //ME ASEGURO DE QUE EL TEXTO NO SE REPITA
+                    if (!string.IsNullOrWhiteSpace(text) && node.ParentNode != null)
+                    {
+                        //SOLO PROCESO SI EL HIJO TIENE DE PADRE UN ENCABEZADO O PARRAFO
+                        if (node.ParentNode.Name != "h1" && node.ParentNode.Name != "h2" && node.ParentNode.Name != "p" && node.ParentNode.Name != "li")
+                        {
+                            TextBlock tb = new TextBlock
+                            {
+                                Text = text,
+                                TextWrapping = TextWrapping.Wrap,
+                                Foreground = AppTheme.Actual.TextoPrincipal,
+                                Margin = new Thickness(10, 5, 0, 5)
+                            };
+                            panelDescripcionLarga.Children.Add(tb);
+                        }
+                    }
+                }
+            }
+
+            panelDescripcionLarga.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
         }
 
 
         //PARTE PARA LAS CATEGORIAS Y GENEROS
         private void CargarCategoriasGeneros()
         {
-            string jsonPrueba = @"
-            {
-                ""categorias"": [
-                ""Multi-player"",
-                ""Valve Anti-Cheat enabled"",
-                ""Stats"",
-                ""Cross-Platform Multiplayer"",
-                ""Steam Trading Cards"",
-                ""Steam Workshop"",
-                ""In-App Purchases"",
-                ""Remote Play on Phone"",
-                ""Remote Play on Tablet"",
-                ""Remote Play on TV"",
-                ""Steam Timeline""
-                ],
-                ""generos"": [
-                ""Action"",
-                ""Free To Play""
-                ]
-            }";
-
-            var datos = JsonConvert.DeserializeObject<DatosJuego>(jsonPrueba);
-
+           
             //LIMPIAR EL GRID
             gridCategoriasGeneros.Children.Clear();
             gridCategoriasGeneros.RowDefinitions.Clear();
@@ -320,17 +412,17 @@ namespace Cliente_TFG.Pages
             gridCategoriasGeneros.Children.Add(headerGenero);
 
             //CALCULAR FILAS NECESARIAS
-            int maxFilas = Math.Max(datos.categorias.Count, datos.generos.Count);
+            int maxFilas = Math.Max(categorias.Count, generos.Count);
 
             for (int i = 0; i < maxFilas; i++)
             {
                 gridCategoriasGeneros.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-                if (i < datos.categorias.Count)
+                if (i < categorias.Count)
                 {
                     TextBlock txtCategoria = new TextBlock
                     {
-                        Text = datos.categorias[i],
+                        Text = categorias[i],
                         Margin = new Thickness(5),
                         Padding = new Thickness(20, 0, 0, 0),
                         Foreground = AppTheme.Actual.TextoPrincipal
@@ -340,11 +432,11 @@ namespace Cliente_TFG.Pages
                     gridCategoriasGeneros.Children.Add(txtCategoria);
                 }
 
-                if (i < datos.generos.Count)
+                if (i < generos.Count)
                 {
                     TextBlock txtGenero = new TextBlock
                     {
-                        Text = datos.generos[i],
+                        Text = generos[i],
                         Margin = new Thickness(5),
                         Padding = new Thickness(20,0,0,0),
                         Foreground = AppTheme.Actual.TextoPrincipal
@@ -359,23 +451,14 @@ namespace Cliente_TFG.Pages
             gridCategoriasGeneros.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
         }
 
-        public class DatosJuego
-        {
-            public List<string> categorias { get; set; }
-            public List<string> generos { get; set; }
-        }
-
-
-
 
         //PARTE PARA LA IMAGEN PRINCIPAL
         private void CargarImagenPrincipal()
         {
-            string source = "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/header.jpg";
 
             Image imagenPrincipal = new Image
             {
-                Source = new BitmapImage(new Uri(source)),
+                Source = new BitmapImage(new Uri(imagenCabecera)),
                 Stretch = Stretch.UniformToFill,
                 Margin = new Thickness(0)
             };
@@ -386,19 +469,60 @@ namespace Cliente_TFG.Pages
         //PARTE PARA EL TEXTO DEL PRECIO
         private void CargarPrecio()
         {
-            string precio = "Free to play";
+            // Comprobar si el precio inicial está vacío o es igual a "0"
+            if (string.IsNullOrEmpty(precioInicial) || precioInicial == "0")
+            {
+                textoPrecio.Text = "Free To Play";
+            }
+            else
+            {
+                // Convertir el precio inicial y el descuento a decimal para poder hacer cálculos
+                decimal precioInicialDecimal = Convert.ToDecimal(precioInicial);
+                decimal descuentoDecimal = Convert.ToDecimal(descuento);
 
-            textoPrecio.Text = precio;
+                // Calcular el precio final con descuento, si es que hay uno
+                decimal precioFinal = precioInicialDecimal;
+                if (descuentoDecimal > 0)
+                {
+                    precioFinal = precioInicialDecimal * (1 - descuentoDecimal / 100);
+                }
+
+                // Convertir el precio final a euros y mostrarlo con el formato adecuado
+                textoPrecio.Text = (precioFinal / 100m).ToString("0.00") + " €";  // Usar "100m" para decimal
+
+                if (descuentoDecimal > 0)
+                {
+                    textoDescuento.Text = descuento.ToString() + "%";
+                    textoDescuento.Padding = new Thickness(10);
+                }
+                    
+                
+            }
+
             textoPrecio.Foreground = AppTheme.Actual.TextoPrincipal;
             textoPrecio.FontSize = 22;
             textoPrecio.FontWeight = FontWeights.Bold;
 
+            
+            textoDescuento.Foreground = AppTheme.Actual.TextoPrecio;
+            textoDescuento.Background = AppTheme.Actual.FondoDescuento;
+            textoDescuento.FontSize = 22;
+            textoDescuento.FontWeight = FontWeights.Bold;
         }
+
+
+
 
         //PARTE PARA EL BOTON DE COMPRA
         private void CargarBotonCompra()
         {
-            string textoBoton = "AÑADIR A BIBLIOTECA";
+            string textoBoton;
+
+            if (string.IsNullOrEmpty(precioInicial) || precioInicial == "0")
+                textoBoton = "AÑADIR A BIBLIOTECA";
+            else 
+                textoBoton = "COMPRAR";
+
 
             botonCompra.Content = textoBoton;
             botonCompra.Height = 40;
@@ -449,6 +573,95 @@ namespace Cliente_TFG.Pages
             textDesarrollador.Foreground = AppTheme.Actual.TextoPrincipal;
 
         }
+
+
+
+        //METODO PARA CARGAR LOS DATOS DEL JSON
+        private async Task CargarDatosJson()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    string json = await client.GetStringAsync("http://127.0.0.1:5000/games/" + appid + "?full");
+                    var response = JsonConvert.DeserializeObject<CarruselResponse>(json);
+
+                    if (response?.juegos != null && response.juegos.Count > 0)
+                    {
+                        var juego = response.juegos[0];
+
+                        //MINIATURAS
+                        miniaturas = juego.capturas_miniatura ?? new List<string>();
+
+
+                        //CATEGORÍAS
+                        categorias = juego.categorias ?? new List<string>();
+
+                        //GENEROS
+                        generos = juego.generos ?? new List<string>();
+
+                        //DESARROLLADOR
+                        desarrollador = juego.desarrolladores?.FirstOrDefault() ?? "";
+
+                        //DESCRIPCIONES
+                        descripcionCorta = juego.descripcion_corta;
+                        descripcionDetallada = juego.descripcion_detallada;
+
+                        //FECHA DE LANZAMIENTO
+                        fechaLanzamiento = juego.fecha_de_lanzamiento;
+
+                        //IMAGEN DE CABECERA
+                        imagenCabecera = juego.imagen_cabecera;
+
+                        //NOMBRE
+                        nombreJuego = juego.nombre;
+
+                        //PRECIO
+                        descuento = juego.precio?.descuento;
+                        precioInicial = juego.precio?.precio_inicial;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al cargar datos del carrusel: {ex.Message}");
+                }
+            }
+        }
+
+        public class Precio
+        {
+            public string descuento { get; set; }
+            public string precio_inicial { get; set; }
+        }
+
+        public class Juego
+        {
+            public int app_id { get; set; }
+            public List<string> capturas { get; set; }
+            public List<string> capturas_miniatura { get; set; }
+            public List<string> categorias { get; set; }
+            public List<string> desarrolladores { get; set; }
+            public string descripcion_corta { get; set; }
+            public string descripcion_detallada { get; set; }
+            public List<string> editores { get; set; }
+            public bool f2p { get; set; }
+            public string fecha_de_lanzamiento { get; set; }
+            public List<string> generos { get; set; }
+            public string imagen_cabecera { get; set; }
+            public string imagen_capsula { get; set; }
+            public string imagen_capsula_v5 { get; set; }
+            public string nombre { get; set; }
+            public int numero_de_ventas { get; set; }
+            public string pagina_web { get; set; }
+            public Precio precio { get; set; }
+            public string tipo { get; set; }
+        }
+
+        public class CarruselResponse
+        {
+            public List<Juego> juegos { get; set; }
+        }
+
 
     }
 }
