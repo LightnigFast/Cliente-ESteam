@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static Cliente_TFG.Pages.paginaTienda;
 
 namespace Cliente_TFG.Pages
 {
@@ -41,6 +42,8 @@ namespace Cliente_TFG.Pages
         private List<string> imagenesOfertas = new List<string>();
         private List<string> precioOfertas = new List<string>();
         private List<string> descuentoOfertas = new List<string>();
+        private List<int> appidOfertas = new List<int>();
+
 
         public paginaTienda(MainWindow mainWindow)
         {
@@ -476,7 +479,8 @@ namespace Cliente_TFG.Pages
                 StackPanel contenedor = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Margin = margen
+                    Margin = margen,
+                    Tag = appidOfertas[i]
                 };
 
                 contenedor.Children.Add(img);
@@ -506,6 +510,8 @@ namespace Cliente_TFG.Pages
 
                     foreach (var juegoOferta in response.juegos)
                     {
+
+                        appidOfertas.Add(juegoOferta.app_id);
                         imagenesOfertas.Add(juegoOferta.header_image);
                         if (string.IsNullOrEmpty(juegoOferta.precio?.precio_inicial) || juegoOferta.precio.precio_inicial == "0")
                         {
@@ -740,9 +746,19 @@ namespace Cliente_TFG.Pages
         //EVENTO DE CLICK
         private void JuegoClick(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show("¡Has hecho clic en el Grid!");
-            AppTheme.Alternar();
-            RefrescarTemas(); // ACTUALIZA LOS COLORES AL CAMBIAR EL TEMA
+            //MessageBox.Show("¡Has hecho clic en el Grid!");
+            //AppTheme.Alternar();
+            //RefrescarTemas(); // ACTUALIZA LOS COLORES AL CAMBIAR EL TEMA
+
+            //var paginaJuegoTienda = new paginaJuegoTienda(ventanaPrincipal, appidCarrusel[indiceActual]);
+            //await AplicarFadeOutAsync(panelJuegosDestacados);
+            //ventanaPrincipal.framePrincipal.Navigate(paginaJuegoTienda);
+
+            if (sender is FrameworkElement elemento && elemento.Tag is int appid)
+            {
+                var paginaJuegoTienda = new paginaJuegoTienda(ventanaPrincipal, appid);
+                ventanaPrincipal.framePrincipal.Navigate(paginaJuegoTienda);
+            }
         }
 
         //EVENTO ENTER

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -283,78 +284,152 @@ namespace Cliente_TFG.Pages
         private void CargarDescripccionLarga()
         {
             panelDescripcionLarga.Children.Clear();
-
-            string html = System.Net.WebUtility.HtmlDecode(descripcionDetallada);
-
+            string html = WebUtility.HtmlDecode(descripcionDetallada);
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
 
-            foreach (var node in doc.DocumentNode.Descendants())
+            ProcesarNodoRecursivo(doc.DocumentNode);
+            panelDescripcionLarga.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
+        }
+
+        private void ProcesarNodoRecursivo(HtmlNode node)
+        {
+            //SALTAR NODOS QUE NO SON RELEVANTES
+            if (node.Name == "script" || node.Name == "style" || node.Name == "head") return;
+
+            //PROCESO LAS IMAGENES PRIMERO
+            if (node.Name == "img" && node.Attributes["src"] != null)
             {
-                //PROCESO IMAGENES
-                if (node.Name == "img" && node.Attributes["src"] != null)
-                {
-                    string imageUrl = node.Attributes["src"].Value;
-                    try
-                    {
-                        Image img = new Image
-                        {
-                            Source = new BitmapImage(new Uri(imageUrl)),
-                            Height = 370,
-                            Margin = new Thickness(0, 10, 0, 10),
-                            Stretch = Stretch.Uniform
-                        };
-                        panelDescripcionLarga.Children.Add(img);
-                    }
-                    catch
-                    {
-                        //IGNORO ERRORES DE CARGA DE IMAGEN
-                    }
-                }
-
-                //PROCESO TEXTOS SIMPLES (PARA EVITAR DUPLICADOS)
-                else if ((node.Name == "h1" || node.Name == "h2" || node.Name == "p" || node.Name == "li")
-                         && node.ChildNodes.All(n => n.Name == "#text"))
-                {
-                    string text = HtmlEntity.DeEntitize(node.InnerText.Trim());
-                    if (!string.IsNullOrWhiteSpace(text))
-                    {
-                        TextBlock tb = new TextBlock
-                        {
-                            TextWrapping = TextWrapping.Wrap,
-                            Foreground = AppTheme.Actual.TextoPrincipal,
-                            Margin = new Thickness(10, 5, 10, 5)
-                        };
-
-                        if (node.Name == "h1")
-                        {
-                            tb.Text = text.ToUpper();
-                            tb.FontSize = 26;
-                            tb.FontWeight = FontWeights.Bold;
-                            tb.Margin = new Thickness(10, 20, 10, 10);
-                        }
-                        else if (node.Name == "h2")
-                        {
-                            tb.Text = text.ToUpper();
-                            tb.FontSize = 20;
-                            tb.FontWeight = FontWeights.SemiBold;
-                            tb.Margin = new Thickness(10, 15, 10, 5);
-                        }
-                        else if (node.Name == "li")
-                        {
-                            tb.Text = "   • " + text;
-                        }
-                        else // p
-                        {
-                            tb.Text = text;
-                        }
-
-                        panelDescripcionLarga.Children.Add(tb);
-                    }
-                }
+                ProcesarImagen(node);
+                return;
             }
 
-            panelDescripcionLarga.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
+            //MANEJO LOS SALTOS DE LINEA
+            if (node.Name == "br")
+            {
+                panelDescripcionLarga.Children.Add(new TextBlock { Height = 10 });
+                return;
+            }
+
+            //PROCESAR NODOS QUE NO TIENEN NODOS HIJOS
+            if (node.NodeType == HtmlNodeType.Text || EsElementoTexto(node))
+            {
+                ProcesarTexto(node);
+                return;
+            }
+
+            //PROCESO LISTAS Y SUS HIJOS
+            if (node.Name == "ul" || node.Name == "ol")
+            {
+                foreach (var child in node.ChildNodes.Where(n => n.Name == "li"))
+                {
+                    ProcesarElementoLista(child);
+                }
+                return;
+            }
+
+            //OTROS ELEMENTOS RECURSIVAMENTE
+            foreach (var child in node.ChildNodes)
+            {
+                ProcesarNodoRecursivo(child);
+            }
+        }
+
+        private bool EsElementoTexto(HtmlNode node)
+        {
+            return (node.Name == "h1" || node.Name == "h2" || node.Name == "h3" ||
+                   node.Name == "p" || node.Name == "strong") &&
+                   !node.ChildNodes.Any(n => n.NodeType == HtmlNodeType.Element);
+        }
+
+        private void ProcesarImagen(HtmlNode node)
+        {
+            try
+            {
+                var img = new Image
+                {
+                    Source = new BitmapImage(new Uri(node.Attributes["src"].Value)),
+                    Margin = new Thickness(20, 20, 20, 10),
+                    Stretch = Stretch.Uniform
+                };
+                panelDescripcionLarga.Children.Add(img);
+            }
+            catch { /* NO HACER NADA SI NO CARGA LA IMAGEN */ }
+        }
+
+        private void ProcesarTexto(HtmlNode node)
+        {
+            var texto = HtmlEntity.DeEntitize(node.InnerText.Trim());
+            if (string.IsNullOrWhiteSpace(texto)) return;
+
+            var tb = new TextBlock
+            {
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = AppTheme.Actual.TextoPrincipal,
+                Margin = ObtenerMargenPorElemento(node),
+                FontSize = ObtenerTamañoFuente(node),
+                FontWeight = ObtenerPesoFuente(node),
+                Text = FormatearTexto(node, texto)
+            };
+
+            panelDescripcionLarga.Children.Add(tb);
+        }
+
+        private void ProcesarElementoLista(HtmlNode liNode)
+        {
+            var texto = HtmlEntity.DeEntitize(liNode.InnerText.Trim());
+            if (string.IsNullOrWhiteSpace(texto)) return;
+
+            var tb = new TextBlock
+            {
+                Text = "   • " + texto,
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = AppTheme.Actual.TextoPrincipal,
+                Margin = new Thickness(15, 2, 10, 2)
+            };
+
+            panelDescripcionLarga.Children.Add(tb);
+        }
+
+        // Métodos auxiliares
+        private Thickness ObtenerMargenPorElemento(HtmlNode node)
+        {
+            switch (node.Name)
+            {
+                case "h1": return new Thickness(10, 20, 10, 15);
+                case "h2": return new Thickness(10, 15, 10, 10);
+                case "strong": return new Thickness(10, 5, 10, 5);
+                default: return new Thickness(10, 2, 10, 2);
+            }
+        }
+
+        private double ObtenerTamañoFuente(HtmlNode node)
+        {
+            switch (node.Name)
+            {
+                case "h1": return 26;
+                case "h2": return 20;
+                case "h3": return 18;
+                case "strong": return 14;
+                default: return 12;
+            }
+        }
+
+        private FontWeight ObtenerPesoFuente(HtmlNode node)
+        {
+            switch (node.Name)
+            {
+                case "h1": return FontWeights.Bold;
+                case "h2": return FontWeights.SemiBold;
+                case "strong": return FontWeights.Bold;
+                default: return FontWeights.Normal;
+            }
+        }
+
+        private string FormatearTexto(HtmlNode node, string texto)
+        {
+            if (node.Name == "h1" || node.Name == "h2") return texto.ToUpper();
+            return texto;
         }
 
 
