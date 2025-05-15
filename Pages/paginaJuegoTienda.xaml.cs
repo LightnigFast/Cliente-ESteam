@@ -43,6 +43,7 @@ namespace Cliente_TFG.Pages
         private List<string> categorias = new List<string>();
         private List<string> generos = new List<string>();
         private string desarrollador;
+        private string editores;
         private string descripcionCorta;
         private string descripcionDetallada;
         private string fechaLanzamiento;
@@ -77,6 +78,7 @@ namespace Cliente_TFG.Pages
             CargarDescripccionCorta();
             CargarFechaLanzamiento();
             CargarDesarrolador();
+            CargarEditor();
 
             //PARTE IZQUIERDA
             CargarCarrusel();
@@ -287,10 +289,9 @@ namespace Cliente_TFG.Pages
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
 
-            //EVITO PROCESAR NODOS DE TEXTO REDUNDANTES
-            foreach (var node in doc.DocumentNode.DescendantsAndSelf())
+            foreach (var node in doc.DocumentNode.Descendants())
             {
-                //FILTRO LAS IMAGENES
+                //PROCESO IMAGENES
                 if (node.Name == "img" && node.Attributes["src"] != null)
                 {
                     string imageUrl = node.Attributes["src"].Value;
@@ -307,19 +308,23 @@ namespace Cliente_TFG.Pages
                     }
                     catch
                     {
-                        //SI HAY ERRORES EN LAS IMAGENES
+                        //IGNORO ERRORES DE CARGA DE IMAGEN
                     }
                 }
-                //FILTRO ENCABEZADOS, PARRAFOS Y LISTAS
-                else if (node.Name == "h1" || node.Name == "h2" || node.Name == "p" || node.Name == "li")
+
+                //PROCESO TEXTOS SIMPLES (PARA EVITAR DUPLICADOS)
+                else if ((node.Name == "h1" || node.Name == "h2" || node.Name == "p" || node.Name == "li")
+                         && node.ChildNodes.All(n => n.Name == "#text"))
                 {
                     string text = HtmlEntity.DeEntitize(node.InnerText.Trim());
                     if (!string.IsNullOrWhiteSpace(text))
                     {
-                        TextBlock tb = new TextBlock();
-                        tb.TextWrapping = TextWrapping.Wrap;
-                        tb.Foreground = AppTheme.Actual.TextoPrincipal;
-                        tb.Margin = new Thickness(10, 5, 10, 5);
+                        TextBlock tb = new TextBlock
+                        {
+                            TextWrapping = TextWrapping.Wrap,
+                            Foreground = AppTheme.Actual.TextoPrincipal,
+                            Margin = new Thickness(10, 5, 10, 5)
+                        };
 
                         if (node.Name == "h1")
                         {
@@ -347,31 +352,11 @@ namespace Cliente_TFG.Pages
                         panelDescripcionLarga.Children.Add(tb);
                     }
                 }
-                //FILTRO NODOS QUE PUEDE QUE NO ESTEN DENTRO DE UN ENCABEZADO O PARRAFO
-                else if (node.NodeType == HtmlAgilityPack.HtmlNodeType.Text)
-                {
-                    string text = node.InnerText.Trim();
-                    //ME ASEGURO DE QUE EL TEXTO NO SE REPITA
-                    if (!string.IsNullOrWhiteSpace(text) && node.ParentNode != null)
-                    {
-                        //SOLO PROCESO SI EL HIJO TIENE DE PADRE UN ENCABEZADO O PARRAFO
-                        if (node.ParentNode.Name != "h1" && node.ParentNode.Name != "h2" && node.ParentNode.Name != "p" && node.ParentNode.Name != "li")
-                        {
-                            TextBlock tb = new TextBlock
-                            {
-                                Text = text,
-                                TextWrapping = TextWrapping.Wrap,
-                                Foreground = AppTheme.Actual.TextoPrincipal,
-                                Margin = new Thickness(10, 5, 0, 5)
-                            };
-                            panelDescripcionLarga.Children.Add(tb);
-                        }
-                    }
-                }
             }
 
             panelDescripcionLarga.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
         }
+
 
 
         //PARTE PARA LAS CATEGORIAS Y GENEROS
@@ -532,11 +517,8 @@ namespace Cliente_TFG.Pages
         //PARTE PARA LA DESCRIPCCION CORTA
         private void CargarDescripccionCorta()
         {
-            // Contenido HTML recibido
-            string htmlContent = "For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. This is Counter-Strike 2.";
-
             // Convertir los saltos de línea "<br>" a "\n" y las listas "<ul>" a un formato adecuado
-            string formattedText = htmlContent.Replace("<br>", "\n").Replace("<ul class=\"bb_ul\">", "").Replace("</ul>", "").Replace("<li>", "   • ").Replace("</li>", "\n");
+            string formattedText = descripcionCorta.Replace("<br>", "\n").Replace("<ul class=\"bb_ul\">", "").Replace("</ul>", "").Replace("<li>", "   • ").Replace("</li>", "\n");
 
             // Mostrar el texto formateado en el TextBlock
             textDescripccionCorta.Text = formattedText;
@@ -547,9 +529,7 @@ namespace Cliente_TFG.Pages
         //PARTE PARA LA FECHA DE LANZAMIENTO CORTA
         private void CargarFechaLanzamiento()
         {
-            // Contenido HTML recibido
-            string fechaLanzamiento = "12 AUG, 2023";
-
+            
             //MOSTRAR TEXTOS
             textLanzamiento.Text = "Fecha de lanzamiento: ";
             textLanzamiento.Foreground = AppTheme.Actual.TextoPrincipal;
@@ -559,19 +539,28 @@ namespace Cliente_TFG.Pages
 
         }
 
-        //PARTE PARA LA FECHA DE LANZAMIENTO CORTA
+        //PARTE PARA LOS DESARROLLADORES
         private void CargarDesarrolador()
         {
-            // Contenido HTML recibido
-            string desarrolador = "Valve";
 
             //MOSTRAR TEXTOS
             textEtiquetaDesarrollador.Text = "Desarrollador: ";
             textEtiquetaDesarrollador.Foreground = AppTheme.Actual.TextoPrincipal;
 
-            textDesarrollador.Text += desarrolador;
+            textDesarrollador.Text += desarrollador;
             textDesarrollador.Foreground = AppTheme.Actual.TextoPrincipal;
 
+        }
+
+        //PARTE PARA LOS EDITORES
+        private void CargarEditor()
+        {
+            //MOSTRAR TEXTOS
+            textEtiquetaEditor.Text = "Editor: ";
+            textEtiquetaEditor.Foreground = AppTheme.Actual.TextoPrincipal;
+
+            textEditor.Text += editores;
+            textEditor.Foreground = AppTheme.Actual.TextoPrincipal;
         }
 
 
@@ -600,8 +589,11 @@ namespace Cliente_TFG.Pages
                         //GENEROS
                         generos = juego.generos ?? new List<string>();
 
-                        //DESARROLLADOR
-                        desarrollador = juego.desarrolladores?.FirstOrDefault() ?? "";
+                        //DESARROLLADORES
+                        desarrollador = juego.desarrolladores != null ? string.Join(", ", juego.desarrolladores) : "";
+
+                        //EDITORES
+                        editores = juego.editores != null ? string.Join(", ", juego.editores) : "";
 
                         //DESCRIPCIONES
                         descripcionCorta = juego.descripcion_corta;

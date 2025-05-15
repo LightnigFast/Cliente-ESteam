@@ -42,7 +42,7 @@ namespace Cliente_TFG
             //var paginaTienda = new paginaTienda(this);
             //framePrincipal.Navigate(paginaTienda);
 
-            var paginaTienda = new paginaJuegoTienda(this, 3017860);
+            var paginaTienda = new paginaJuegoTienda(this, 3159330);
             framePrincipal.Navigate(paginaTienda);
         }
 
