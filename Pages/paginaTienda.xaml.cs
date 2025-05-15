@@ -44,6 +44,12 @@ namespace Cliente_TFG.Pages
         private List<string> descuentoOfertas = new List<string>();
         private List<int> appidOfertas = new List<int>();
 
+        //OFERTAS ESPECIALES
+        private List<string> imagenesOfertasEspeciales = new List<string>();
+        private List<string> precioOfertasEspeciales = new List<string>();
+        private List<string> descuentoOfertasEspeciales = new List<string>();
+        private List<int> appidOfertasEspeciales = new List<int>();
+
 
         public paginaTienda(MainWindow mainWindow)
         {
@@ -59,10 +65,11 @@ namespace Cliente_TFG.Pages
 
             CargarDatosJsonCarrusel();
             CargarDatosJsonOfertas();
+            CargarDatosJsonOfertasDeterminadoPrecio();
 
             //CargarCarrusel();
             //CargarOfertas();
-            CargarOfertasDeterminadoPrecio();
+            //CargarOfertasDeterminadoPrecio();
             CargarNuevosLanzamientos();
         }
 
@@ -434,7 +441,7 @@ namespace Cliente_TFG.Pages
                 infoHorizontal.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); //Precio
 
                 //TEXTO DEL DESCUENTO (IZQUIERDA)
-                TextBlock textoNombre = new TextBlock
+                TextBlock textoDescuentoPorcentaje = new TextBlock
                 {
                     Text = "-" + descuentoOfertas[i] + "%",
                     FontSize = 15,
@@ -447,7 +454,7 @@ namespace Cliente_TFG.Pages
                     VerticalAlignment = VerticalAlignment.Center,
                     TextTrimming = TextTrimming.CharacterEllipsis
                 };
-                Grid.SetColumn(textoNombre, 0);
+                Grid.SetColumn(textoDescuentoPorcentaje, 0);
 
                 //TEXTO DEL PRECIO (DERECHA)
                 TextBlock textoPrecio = new TextBlock
@@ -463,7 +470,7 @@ namespace Cliente_TFG.Pages
                 Grid.SetColumn(textoPrecio, 1);
 
                 //AÑADE LOS TEXTBLOCK AL GRID
-                infoHorizontal.Children.Add(textoNombre);
+                infoHorizontal.Children.Add(textoDescuentoPorcentaje);
                 infoHorizontal.Children.Add(textoPrecio);
 
 
@@ -515,7 +522,7 @@ namespace Cliente_TFG.Pages
                         imagenesOfertas.Add(juegoOferta.header_image);
                         if (string.IsNullOrEmpty(juegoOferta.precio?.precio_inicial) || juegoOferta.precio.precio_inicial == "0")
                         {
-                            precioCarrusel.Add("Free To Play");
+                            precioOfertas.Add("Free To Play");
                         }
                         else
                         {
@@ -573,6 +580,7 @@ namespace Cliente_TFG.Pages
         //PARTE PARA LAS OFERTAS ESPECIFICAS
         private void CargarOfertasDeterminadoPrecio()
         {
+            /*
             string[] urls = new string[]
             {
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1200/capsule_231x87.jpg",
@@ -580,17 +588,18 @@ namespace Cliente_TFG.Pages
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/620/capsule_231x87.jpg",
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_231x87.jpg"
             };
+            */
 
             int columnas = 4;
 
-            for (int i = 0; i < urls.Length; i++)
+            for (int i = 0; i < imagenesOfertasEspeciales.Count; i++)
             {
                 int col = i % columnas;
 
                 //CREO LA IMAGEN
                 Image img = new Image
                 {
-                    Source = new BitmapImage(new Uri(urls[i])),
+                    Source = new BitmapImage(new Uri(imagenesOfertasEspeciales[i])),
                     Stretch = Stretch.UniformToFill,
                     Margin = new Thickness(0)
                 };
@@ -598,14 +607,16 @@ namespace Cliente_TFG.Pages
                 //TEXTO DEL PRECIO
                 TextBlock textoPrecio = new TextBlock
                 {
-                    Text = "15,99" + "€ ",
+                    Text = precioOfertasEspeciales[i],
                     Height = 25,
+                    FontSize = 15,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = AppTheme.Actual.TextoPrincipal,
+                    Background = AppTheme.Actual.FondoPanel,
+                    Padding = new Thickness(0, 0, 5, 0),
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     VerticalAlignment = VerticalAlignment.Center,
                     TextAlignment = TextAlignment.Right,
-                    FontSize = 17,
-                    Foreground = AppTheme.Actual.TextoPrecio,
-                    Background = AppTheme.Actual.FondoPanel,
 
                 };
 
@@ -622,7 +633,8 @@ namespace Cliente_TFG.Pages
                 StackPanel contenedor = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Margin = margen
+                    Margin = margen,
+                    Tag = appidOfertasEspeciales[i]
                 };
 
                 contenedor.Children.Add(img);
@@ -641,6 +653,75 @@ namespace Cliente_TFG.Pages
             }
 
         }
+
+        private async void CargarDatosJsonOfertasDeterminadoPrecio()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    string json = await client.GetStringAsync("http://127.0.0.1:5000/store/10.00");
+                    var response = JsonConvert.DeserializeObject<OfertaEspeciallResponse>(json);
+
+
+                    foreach (var juegoOferta in response.juegos)
+                    {
+
+                        appidOfertasEspeciales.Add(juegoOferta.app_id);
+                        imagenesOfertasEspeciales.Add(juegoOferta.capsule_image);
+                        if (string.IsNullOrEmpty(juegoOferta.precio?.precio_inicial) || juegoOferta.precio.precio_inicial == "0")
+                        {
+                            precioOfertasEspeciales.Add("Free To Play");
+                        }
+                        else
+                        {
+
+                            double precioEuros = double.Parse(juegoOferta.precio.precio_inicial) / 100.0;
+                            double descuento = double.Parse(juegoOferta.precio.descuento);
+                            double precioFinal = precioEuros * (1 - (descuento / 100.0));
+
+                            precioOfertasEspeciales.Add(precioFinal.ToString("0.00") + " € ");
+                            descuentoOfertasEspeciales.Add(descuento.ToString());
+                        }
+
+                    }
+
+                    if (imagenesOfertas.Count == 0)
+                    {
+                        MessageBox.Show("No se encontraron imágenes para las ofertas.");
+                    }
+                    else
+                    {
+                        //SI AL MENOS UNA IMAGEN ESTA DISPONIBLE, MUESTRO LAS OFERTAS
+                        CargarOfertasDeterminadoPrecio();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al cargar datos de las ofertas espciales: {ex.Message}");
+                }
+            }
+        }
+
+        public class OfertaEspeciallResponse
+        {
+            public List<JuegoOfertaEspecial> juegos { get; set; }
+        }
+        public class JuegoOfertaEspecial
+        {
+            public int app_id { get; set; }
+            public string capsule_image { get; set; }
+            public string nombre { get; set; }
+            public PrecioOferta precio { get; set; }
+        }
+
+        public class PrecioOfertaEspecial
+        {
+            public string descuento { get; set; }
+            public string precio_inicial { get; set; }
+        }
+
+
 
 
         //PARTE PARA LOS NUEVOS LANZAMIENTOS

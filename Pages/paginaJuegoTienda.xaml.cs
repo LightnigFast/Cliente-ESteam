@@ -391,7 +391,7 @@ namespace Cliente_TFG.Pages
             panelDescripcionLarga.Children.Add(tb);
         }
 
-        // Métodos auxiliares
+        //METODOS AUX
         private Thickness ObtenerMargenPorElemento(HtmlNode node)
         {
             switch (node.Name)
