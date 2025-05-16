@@ -2,10 +2,13 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Policy;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -59,6 +62,12 @@ namespace Cliente_TFG.Pages
         private List<string> imagenesNuevosLanzamientos = new List<string>();
         private List<string> precioNuevosLanzamientos = new List<string>();
         private List<string> descuentoNuevosLanzamientos = new List<string>();
+
+        //PARA LAS BUSQUEDAS
+        private readonly HttpClient _client = new HttpClient();
+        private CancellationTokenSource _cts;
+        private DateTime _lastKeyPressTime;
+        private CancellationTokenSource _searchCts;
 
 
 
@@ -132,7 +141,7 @@ namespace Cliente_TFG.Pages
                                 CargarMiniaturas(indiceActual);
 
                                 primeraImagenCargada = true;
-                                
+
                                 AplicarFadeIn(imagenTiendaGrande);
                                 AplicarFadeIn(carruselTituloJuego);
                                 AplicarFadeIn(carruselPrecioJuego);
@@ -231,7 +240,8 @@ namespace Cliente_TFG.Pages
             panelJuegosDestacados.MouseDown += async (s, e) =>
             {
                 var paginaJuegoTienda = new paginaJuegoTienda(ventanaPrincipal, appidCarrusel[indiceActual]);
-                await AplicarFadeOutAsync(panelJuegosDestacados);
+                //await AplicarFadeOutAsync(panelJuegosDestacados);
+                await FadeOutATodo();
                 ventanaPrincipal.framePrincipal.Navigate(paginaJuegoTienda);
             };
 
@@ -291,6 +301,14 @@ namespace Cliente_TFG.Pages
             carruselTimer.Stop();
             carruselTimer.Start();
         }
+
+        //METODO PARA HACER EL EFECTO FADEIN EN TODOS LOS ELEMENTOS DE LA INTERFAZ
+        private async Task FadeOutATodo()
+        {
+            await AplicarFadeOutAsync(panelPrincipal);
+           
+        }
+
 
         //METODO PARA QUE TODO SE VEA MAS NATURAL CON UNA TRASICION FADEIN
         private void AplicarFadeIn(UIElement elemento)
@@ -354,7 +372,7 @@ namespace Cliente_TFG.Pages
                 
                 carruselMiniaturasImagenes.Children.Add(img);
             }
-            //AplicarFadeIn(carruselMiniaturasImagenes);
+            AplicarFadeIn(carruselMiniaturasImagenes);
         }
 
         private async Task<bool> ImagenExiste(string url)
@@ -927,20 +945,208 @@ namespace Cliente_TFG.Pages
 
 
 
+
+        //PARTE PARA LA BSUQUEDA DE JUEGOS
+        private async void txtBusqueda_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var searchText = txtBusqueda.Text.Trim();
+            _lastKeyPressTime = DateTime.Now;
+
+            //ESPERO 400ms DESPUES DE PRESIONAR LA ULTIMA TECLA PARA AHORRAR RECURSOS
+            await Task.Delay(400);
+
+            //SI EL USER SIGUE ESCRIBIENDO, IGNORAMOS ESA BUSQUEDA
+            if ((DateTime.Now - _lastKeyPressTime).TotalMilliseconds < 400)
+                return;
+
+            //SI EL TEXTO ESTA VACIO, SE CIERRA EL POPUP Y CANCELO LA BUSQUEDA
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                _searchCts?.Cancel();
+                Dispatcher.Invoke(() => popupResultados.IsOpen = false);
+                return;
+            }
+
+            await RealizarBusquedaSegura(searchText);
+        }
+
+        private async Task RealizarBusquedaSegura(string texto)
+        {
+            _searchCts?.Cancel(); //CANCELO LA BUSQUEDA ANTERIOR
+            _searchCts = new CancellationTokenSource();
+
+            try
+            {
+                _searchCts.CancelAfter(TimeSpan.FromSeconds(3)); //TIMER DE 3 SEGUNODS
+
+                var response = await _client.GetAsync(
+                    $"http://127.0.0.1:5000/games/?name={Uri.EscapeDataString(texto)}&limit=10",
+                    _searchCts.Token
+                );
+
+                response.EnsureSuccessStatusCode(); //VERIFICO SI LA RESPUESTA ESTA BIEN
+
+                var content = await response.Content.ReadAsStringAsync();
+                var resultados = JsonConvert.DeserializeObject<ResultadoBusqueda>(content);
+
+                //ACTUALIZAR INTERFAZ DEL HILO PRINCIPAL
+                Dispatcher.Invoke(() =>
+                {
+                    lstResultados.Items.Clear();
+
+                    if (resultados?.juegos?.Count > 0)
+                    {
+                        foreach (var juego in resultados.juegos)
+                        {
+                            //CREO EL CONTENEDOR PRINCIPAL
+                            var grid = new Grid
+                            {
+                                Margin = new Thickness(2),
+                                Height = 60
+                            };
+                            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                            //CREO LA IMAGEN
+                            var imagen = new Image
+                            {
+                                Source = new BitmapImage(new Uri(juego.imagen_capsula_v5)),
+                                Stretch = Stretch.UniformToFill,
+                                Margin = new Thickness(5),
+                                Width = 130
+                            };
+                            Grid.SetColumn(imagen, 0);
+                            grid.Children.Add(imagen);
+
+                            //CREO EL PANEL DEL TEXTO
+                            var stackPanel = new StackPanel
+                            {
+                                VerticalAlignment = VerticalAlignment.Center,
+                                Margin = new Thickness(5, 0, 0, 0)
+                            };
+
+                            //NOMBRE DEL JUEGO
+                            var txtNombre = new TextBlock
+                            {
+                                Text = juego.nombre,
+                                Foreground = Brushes.White,
+                                
+                                FontSize = 14,
+                                FontWeight = FontWeights.SemiBold
+                            };
+
+                            //PRECIO DEL JUEGO
+                            var txtPrecio = new TextBlock
+                            {
+                                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B929A")),
+                                FontSize = 12
+                            };
+
+                            // Aplicar la lógica de formato de precio
+                            if (string.IsNullOrEmpty(juego.precio?.precio_inicial) || juego.precio.precio_inicial == "0")
+                            {
+                                txtPrecio.Text = "Free To Play";
+
+                                // Opcional: cambiar color para gratis
+                                txtPrecio.Foreground = Brushes.LightGreen;
+                            }
+                            else
+                            {
+                                double precioEuros = double.Parse(juego.precio.precio_inicial) / 100.0;
+                                txtPrecio.Text = precioEuros.ToString("0.00") + " €";
+
+                                // Opcional: tachar precio si tiene descuento
+                                if (juego.precio.descuento != "0")
+                                {
+                                    txtPrecio.TextDecorations = TextDecorations.Strikethrough;
+
+                                    // Agregar precio con descuento
+                                    double descuento = double.Parse(juego.precio.descuento);
+                                    double precioFinal = precioEuros * (1 - descuento / 100);
+                                    txtPrecio.Text += $" → {precioFinal.ToString("0.00")} €";
+                                }
+                            }
+
+                            stackPanel.Children.Add(txtNombre);
+                            stackPanel.Children.Add(txtPrecio);
+                            stackPanel.MouseLeftButtonDown += JuegoClick;
+
+                            Grid.SetColumn(stackPanel, 1);
+                            grid.Children.Add(stackPanel);
+
+                            lstResultados.Items.Add(grid);
+                        }
+
+                        popupResultados.IsOpen = true;
+                    }
+                    else
+                    {
+                        popupResultados.IsOpen = false;
+                    }
+                });
+            }
+            catch (TaskCanceledException)
+            {
+                Debug.WriteLine("Búsqueda cancelada por el usuario o timeout.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error en la búsqueda: {ex.Message}");
+                Dispatcher.Invoke(() => popupResultados.IsOpen = false);
+            }
+        }
+
+        private void panelPrincipal_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (e.VerticalChange != 0 && popupResultados.IsOpen)
+            {
+                //OBTENER LA POSICION RELATIVA AL POPUP
+                Point mousePos = Mouse.GetPosition(popupResultados.Child);
+
+                //SI EL MOUSE NO ESTA SOBRE EL POPUP, LO CIERRO A LA HORA DE HACER SCROLL
+                if (!(mousePos.X >= 0 && mousePos.Y >= 0 &&
+                      mousePos.X <= popupResultados.Child.RenderSize.Width &&
+                      mousePos.Y <= popupResultados.Child.RenderSize.Height))
+                {
+                    popupResultados.IsOpen = false;
+                }
+            }
+        }
+
+        public class JuegoBusqueda
+        {
+            public int app_id { get; set; }
+            public bool f2p { get; set; }
+            public string imagen_capsula_v5 { get; set; }
+            public string nombre { get; set; }
+            public PrecioBusqueda precio { get; set; }
+        }
+
+        public class PrecioBusqueda
+        {
+            public string descuento { get; set; }
+            public string precio_inicial { get; set; }
+        }
+
+        public class ResultadoBusqueda
+        {
+            public ObservableCollection<JuegoBusqueda> juegos { get; set; }
+        }
+
+
+
         //EVENTO DE CLICK
         private void JuegoClick(object sender, MouseButtonEventArgs e)
         {
-            //MessageBox.Show("¡Has hecho clic en el Grid!");
-            //AppTheme.Alternar();
-            //RefrescarTemas(); // ACTUALIZA LOS COLORES AL CAMBIAR EL TEMA
+            _ = JuegoClickAsync(sender, e); //PARA NO BLOQUEAR EL HILO DE UI
+        }
 
-            //var paginaJuegoTienda = new paginaJuegoTienda(ventanaPrincipal, appidCarrusel[indiceActual]);
-            //await AplicarFadeOutAsync(panelJuegosDestacados);
-            //ventanaPrincipal.framePrincipal.Navigate(paginaJuegoTienda);
-
+        private async Task JuegoClickAsync(object sender, MouseButtonEventArgs e)
+        {
             if (sender is FrameworkElement elemento && elemento.Tag is int appid)
             {
                 var paginaJuegoTienda = new paginaJuegoTienda(ventanaPrincipal, appid);
+                await FadeOutATodo();
                 ventanaPrincipal.framePrincipal.Navigate(paginaJuegoTienda);
             }
         }

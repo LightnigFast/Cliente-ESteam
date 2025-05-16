@@ -8,11 +8,25 @@
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="paginaTienda">
 
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent">
+    <ScrollViewer x:Name="panelPrincipal" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent"
+                  ScrollChanged="panelPrincipal_ScrollChanged">
         <StackPanel HorizontalAlignment="Center">
+            
             <!--GRID PARA LA CATEGORIA-->
             <Grid x:Name="panelControlador" Background="Blue" Width="1150" Height="35" VerticalAlignment="Top" Margin="0,30,0,0">
+                <TextBox x:Name="txtBusqueda" Width="430" Height="25" Margin="10,5" Padding="5" TextChanged="txtBusqueda_TextChanged"
+                         Background="#FFF" Foreground="Black" HorizontalAlignment="Right"/>       
 
+                <Popup x:Name="popupResultados" PlacementTarget="{Binding ElementName=txtBusqueda}" Placement="Bottom"
+                       StaysOpen="False" Width="{Binding ActualWidth, ElementName=txtBusqueda}">
+                    <Border Background="#252525" CornerRadius="3" BorderThickness="1" BorderBrush="#404040">
+                        <ScrollViewer MaxHeight="500">
+                            <ItemsControl x:Name="lstResultados">
+                                
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
             </Grid>
 
             <!--GRID PARA JUEGOS DESTACADOS-->
