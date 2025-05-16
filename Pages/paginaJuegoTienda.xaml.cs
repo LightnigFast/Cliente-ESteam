@@ -126,7 +126,7 @@ namespace Cliente_TFG.Pages
 
             for (int i = 0; i < miniaturas.Count; i++)
             {
-                // IMAGEN PRINCIPAL GRANDE DEL CARRUSEL
+                //IMAGEN PRINCIPAL GRANDE DEL CARRUSEL
                 Image imagen = new Image
                 {
                     Stretch = Stretch.UniformToFill,
@@ -138,11 +138,11 @@ namespace Cliente_TFG.Pages
                 panelCarrusel.Children.Add(imagen);
                 imagenesCarrusel.Add(imagen);
 
-                // Cargar imagen de forma asíncrona
+                //CARGAR IMAGENES DE FORMA ASYNC
                 var bitmap = await CargarImagenAsync(miniaturas[i]);
                 imagen.Source = bitmap;
 
-                // IMAGENES DE LAS MINIATURAS
+                //IMAGENES DE LAS MINIATURAS
                 Image miniatura = new Image
                 {
                     Width = 100,
@@ -154,8 +154,8 @@ namespace Cliente_TFG.Pages
 
                 miniatura.Source = bitmap;
 
-                // Añadir evento de click a las miniaturas
-                int index = i; // Copia del index para que no cambie en medio del código
+                //EVENTO DE CLICK DE LAS MINIATUAS
+                int index = i; 
                 miniatura.MouseLeftButtonDown += (sender, e) => CambiarImagenCarruselManual(index);
 
                 stackMiniaturas.Children.Add(miniatura);
@@ -529,30 +529,30 @@ namespace Cliente_TFG.Pages
         //PARTE PARA EL TEXTO DEL PRECIO
         private void CargarPrecio()
         {
-            // Comprobar si el precio inicial está vacío o es igual a "0"
+            //Compruebo si el precio inicial está vacío o es igual a "0"
             if (string.IsNullOrEmpty(precioInicial) || precioInicial == "0")
             {
                 textoPrecio.Text = "Free To Play";
             }
             else
             {
-                // Convertir el precio inicial y el descuento a decimal para poder hacer cálculos
+                //CONVERTO A DECIMAL PARA PODER HACER CALCULOS
                 decimal precioInicialDecimal = Convert.ToDecimal(precioInicial);
                 decimal descuentoDecimal = Convert.ToDecimal(descuento);
 
-                // Calcular el precio final con descuento, si es que hay uno
+                //CARLCULAR EL PRECIO FINAL SIEMPRE Y CUANDO HAYA DESCUENTO
                 decimal precioFinal = precioInicialDecimal;
                 if (descuentoDecimal > 0)
                 {
                     precioFinal = precioInicialDecimal * (1 - descuentoDecimal / 100);
                 }
 
-                // Convertir el precio final a euros y mostrarlo con el formato adecuado
-                textoPrecio.Text = (precioFinal / 100m).ToString("0.00") + " €";  // Usar "100m" para decimal
+                //CONVIERTO EL PRECIO FINAL A EUROS
+                textoPrecio.Text = (precioFinal / 100m).ToString("0.00") + " €";
 
                 if (descuentoDecimal > 0)
                 {
-                    textoDescuento.Text = descuento.ToString() + "%";
+                    textoDescuento.Text = "-" + descuento.ToString() + "%";
                     textoDescuento.Padding = new Thickness(10);
                 }
                     

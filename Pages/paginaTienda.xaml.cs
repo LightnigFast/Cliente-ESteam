@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static Cliente_TFG.Pages.paginaJuegoTienda;
 using static Cliente_TFG.Pages.paginaTienda;
 
 namespace Cliente_TFG.Pages
@@ -50,6 +51,16 @@ namespace Cliente_TFG.Pages
         private List<string> descuentoOfertasEspeciales = new List<string>();
         private List<int> appidOfertasEspeciales = new List<int>();
 
+        //NUEVOS LANZAMIENTOS
+        private List<int> appidNuevosLanzamientos = new List<int>();
+        private List<string> nombreNuevosLanzamientos = new List<string>();
+        private List<string> fechaNuevosLanzamientos = new List<string>();
+        private List<string> generosNuevosLanzamientos = new List<string>();
+        private List<string> imagenesNuevosLanzamientos = new List<string>();
+        private List<string> precioNuevosLanzamientos = new List<string>();
+        private List<string> descuentoNuevosLanzamientos = new List<string>();
+
+
 
         public paginaTienda(MainWindow mainWindow)
         {
@@ -66,6 +77,7 @@ namespace Cliente_TFG.Pages
             CargarDatosJsonCarrusel();
             CargarDatosJsonOfertas();
             CargarDatosJsonOfertasDeterminadoPrecio();
+            CargarDatosJsonNuevosLanzamientos();
 
             //CargarCarrusel();
             //CargarOfertas();
@@ -91,15 +103,9 @@ namespace Cliente_TFG.Pages
                         {
                             string imagenGrande = "https://cdn.akamai.steamstatic.com/steam/apps/" + juego.app_id + "/capsule_616x353.jpg";
                             string fallback = juego.header_image;
-                            if (await ImagenExiste(imagenGrande))
-                            {
-                                imagenesCarrusel.Add(imagenGrande);
-                            }
-                            else
-                            {
-                                imagenesCarrusel.Add(fallback);
-                            }
+                            
 
+                            imagenesCarrusel.Add(fallback);
                             appidCarrusel.Add(juego.app_id);
 
                             miniaturasCarrusel.Add(juego.capturas_miniatura);
@@ -707,6 +713,7 @@ namespace Cliente_TFG.Pages
         {
             public List<JuegoOfertaEspecial> juegos { get; set; }
         }
+
         public class JuegoOfertaEspecial
         {
             public int app_id { get; set; }
@@ -727,6 +734,7 @@ namespace Cliente_TFG.Pages
         //PARTE PARA LOS NUEVOS LANZAMIENTOS
         private void CargarNuevosLanzamientos()
         {
+            /*
             string[] urls = new string[]
             {
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1850570/capsule_231x87.jpg",
@@ -740,30 +748,33 @@ namespace Cliente_TFG.Pages
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/capsule_231x87.jpg",
                 "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/capsule_231x87.jpg"
             };
+            */
 
 
 
-
-            for (int i = 0; i < urls.Length; i++)
+            for (int i = 0; i < imagenesNuevosLanzamientos.Count; i++)
             {
-                Thickness margenFila = new Thickness(0, i == 0 ? 0 : 5, 0, i == urls.Length - 1 ? 0 : 5);
-
+                Thickness margenFila = new Thickness(0, i == 0 ? 0 : 5, 0, i == imagenesNuevosLanzamientos.Count - 1 ? 0 : 5);
+                
                 //GRID CONTENEDOR DE LA FILA
                 Grid filaGrid = new Grid
                 {
-                    Background = Brushes.Transparent, // Necesario para que el click funcione
+                    Background = Brushes.Transparent, 
                     Margin = margenFila,
-                    Cursor = Cursors.Hand // Opcional: cambia el cursor
+                    Cursor = Cursors.Hand,
+                    Tag = appidNuevosLanzamientos[i]
                 };
 
-                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(231) }); // Imagen
-                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Texto
-                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100) }); // Precio
+                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(231) });
+                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength() });
+                filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100) });
+
 
                 //IMAGEN
                 Image img = new Image
                 {
-                    Source = new BitmapImage(new Uri(urls[i])),
+                    Source = new BitmapImage(new Uri(imagenesNuevosLanzamientos[i])),
                     Stretch = Stretch.UniformToFill,
                     HorizontalAlignment = HorizontalAlignment.Left
                 };
@@ -773,7 +784,8 @@ namespace Cliente_TFG.Pages
                 //TEXTO DEL CONTENIDO
                 Label textoContenido = new Label
                 {
-                    Content = "Half-Life 2\nAcción, Ciencia ficción",
+                    //Content = "Half-Life 2\nAcción, Ciencia ficción",
+                    Content = $"{nombreNuevosLanzamientos[i]}\n{generosNuevosLanzamientos[i]}",
                     FontSize = 16,
                     Foreground = AppTheme.Actual.TextoPrincipal,
                     HorizontalContentAlignment = HorizontalAlignment.Left,
@@ -784,17 +796,34 @@ namespace Cliente_TFG.Pages
                 Grid.SetColumn(textoContenido, 1);
                 filaGrid.Children.Add(textoContenido);
 
+                //FECHA DE PUBLICACIÓN
+                Label textoFechaPublicacion = new Label
+                {
+                    //Content = "15,99€",
+                    Content = "Fecha de lanzamiento: " + fechaNuevosLanzamientos[i] + "               ",
+                    FontSize = 12,
+                    FontWeight = FontWeights.Light,
+                    HorizontalContentAlignment = HorizontalAlignment.Left,
+                    VerticalContentAlignment = VerticalAlignment.Center,
+                    Background = AppTheme.Actual.FondoPanel,
+                    Foreground = AppTheme.Actual.TextoPrincipal,
+                };
+                Grid.SetColumn(textoFechaPublicacion, 2);
+                filaGrid.Children.Add(textoFechaPublicacion);
+
                 //PRECIO
                 Label textoPrecio = new Label
                 {
-                    Content = "15,99€",
+                    //Content = "15,99€",
+                    Content = precioNuevosLanzamientos[i],
                     FontSize = 16,
                     HorizontalContentAlignment = HorizontalAlignment.Left,
                     VerticalContentAlignment = VerticalAlignment.Center,
                     Background = AppTheme.Actual.FondoPanel,
-                    Foreground = AppTheme.Actual.TextoPrecio,
+                    Foreground = AppTheme.Actual.TextoPrincipal,
+                    FontWeight = FontWeights.Bold,
                 };
-                Grid.SetColumn(textoPrecio, 2);
+                Grid.SetColumn(textoPrecio, 3);
                 filaGrid.Children.Add(textoPrecio);
 
                 //EVENTO DE CLICK
@@ -804,23 +833,97 @@ namespace Cliente_TFG.Pages
                 filaGrid.MouseEnter += (s, e) =>
                 {
                     textoContenido.Background = AppTheme.Actual.RatonEncima;
+                    textoFechaPublicacion.Background = AppTheme.Actual.RatonEncima;
                     textoPrecio.Background = AppTheme.Actual.RatonEncima;
                 };
                 filaGrid.MouseLeave += (s, e) =>
                 {
                     textoContenido.Background = AppTheme.Actual.FondoPanel;
+                    textoFechaPublicacion.Background = AppTheme.Actual.FondoPanel;
                     textoPrecio.Background = AppTheme.Actual.FondoPanel;
                 };
 
 
                 //AÑADIR LA FILA AL GRID PRINCIPAL
                 Grid.SetRow(filaGrid, i);
-                Grid.SetColumnSpan(filaGrid, 3);
+                Grid.SetColumnSpan(filaGrid, 4);
                 panelNuevosLanzamientos.Children.Add(filaGrid);
             }
 
         }
 
+        private async void CargarDatosJsonNuevosLanzamientos()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    string json = await client.GetStringAsync("http://127.0.0.1:5000/store/nuevos_lanzamientos");
+                    var response = JsonConvert.DeserializeObject<NuevosLanzamientosResponse>(json);
+
+
+                    foreach (var juegoNuevoLanzamiento in response.juegos)
+                    {
+
+                        appidNuevosLanzamientos.Add(juegoNuevoLanzamiento.app_id);
+                        nombreNuevosLanzamientos.Add(juegoNuevoLanzamiento.nombre);
+                        generosNuevosLanzamientos.Add(string.Join(", ", juegoNuevoLanzamiento.generos));
+                        fechaNuevosLanzamientos.Add(juegoNuevoLanzamiento.fecha_de_lanzamiento);
+                        imagenesNuevosLanzamientos.Add(juegoNuevoLanzamiento.capsule_image);
+                        if (string.IsNullOrEmpty(juegoNuevoLanzamiento.precio?.precio_inicial) || juegoNuevoLanzamiento.precio.precio_inicial == "0")
+                        {
+                            precioNuevosLanzamientos.Add("Free To Play");
+                        }
+                        else
+                        {
+
+                            double precioEuros = double.Parse(juegoNuevoLanzamiento.precio.precio_inicial) / 100.0;
+                            double descuento = double.Parse(juegoNuevoLanzamiento.precio.descuento);
+                            double precioFinal = precioEuros * (1 - (descuento / 100.0));
+
+                            precioNuevosLanzamientos.Add(precioFinal.ToString("0.00") + " € ");
+                            descuentoNuevosLanzamientos.Add(descuento.ToString());
+                        }
+
+                    }
+
+                    if (imagenesOfertas.Count == 0)
+                    {
+                        MessageBox.Show("No se encontraron imágenes para las ofertas.");
+                    }
+                    else
+                    {
+                        //SI AL MENOS UNA IMAGEN ESTA DISPONIBLE, MUESTRO LAS OFERTAS
+                        CargarNuevosLanzamientos();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al cargar datos de las ofertas espciales: {ex.Message}");
+                }
+            }
+        }
+
+        public class NuevosLanzamientosResponse
+        {
+            public List<JuegoNuevoLanzamiento> juegos { get; set; }
+        }
+
+        public class JuegoNuevoLanzamiento
+        {
+            public int app_id { get; set; }
+            public string capsule_image { get; set; }
+            public string nombre { get; set; }
+            public string fecha_de_lanzamiento { get; set; }
+            public List<string> generos { get; set; }
+            public PrecioNuevoLanzamiento precio { get; set; }
+        }
+
+        public class PrecioNuevoLanzamiento
+        {
+            public string descuento { get; set; }
+            public string precio_inicial { get; set; }
+        }
 
 
 
