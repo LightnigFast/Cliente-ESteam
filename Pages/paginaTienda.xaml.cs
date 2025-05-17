@@ -65,7 +65,6 @@ namespace Cliente_TFG.Pages
 
         //PARA LAS BUSQUEDAS
         private readonly HttpClient _client = new HttpClient();
-        private CancellationTokenSource _cts;
         private DateTime _lastKeyPressTime;
         private CancellationTokenSource _searchCts;
 

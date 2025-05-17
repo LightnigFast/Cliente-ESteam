@@ -39,11 +39,14 @@ namespace Cliente_TFG
 
         private void CargarPrimeraVentana()
         {
-            var paginaTienda = new paginaTienda(this);
-            framePrincipal.Navigate(paginaTienda);
+            //var paginaTienda = new paginaTienda(this);
+            //framePrincipal.Navigate(paginaTienda);
 
             //var paginaTienda = new paginaJuegoTienda(this, 3017860);
             //framePrincipal.Navigate(paginaTienda);
+
+            var paginaBiblioteca = new paginaBiblioteca();
+            framePrincipal.Navigate(paginaBiblioteca);
         }
 
         private void boton_biblioteca_presionado(object sender, RoutedEventArgs e)

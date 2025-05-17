@@ -8,7 +8,37 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="paginaBiblioteca">
 
-    <Grid Background="Green">
-        
+    <Grid x:Name="gridPrincipal" Background="Black">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--IMAGEN GRANDE DEL JUEGO-->
+        <Image x:Name="imgFondo" Grid.RowSpan="2" Stretch="Uniform" VerticalAlignment="Top" Panel.ZIndex="0">
+            <Image.OpacityMask>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <!-- Arriba 100% opaco (se ve la imagen) -->
+                    <GradientStop Color="#FFFFFFFF" Offset="0.0"/>
+                    <!-- En un punto medio sigue opaco -->
+                    <GradientStop Color="#FFFFFFFF" Offset="0.7"/>
+                    <!-- Abajo 100% transparente (se ve el fondo negro) -->
+                    <GradientStop Color="#00FFFFFF" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Image.OpacityMask>
+        </Image>
+
+        <!--PARTE PARA LOS DATOS DEL JUEGO, BOTON DE PLAY Y DEMAS-->
+        <Grid x:Name="gridDatosJuego" Grid.Row="0" Background="Transparent" Panel.ZIndex="1">
+
+        </Grid>
+
+        <!--PARTE DE ABAJO PARA LOS DEMAS JUEGOS-->
+        <ScrollViewer Grid.Row="1" Background="Transparent" Panel.ZIndex="1">
+            
+        </ScrollViewer>
     </Grid>
+
+
+
 </Page>
