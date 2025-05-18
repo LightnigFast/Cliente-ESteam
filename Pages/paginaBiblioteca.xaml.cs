@@ -61,7 +61,7 @@ namespace Cliente_TFG.Pages
                 "1086940",
                 "3017860",
                 "2456740",
-                "805550",
+                "805550", 
                 "2878980",
                 "3159330",
                 "2909400",
@@ -73,6 +73,7 @@ namespace Cliente_TFG.Pages
                 "1551360",
                 "3164500",
                 "2842040",
+                "2488620",
             };
 
             Nombres = new string[]
@@ -81,11 +82,24 @@ namespace Cliente_TFG.Pages
                 "Dota 2",
                 "PUBG: BATTLEGROUNDS",
                 "Rust",
-                "2507950",
                 "Delta Force",
+                "Clair Obscur: Expedition 33",
                 "Baldur's Gate 3",
                 "DOOM: The Dark Ages",
                 "inZOI",
+                "Assetto Corsa Competizione",
+                "NBA 2K25",
+                "Assassin's Creed Shadows",
+                "FINAL FANTASY VII REBIRTH",
+                "The Last of Us™ Part II Remastered",
+                "Assetto Corsa EVO",
+                "EA SPORTS FC 25",
+                "Persona 5 Royal",
+                "Assetto Corsa",
+                "Forza Horizon 5",
+                "Schedule I",
+                "Star Wars Outlaws",
+                "F1® 24",
             };
 
         }
@@ -190,11 +204,13 @@ namespace Cliente_TFG.Pages
                     var fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(300)));
                     imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                    BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 };
 
                 //INICIAR FADE OUT
                 imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+                BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOut);
             }
         }
 
@@ -205,10 +221,14 @@ namespace Cliente_TFG.Pages
             string filtro = txtBuscar.Text.ToLower();
             panelJuegosBiblioteca.Children.Clear();
 
+            bool hayCoincidencias = false;
+
             for (int i = 0; i < imagenVerticalJuegos.Count; i++)
             {
                 if (i < Nombres.Length && Nombres[i].ToLower().Contains(filtro))
                 {
+                    hayCoincidencias = true;
+
                     string juegosBiblioteca = imagenVerticalJuegos[i];
                     var scale = new ScaleTransform(1.0, 1.0);
 
@@ -242,7 +262,42 @@ namespace Cliente_TFG.Pages
                     panelJuegosBiblioteca.Children.Add(img);
                 }
             }
+
+            if (!hayCoincidencias)
+            {
+
+                Grid gridContenedor = new Grid()
+                {
+                    Width = panelJuegosBiblioteca.ActualWidth,
+                    Height = panelJuegosBiblioteca.ActualHeight,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+
+                TextBlock textoError = new TextBlock()
+                {
+                    Text = "Ningún juego coincide con tu búsqueda. Quizás lo encuentres en la tienda.",
+                    Foreground = Brushes.White,
+                    FontSize = 16,
+                    TextWrapping = TextWrapping.Wrap,
+                    TextAlignment = TextAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    MaxWidth = 500
+                };
+
+                gridContenedor.Children.Add(textoError);
+                panelJuegosBiblioteca.Children.Add(gridContenedor);
+
+                panelJuegosBiblioteca.SizeChanged += (s, ev) =>
+                {
+                    gridContenedor.Width = panelJuegosBiblioteca.ActualWidth;
+                    gridContenedor.Height = panelJuegosBiblioteca.ActualHeight;
+                };
+
+            }
         }
+
 
 
 
