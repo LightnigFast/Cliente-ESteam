@@ -36,8 +36,18 @@
             </Grid.ColumnDefinitions>
 
             <Image x:Name="ImagenLogo" Grid.Column="0" Margin="20,50,50,50" HorizontalAlignment="Left"/>
-            
 
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="4*"/>
+                </Grid.RowDefinitions>
+            </Grid>
+
+            <!--PARTE PARA LA BARRA DE BUSQUEDA-->
+            <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Margin="20,10,0,0" VerticalAlignment="Top">
+                <TextBox x:Name="txtBuscar" Width="300" Height="30" Margin="0,0,10,0" VerticalAlignment="Center" TextChanged="txtBuscar_TextChanged"/>
+            </StackPanel>
         </Grid>
 
         <!--PARTE DE ABAJO PARA LOS DEMAS JUEGOS-->

@@ -60,6 +60,19 @@ namespace Cliente_TFG.Pages
                 "1903340",
                 "1086940",
                 "3017860",
+                "2456740",
+                "805550",
+                "2878980",
+                "3159330",
+                "2909400",
+                "2531310",
+                "3058630",
+                "2669320",
+                "1687950",
+                "244210",
+                "1551360",
+                "3164500",
+                "2842040",
             };
 
             Nombres = new string[]
@@ -72,6 +85,7 @@ namespace Cliente_TFG.Pages
                 "Delta Force",
                 "Baldur's Gate 3",
                 "DOOM: The Dark Ages",
+                "inZOI",
             };
 
         }
@@ -107,6 +121,7 @@ namespace Cliente_TFG.Pages
         }
 
 
+
         //METODO PARA CARGAR EL FONDO
         private void CargarFondo()
         {
@@ -123,22 +138,41 @@ namespace Cliente_TFG.Pages
             {
                 var juegosBiblioteca = imagenVerticalJuegos[i];
 
+                // CREAMOS EL SCALE TRANSFORM PARA APLICAR LA ANIMACIÓN
+                var scale = new ScaleTransform(1.0, 1.0);
+
                 Image img = new Image
                 {
                     Source = new BitmapImage(new Uri(juegosBiblioteca)),
                     Stretch = Stretch.Uniform,
                     Height = 170,
-                    Margin = new Thickness(5),
-                    Tag = i //ALMACENAMOS EL ÍNDICE PARA IDENTIFICAR EL JUEGO
+                    Margin = new Thickness(11),
+                    Tag = i,
+                    RenderTransform = scale,
+                    RenderTransformOrigin = new Point(0.5, 0.5)
                 };
 
-                //EVENTO DE CLIC
+                // EVENTO DE CLIC
                 img.MouseLeftButtonUp += ImagenJuego_Click;
+
+                // EVENTOS DE ANIMACIÓN AL PASAR EL RATÓN
+                img.MouseEnter += (s, e) =>
+                {
+                    var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                };
+
+                img.MouseLeave += (s, e) =>
+                {
+                    var anim = new DoubleAnimation(1.1, 1.0, TimeSpan.FromMilliseconds(150));
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                };
 
                 panelJuegosBiblioteca.Children.Add(img);
             }
         }
-
 
         private void ImagenJuego_Click(object sender, MouseButtonEventArgs e)
         {
@@ -165,6 +199,50 @@ namespace Cliente_TFG.Pages
         }
 
 
+        //PARTE PARA EL BUSCADOR
+        private void txtBuscar_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string filtro = txtBuscar.Text.ToLower();
+            panelJuegosBiblioteca.Children.Clear();
+
+            for (int i = 0; i < imagenVerticalJuegos.Count; i++)
+            {
+                if (i < Nombres.Length && Nombres[i].ToLower().Contains(filtro))
+                {
+                    string juegosBiblioteca = imagenVerticalJuegos[i];
+                    var scale = new ScaleTransform(1.0, 1.0);
+
+                    Image img = new Image
+                    {
+                        Source = new BitmapImage(new Uri(juegosBiblioteca)),
+                        Stretch = Stretch.Uniform,
+                        Height = 170,
+                        Margin = new Thickness(11),
+                        Tag = i,
+                        RenderTransform = scale,
+                        RenderTransformOrigin = new Point(0.5, 0.5)
+                    };
+
+                    img.MouseLeftButtonUp += ImagenJuego_Click;
+
+                    img.MouseEnter += (s2, e2) =>
+                    {
+                        var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
+                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                    };
+
+                    img.MouseLeave += (s2, e2) =>
+                    {
+                        var anim = new DoubleAnimation(1.1, 1.0, TimeSpan.FromMilliseconds(150));
+                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                    };
+
+                    panelJuegosBiblioteca.Children.Add(img);
+                }
+            }
+        }
 
 
 
