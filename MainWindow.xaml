@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:Cliente_TFG"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="720" Width="1280">
+        Title="MainWindow" Width="1280" Height="720" MinWidth="1280" MinHeight="720">
     <Grid>
         <!--FONDO GRADIENTE-->
         <Grid.Background>
