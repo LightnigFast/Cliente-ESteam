@@ -1001,10 +1001,32 @@ namespace Cliente_TFG.Pages
                             var grid = new Grid
                             {
                                 Margin = new Thickness(2),
-                                Height = 60
+                                Height = 60,
+                                Tag = juego.app_id,
                             };
                             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                            grid.MouseEnter += (s, e) =>
+                            {
+                                if (s is Grid g)
+                                {
+                                    g.Background = new SolidColorBrush(Color.FromRgb(81, 81, 81)); //FONDO HOVER
+                                }
+                            };
+
+                            grid.MouseLeave += (s, e) =>
+                            {
+                                if (s is Grid g)
+                                {
+                                    g.Background = Brushes.Transparent; //RESTAURA FONDO
+                                }
+                            };
+
+                            grid.MouseLeftButtonDown += (s, e) =>
+                            {
+                                _ = JuegoClickAsync(s, e); // LLAMA AL ASYNC PARA EL CLICK
+                            };
 
                             //CREO LA IMAGEN
                             var imagen = new Image
@@ -1068,7 +1090,7 @@ namespace Cliente_TFG.Pages
 
                             stackPanel.Children.Add(txtNombre);
                             stackPanel.Children.Add(txtPrecio);
-                            stackPanel.MouseLeftButtonDown += JuegoClick;
+                            //stackPanel.MouseLeftButtonDown += JuegoClick;
 
                             Grid.SetColumn(stackPanel, 1);
                             grid.Children.Add(stackPanel);
@@ -1173,6 +1195,7 @@ namespace Cliente_TFG.Pages
         {
             stackHorizontal.Background = AppTheme.Actual.FondoPanel;
         }
+
 
 
         private void RefrescarTemas()

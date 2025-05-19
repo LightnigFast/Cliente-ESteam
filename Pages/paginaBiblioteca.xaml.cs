@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Policy;
@@ -297,8 +298,6 @@ namespace Cliente_TFG.Pages
 
             }
         }
-
-
 
 
 
