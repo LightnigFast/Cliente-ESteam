@@ -8,6 +8,7 @@
              d:DesignHeight="60" d:DesignWidth="1280">
 
     <UserControl.Resources>
+        <!--ESTILO DEL MENU DESPLEGABLE DEL PERFIL-->
         <Style x:Key="EstiloMenuItem" TargetType="MenuItem">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
@@ -89,7 +90,16 @@
                         </Style>
                     </ContextMenu.Resources>
 
-                    <!-- Ahora definimos cada MenuItem con su propia cabecera compuesta -->
+                    <!--MENU ITEMS PARA LOS ESTADOS Y DEMAS OPCIONES-->
+                    <MenuItem Click="VerPerfil_Click" Tag="Conectado" Style="{StaticResource EstiloMenuItem}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                <TextBlock Text="Ver mi perfil" FontSize="12" VerticalAlignment="Center"/>
+                                <Border Height="1" Background="White" Margin="-5" VerticalAlignment="Bottom" Width="100" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+
                     <MenuItem Click="StatusMenuItem_Click" Tag="Conectado" Style="{StaticResource EstiloMenuItem}">
                         <MenuItem.Header>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

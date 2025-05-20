@@ -21,14 +21,18 @@ namespace Cliente_TFG.UserControls
     /// </summary>
     public partial class Cabezera : UserControl, INotifyPropertyChanged
     {
+        //PARA LAS OPCIONES
         public event RoutedEventHandler BibliotecaPresionado;
         public event RoutedEventHandler TiendaPresionado;
         public event RoutedEventHandler AmigosPresionado;
 
+
+        //PARA EL MENU
         public event PropertyChangedEventHandler PropertyChanged;
         private string _nombreUsuario = "NombreUsuario";
         private string _estadoTexto = "En línea";
-        private Color _estadoColor = (Color)ColorConverter.ConvertFromString("#FF5EBD3E"); // Verde
+        private Color _estadoColor = (Color)ColorConverter.ConvertFromString("#FF5EBD3E");
+        public event RoutedEventHandler VerPerfilPresionado;
 
         public Cabezera()
         {
@@ -63,7 +67,7 @@ namespace Cliente_TFG.UserControls
 
 
 
-
+        //PARTE PARA EL USUARIO
         public string NombreUsuario
         {
             get => _nombreUsuario;
@@ -86,7 +90,7 @@ namespace Cliente_TFG.UserControls
         private void GridPerfilUsuario_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed
-                && !StatusMenu.IsOpen)            // <-- solo si no está ya abierto
+                && !StatusMenu.IsOpen)
             {
                 StatusMenu.PlacementTarget = gridPerfilUsuario;
                 StatusMenu.IsOpen = true;
@@ -94,6 +98,7 @@ namespace Cliente_TFG.UserControls
             }
         }
 
+        //CLICK EN EL MENU DE LOS ESTADOS
         private void StatusMenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem)
@@ -104,6 +109,14 @@ namespace Cliente_TFG.UserControls
             }
         }
 
+        //VER PERFIL CLICK
+        public void VerPerfil_Click(object sender, RoutedEventArgs e)
+        {
+            VerPerfilPresionado?.Invoke(this, e);
+        }
+
+
+        //PARA CAMBIAR EL ESTADO DE LA CUENTA
         private string _estadoActual;
         public string EstadoActual
         {

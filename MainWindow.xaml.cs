@@ -31,6 +31,7 @@ namespace Cliente_TFG
             Cabecera_top.BibliotecaPresionado += boton_biblioteca_presionado;
             Cabecera_top.TiendaPresionado += boton_tienda_presionado;
             Cabecera_top.AmigosPresionado += boton_amigos_presionado;
+            Cabecera_top.VerPerfilPresionado += boton_verPerfil_presionado; ;
 
             CargarPrimeraVentana();
 
@@ -62,6 +63,11 @@ namespace Cliente_TFG
         private void boton_amigos_presionado(object sender, RoutedEventArgs e)
         {
             framePrincipal.Navigate(new paginaAmigos());
+        }
+
+        private void boton_verPerfil_presionado(object sender, RoutedEventArgs e)
+        {
+            framePrincipal.Navigate(new paginaPerfil());
         }
     }
 }
