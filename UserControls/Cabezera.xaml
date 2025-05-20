@@ -35,12 +35,19 @@
     
     <Grid Background="Black">
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
+        <!--BOTONES DE NAVEGACIÓN-->
+        <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" Margin="10,0">
+            <Button Content="←" Width="30" Height="30" Margin="0,0,5,0" Click="BtnAtras_Click"/>
+            <Button Content="→" Width="30" Height="30" Click="BtnAdelante_Click"/>
+        </StackPanel>
+
         <!--GRID PARA LOS BOTONES DE TIENDA, BIBLIOTECA Y AMIGOS-->
-        <Grid Grid.Column="0">
+        <Grid Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -60,8 +67,7 @@
 
 
         <!--GRID PARA LA PESTAÑA DE USUARIO-->
-        <Grid x:Name="gridPerfilUsuario" Grid.Column="1" MouseDown="GridPerfilUsuario_MouseDown">
-            <!-- Reemplaza TODO este bloque -->
+        <Grid x:Name="gridPerfilUsuario" Grid.Column="2" MouseDown="GridPerfilUsuario_MouseDown">
             <Grid.ContextMenu>
                 <ContextMenu x:Name="StatusMenu"
                              Background="#FF2D2D2D"
@@ -70,9 +76,8 @@
                              BorderThickness="1"
                              OverridesDefaultStyle="True"
                               DataContext="{Binding PlacementTarget.DataContext,
-                             RelativeSource={RelativeSource Self}}">        
+                             RelativeSource={RelativeSource Self}}">
                     <ContextMenu.Resources>
-                        <!-- Ya tienes aquí el template de ContextMenu para quitar chrome -->
                         <Style TargetType="ContextMenu">
                             <Setter Property="Template">
                                 <Setter.Value>
@@ -145,7 +150,7 @@
 
             <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                    <!-- PARTE PARA LA IMAGEN DE PERFIL -->
+                    <!--PARTE PARA LA IMAGEN DE PERFIL-->
                     <Border Margin="0,0,10,0">
                         <Border.CornerRadius>
                             <CornerRadius TopLeft="5" TopRight="5" BottomLeft="5" BottomRight="5"/>
@@ -160,11 +165,11 @@
                         </Ellipse>
                     </Border>
 
-                    <!-- CONTENEDOR DE NOMBRE Y ESTADO -->
+                    <!--CONTENEDOR DE NOMBRE Y ESTADO-->
                     <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                         <TextBlock Text="{Binding NombreUsuario}" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
 
-                        <!-- INDICADOR DE ESTADO -->
+                        <!--INDICADOR DE ESTADO-->
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
                             <Ellipse Width="8" Height="8" Margin="0,0,5,0">
                                 <Ellipse.Fill>

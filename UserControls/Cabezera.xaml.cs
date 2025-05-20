@@ -22,6 +22,9 @@ namespace Cliente_TFG.UserControls
     public partial class Cabezera : UserControl, INotifyPropertyChanged
     {
         //PARA LAS OPCIONES
+        public event RoutedEventHandler AtrasPresionado;
+        public event RoutedEventHandler AvanzarPresionado;
+
         public event RoutedEventHandler BibliotecaPresionado;
         public event RoutedEventHandler TiendaPresionado;
         public event RoutedEventHandler AmigosPresionado;
@@ -43,6 +46,19 @@ namespace Cliente_TFG.UserControls
             EstadoActual = "Conectado";
         }
 
+        //ATRAS CLICK
+        private void BtnAtras_Click(object sender, RoutedEventArgs e)
+        {
+            //CAMBIAR A LA PÁGINA ANTERIOR
+            AtrasPresionado?.Invoke(this, e);
+        }
+
+        //ADELANT CLICK
+        private void BtnAdelante_Click(object sender, RoutedEventArgs e)
+        {
+            //CAMBIAR A LA PÁGINA SIGUIENTE
+            AvanzarPresionado?.Invoke(this, e);
+        }
 
 
         //BIBLIOTECA CLICK

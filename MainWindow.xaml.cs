@@ -28,10 +28,15 @@ namespace Cliente_TFG
             InitializeComponent();
             this.DataContext = AppTheme.Actual;
 
+            framePrincipal.Navigated += FramePrincipal_Navigated;
+
+            Cabecera_top.AtrasPresionado += boton_atras_presionado;
+            Cabecera_top.AvanzarPresionado += boton_avanzar_presionado;
             Cabecera_top.BibliotecaPresionado += boton_biblioteca_presionado;
             Cabecera_top.TiendaPresionado += boton_tienda_presionado;
             Cabecera_top.AmigosPresionado += boton_amigos_presionado;
-            Cabecera_top.VerPerfilPresionado += boton_verPerfil_presionado; ;
+
+            Cabecera_top.VerPerfilPresionado += boton_verPerfil_presionado;
 
             CargarPrimeraVentana();
 
@@ -48,6 +53,26 @@ namespace Cliente_TFG
 
             var paginaBiblioteca = new paginaBiblioteca();
             framePrincipal.Navigate(paginaBiblioteca);
+        }
+
+        private void FramePrincipal_Navigated(object sender, NavigationEventArgs e)
+        {
+            if (e.Content is paginaTienda pagina)
+            {
+                pagina.RestaurarOpacidad();
+            }
+        }
+
+        private void boton_atras_presionado(object sender, RoutedEventArgs e)
+        {
+            if (framePrincipal.CanGoBack) 
+                framePrincipal.GoBack();
+        }
+
+        private void boton_avanzar_presionado(object sender, RoutedEventArgs e)
+        {
+            if (framePrincipal.CanGoForward)
+                framePrincipal.GoForward();
         }
 
         private void boton_biblioteca_presionado(object sender, RoutedEventArgs e)

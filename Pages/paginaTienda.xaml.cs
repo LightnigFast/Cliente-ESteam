@@ -93,6 +93,12 @@ namespace Cliente_TFG.Pages
             CargarNuevosLanzamientos();
         }
 
+        public void RestaurarOpacidad()
+        {
+            panelPrincipal.Opacity = 1;
+        }
+
+
         //METODO PARA CARGAR LOS DATOS DEL JSON
         private async void CargarDatosJsonCarrusel()
         {
@@ -334,6 +340,7 @@ namespace Cliente_TFG.Pages
             elemento.BeginAnimation(UIElement.OpacityProperty, fadeOut);
 
             await Task.Delay(500); //ESPERA A QUE TERMINE LA ANIMACIÓN
+            AplicarFadeIn(elemento);
         }
 
 
