@@ -1025,7 +1025,7 @@ namespace Cliente_TFG.Pages
 
                             grid.MouseLeftButtonDown += (s, e) =>
                             {
-                                _ = JuegoClickAsync(s, e); // LLAMA AL ASYNC PARA EL CLICK
+                                _ = JuegoClickAsync(s, e); //LLAMA AL ASYNC PARA EL CLICK
                             };
 
                             //CREO LA IMAGEN

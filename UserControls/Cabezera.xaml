@@ -6,6 +6,31 @@
              xmlns:local="clr-namespace:Cliente_TFG.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="60" d:DesignWidth="1280">
+
+    <UserControl.Resources>
+        <Style x:Key="EstiloMenuItem" TargetType="MenuItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border Background="{TemplateBinding Background}">
+                            <Grid>
+                                <ContentPresenter Content="{TemplateBinding Header}"
+                                          Margin="10 5"
+                                          VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#656565"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
     
     <Grid Background="Black">
         <Grid.ColumnDefinitions>
@@ -32,6 +57,116 @@
 
         </Grid>
 
+
+        <!--GRID PARA LA PESTAÑA DE USUARIO-->
+        <Grid x:Name="gridPerfilUsuario" Grid.Column="1" MouseDown="GridPerfilUsuario_MouseDown">
+            <!-- Reemplaza TODO este bloque -->
+            <Grid.ContextMenu>
+                <ContextMenu x:Name="StatusMenu"
+                             Background="#FF2D2D2D"
+                             Foreground="White"
+                             BorderBrush="#FF4D4D4D"
+                             BorderThickness="1"
+                             OverridesDefaultStyle="True"
+                              DataContext="{Binding PlacementTarget.DataContext,
+                             RelativeSource={RelativeSource Self}}">        
+                    <ContextMenu.Resources>
+                        <!-- Ya tienes aquí el template de ContextMenu para quitar chrome -->
+                        <Style TargetType="ContextMenu">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ContextMenu">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="2"
+                                                SnapsToDevicePixels="True">           
+                                            <StackPanel IsItemsHost="True"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ContextMenu.Resources>
+
+                    <!-- Ahora definimos cada MenuItem con su propia cabecera compuesta -->
+                    <MenuItem Click="StatusMenuItem_Click" Tag="Conectado" Style="{StaticResource EstiloMenuItem}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="8" Height="8" Margin="0,0,5,0"
+                                         Fill="#FF5EBD3E"/>
+                                <TextBlock Text="En línea" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+
+                    <MenuItem Click="StatusMenuItem_Click" Tag="Ausente" Style="{StaticResource EstiloMenuItem}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="8" Height="8" Margin="0,0,5,0"
+                                         Fill="#FFE6B905"/>
+                                <TextBlock Text="Ausente" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+
+                    <MenuItem Click="StatusMenuItem_Click" Tag="Desconectado" Style="{StaticResource EstiloMenuItem}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="8" Height="8" Margin="0,0,5,0"
+                                         Fill="#FFBD3E3E"/>
+                                <TextBlock Text="Desconectado" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+
+                    <MenuItem Click="StatusMenuItem_Click" Tag="Invisible" Style="{StaticResource EstiloMenuItem}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="8" Height="8" Margin="0,0,5,0"
+                                         Fill="#656565"/>
+                                <TextBlock Text="Invisible" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+
+                </ContextMenu>
+            </Grid.ContextMenu>
+
+            <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <!-- PARTE PARA LA IMAGEN DE PERFIL -->
+                    <Border Margin="0,0,10,0">
+                        <Border.CornerRadius>
+                            <CornerRadius TopLeft="5" TopRight="5" BottomLeft="5" BottomRight="5"/>
+                        </Border.CornerRadius>
+                        <Border.Background>
+                            <ImageBrush x:Name="marcoUser"/>
+                        </Border.Background>
+                        <Ellipse Width="32" Height="32">
+                            <Ellipse.Fill>
+                                <ImageBrush x:Name="imagenUser" />
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Border>
+
+                    <!-- CONTENEDOR DE NOMBRE Y ESTADO -->
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding NombreUsuario}" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
+
+                        <!-- INDICADOR DE ESTADO -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
+                            <Ellipse Width="8" Height="8" Margin="0,0,5,0">
+                                <Ellipse.Fill>
+                                    <SolidColorBrush Color="{Binding EstadoColor}"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <TextBlock Text="{Binding EstadoTexto}" Foreground="#FFB3B3B3" FontSize="12" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Grid>
 
 
     </Grid>
