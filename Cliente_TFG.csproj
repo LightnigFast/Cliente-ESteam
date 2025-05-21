@@ -72,9 +72,6 @@
     <Compile Include="Pages\paginaBiblioteca.xaml.cs">
       <DependentUpon>paginaBiblioteca.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\paginaJuegoBiblioteca.xaml.cs">
-      <DependentUpon>paginaJuegoBiblioteca.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\paginaJuegoTienda.xaml.cs">
       <DependentUpon>paginaJuegoTienda.xaml</DependentUpon>
     </Compile>
@@ -110,10 +107,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\paginaBiblioteca.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\paginaJuegoBiblioteca.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

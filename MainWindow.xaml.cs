@@ -38,9 +38,17 @@ namespace Cliente_TFG
 
             Cabecera_top.VerPerfilPresionado += boton_verPerfil_presionado;
 
+
+            CargarDatosUsuario(2);
+
             CargarPrimeraVentana();
 
 
+        }
+
+        private void CargarDatosUsuario(int id)
+        {
+            
         }
 
         private void CargarPrimeraVentana()

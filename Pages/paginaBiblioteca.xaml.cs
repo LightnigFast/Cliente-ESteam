@@ -126,6 +126,7 @@ namespace Cliente_TFG.Pages
 
             if (imagenesFondo.Count == 0)
             {
+
                 MessageBox.Show("No se encontraron imágenes para el fondo.");
             }
             else
