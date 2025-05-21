@@ -53,7 +53,7 @@ namespace Cliente_TFG.Pages
 
             appids = new string[]
             {
-                "730",
+                /*"730",
                 "570",
                 "578080",
                 "252490",
@@ -62,7 +62,7 @@ namespace Cliente_TFG.Pages
                 "1086940",
                 "3017860",
                 "2456740",
-                "805550", 
+                "805550",
                 "2878980",
                 "3159330",
                 "2909400",
@@ -74,12 +74,12 @@ namespace Cliente_TFG.Pages
                 "1551360",
                 "3164500",
                 "2842040",
-                "2488620",
+                "2488620",*/
             };
 
             Nombres = new string[]
             {
-                "Counter Strike 2",
+                /*"Counter Strike 2",
                 "Dota 2",
                 "PUBG: BATTLEGROUNDS",
                 "Rust",
@@ -100,7 +100,7 @@ namespace Cliente_TFG.Pages
                 "Forza Horizon 5",
                 "Schedule I",
                 "Star Wars Outlaws",
-                "F1® 24",
+                "F1® 24",*/
             };
 
         }
@@ -126,8 +126,16 @@ namespace Cliente_TFG.Pages
 
             if (imagenesFondo.Count == 0)
             {
-
-                MessageBox.Show("No se encontraron imágenes para el fondo.");
+                //CARGO UNA IMAGEN ESTATICA
+                string imagenFondov2 = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "library", "Banner_no_games_library.png");
+                imagenesFondo.Add(imagenFondov2);
+                CargarFondo();
+                //QUITO EL BOTON
+                BotonJugar.IsEnabled = false;
+                BotonJugar.Opacity = 0;
+                //PONGO EL MENSAJE DE ABAJO
+                cargarMensajeBiblioteca("Actualmente no dispones de juegos en tu biblioteca. Accede a la tienda para para comprar tu primer juego");
+                //MessageBox.Show("No se encontraron imágenes para el fondo.");
             }
             else
             {
@@ -143,7 +151,11 @@ namespace Cliente_TFG.Pages
         {
             imgFondo.Source = new BitmapImage(new Uri(imagenesFondo.First(), UriKind.Absolute));
 
-            ImagenLogo.Source = new BitmapImage(new Uri(imagenesLogos.First(), UriKind.Absolute));
+            if (imagenesLogos.Count != 0)
+            {
+                ImagenLogo.Source = new BitmapImage(new Uri(imagenesLogos.First(), UriKind.Absolute));
+            }
+            
 
         }
 
@@ -268,39 +280,43 @@ namespace Cliente_TFG.Pages
             if (!hayCoincidencias)
             {
 
-                Grid gridContenedor = new Grid()
-                {
-                    Width = panelJuegosBiblioteca.ActualWidth,
-                    Height = panelJuegosBiblioteca.ActualHeight,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-
-                TextBlock textoError = new TextBlock()
-                {
-                    Text = "Ningún juego coincide con tu búsqueda. Quizás lo encuentres en la tienda.",
-                    Foreground = Brushes.White,
-                    FontSize = 16,
-                    TextWrapping = TextWrapping.Wrap,
-                    TextAlignment = TextAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    MaxWidth = 500
-                };
-
-                gridContenedor.Children.Add(textoError);
-                panelJuegosBiblioteca.Children.Add(gridContenedor);
-
-                panelJuegosBiblioteca.SizeChanged += (s, ev) =>
-                {
-                    gridContenedor.Width = panelJuegosBiblioteca.ActualWidth;
-                    gridContenedor.Height = panelJuegosBiblioteca.ActualHeight;
-                };
+                cargarMensajeBiblioteca("Ningún juego coincide con tu búsqueda. Quizás lo encuentres en la tienda.");
+                
 
             }
         }
 
+        private void cargarMensajeBiblioteca(string mensaje)
+        {
+            Grid gridContenedor = new Grid()
+            {
+                Width = panelJuegosBiblioteca.ActualWidth,
+                Height = panelJuegosBiblioteca.ActualHeight,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
 
+            TextBlock textoError = new TextBlock()
+            {
+                Text = mensaje,
+                Foreground = Brushes.White,
+                FontSize = 16,
+                TextWrapping = TextWrapping.Wrap,
+                TextAlignment = TextAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                MaxWidth = 500
+            };
+
+            gridContenedor.Children.Add(textoError);
+            panelJuegosBiblioteca.Children.Add(gridContenedor);
+
+            panelJuegosBiblioteca.SizeChanged += (s, ev) =>
+            {
+                gridContenedor.Width = panelJuegosBiblioteca.ActualWidth;
+                gridContenedor.Height = panelJuegosBiblioteca.ActualHeight;
+            };
+        }
 
     }
 }
