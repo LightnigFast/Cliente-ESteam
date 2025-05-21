@@ -5,10 +5,143 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Cliente_TFG.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="720" d:DesignWidth="1280"
       Title="paginaPerfil">
 
-    <Grid Background="DarkGoldenrod">
+    <Page.Resources>
+        <!--ESTILO PARA EL BOTON DE AMIGOS-->
+        <Style x:Key="MinimalButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#4A5568"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#00C7FE"/>
+                                <Setter TargetName="border" Property="Background" Value="#1A2835"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!--ESTILO PARA EL BOTON DE EDITAR USER-->
+        <Style x:Key="EditButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <!--EFECTO HOVER-->
+                                <Setter TargetName="border" Property="Background" Value="#1A2835"/>
+                                <Setter Property="Foreground" Value="#00C7FE"/>
+
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="12" Opacity="0.2" ShadowDepth="3" Color="#00C7FE"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="Transparent">
+        
+        <!--GRID CENTRAR PARA LA INFO DEL USER-->
+        <Grid Name="gridCnetral" HorizontalAlignment="Center" Width="1150" Background="#40000000" Margin="50">
+
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!--PARTE PARA LA IMAGEN DEL USER-->
+            <Image Name="imagenUser" Grid.Column="0" Grid.Row="0"/>
+
+            <!--PARTE PARA EL NOMBRE DEL USUARIO, NOMBRE DE PERFIL, AMIGOS Y BOTON DE EDITAR PERFIL-->
+            <StackPanel Name="gridInfoUser" Grid.Column="1" Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center">
+                <!--PARA EL NOMBRE DE USUARIO Y EL BOTON DE EDITAR USER-->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Name="nombreUser" Grid.Column="0" Text="Nombre_Usuario" FontWeight="Bold" FontSize="46"/>
+
+                    <Button Grid.Column="1" Margin="15,0,20,0" Padding="5" Style="{StaticResource MinimalButtonStyle}" Height="35">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Editar perfil" Foreground="#A0AEC0" VerticalAlignment="Center" Margin="5,0,10,0"/>
+                                
+                                <Path Data="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                                      Fill="#A0AEC0"
+                                      Stretch="Uniform"
+                                      Width="24"
+                                      VerticalAlignment="Center"/>
+                                
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                
+                <!--PARA EL NOMBRE DE CUENTA-->
+                <TextBlock Name="nombreCuenta" Text="user_129" FontWeight="Light" FontSize="22"/>
+                
+                <!--PARA EL BOTON DE AMIGOS-->
+                <Button Margin="0,10,0,0" Padding="25,15" HorizontalAlignment="Left" Style="{StaticResource MinimalButtonStyle}" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <!--ICONO DE LOS AMIGOS-->
+                        <Path Data="M12 4C13.0609 4 14.0783 4.42143 14.8284 5.17157C15.5786 5.92172 16 6.93913 16 8C16 9.06087 15.5786 10.0783 14.8284 10.8284C14.0783 11.5786 13.0609 12 12 12C10.9391 12 9.92172 11.5786 9.17157 10.8284C8.42143 10.0783 8 9.06087 8 8C8 6.93913 8.42143 5.92172 9.17157 5.17157C9.92172 4.42143 10.9391 4 12 4ZM12 14C16.42 14 20 15.79 20 18V20H4V18C4 15.79 7.58 14 12 14Z" 
+                              Fill="#CBD5E0" Stretch="Uniform" Width="28" Margin="0,0,12,0"/>
+                        
+                        <TextBlock Text="Amigos · " FontSize="18" Foreground="#CBD5E0" VerticalAlignment="Center"/>
+                        <TextBlock Name="txtNumeroAmigos" Text="127" FontSize="18" Foreground="#CBD5E0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!--PARA LA DESCRIPCCION DE LA CUENTA-->
+                <TextBlock Name="txtBiografia" Text="BIOGRAFIA:" FontSize="17" Margin="0,10,0,0"/>
+                <TextBlock Name="descripccionCuenta" FontWeight="Light" FontSize="14"  TextWrapping="Wrap"
+                           Text="Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...
+                           Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...
+                           Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion..."/>
+
+            </StackPanel>
+            
+        </Grid>
         
     </Grid>
 </Page>

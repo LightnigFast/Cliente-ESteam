@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cliente_TFG.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,16 @@ namespace Cliente_TFG.Pages
         public paginaPerfil()
         {
             InitializeComponent();
+
+            cargarTemas();
+        }
+
+        private void cargarTemas()
+        {
+            nombreUser.Foreground = AppTheme.Actual.TextoPrincipal;
+            nombreCuenta.Foreground = AppTheme.Actual.TextoPrincipal;
+            descripccionCuenta.Foreground = AppTheme.Actual.TextoPrincipal;
+            txtBiografia.Foreground = AppTheme.Actual.TextoPrincipal;   
         }
     }
 }
