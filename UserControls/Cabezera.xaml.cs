@@ -33,8 +33,38 @@ namespace Cliente_TFG.UserControls
         //PARA EL MENU
         public event PropertyChangedEventHandler PropertyChanged;
         private string _nombreUsuario = "NombreUsuario";
+        public string NombreUsuario
+        {
+            get => _nombreUsuario;
+            set
+            {
+                if (_nombreUsuario != value)
+                {
+                    _nombreUsuario = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NombreUsuario)));
+                }
+            }
+        }
+
+
         private string _estadoTexto = "En línea";
         private Color _estadoColor = (Color)ColorConverter.ConvertFromString("#FF5EBD3E");
+
+        private double _dinero = 0;
+        public double Dinero
+        {
+            get => _dinero;
+            set
+            {
+                if (_dinero != value)
+                {
+                    _dinero = value;
+                    OnPropertyChanged(nameof(Dinero));
+                }
+            }
+        }
+
+
         public event RoutedEventHandler VerPerfilPresionado;
 
         public Cabezera()
@@ -84,11 +114,6 @@ namespace Cliente_TFG.UserControls
 
 
         //PARTE PARA EL USUARIO
-        public string NombreUsuario
-        {
-            get => _nombreUsuario;
-            set { _nombreUsuario = value; OnPropertyChanged(nameof(NombreUsuario)); }
-        }
 
         public string EstadoTexto
         {

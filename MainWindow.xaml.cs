@@ -23,10 +23,14 @@ namespace Cliente_TFG
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        private Usuario user;
+        public Usuario Usuario => user;
         public MainWindow()
         {
             InitializeComponent();
             this.DataContext = AppTheme.Actual;
+            user = new Usuario();
 
             framePrincipal.Navigated += FramePrincipal_Navigated;
 
@@ -40,14 +44,17 @@ namespace Cliente_TFG
 
 
             CargarDatosUsuario(2);
+            Cabecera_top.NombreUsuario = user.NombreUsuario;
+            Cabecera_top.Dinero = user.Dinero;
 
             CargarPrimeraVentana();
 
 
         }
 
-        private void CargarDatosUsuario(int id)
+        public void CargarDatosUsuario(int id)
         {
+            user.CargarDatos(id);
             
         }
 
@@ -100,7 +107,10 @@ namespace Cliente_TFG
 
         private void boton_verPerfil_presionado(object sender, RoutedEventArgs e)
         {
-            framePrincipal.Navigate(new paginaPerfil());
+            framePrincipal.Navigate(new paginaPerfil(this));
         }
+
+
+
     }
 }

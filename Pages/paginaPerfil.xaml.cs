@@ -19,13 +19,21 @@ namespace Cliente_TFG.Pages
     /// <summary>
     /// Lógica de interacción para paginaPerfil.xaml
     /// </summary>
+    /// 
+
     public partial class paginaPerfil : Page
     {
-        public paginaPerfil()
+
+        private MainWindow ventanaPrincipal;
+
+        public paginaPerfil(MainWindow ventanaPrincipal)
         {
             InitializeComponent();
+            this.ventanaPrincipal = ventanaPrincipal;
 
             cargarTemas();
+
+            cargarDatosUser();
         }
 
         private void cargarTemas()
@@ -34,6 +42,16 @@ namespace Cliente_TFG.Pages
             nombreCuenta.Foreground = AppTheme.Actual.TextoPrincipal;
             descripccionCuenta.Foreground = AppTheme.Actual.TextoPrincipal;
             txtBiografia.Foreground = AppTheme.Actual.TextoPrincipal;   
+        }
+
+        private void cargarDatosUser()
+        {
+            nombreUser.Text = ventanaPrincipal.Usuario.NombreUsuario;
+            nombreCuenta.Text = ventanaPrincipal.Usuario.NombreCuenta;
+            descripccionCuenta.Text = ventanaPrincipal.Usuario.Descripcion;
+
+
+
         }
     }
 }

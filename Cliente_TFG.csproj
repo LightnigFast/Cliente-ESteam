@@ -66,6 +66,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Classes\AppTheme.cs" />
+    <Compile Include="Classes\Usuario.cs" />
     <Compile Include="Pages\paginaAmigos.xaml.cs">
       <DependentUpon>paginaAmigos.xaml</DependentUpon>
     </Compile>

@@ -167,7 +167,8 @@
 
                     <!--CONTENEDOR DE NOMBRE Y ESTADO-->
                     <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding NombreUsuario}" Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                        <TextBlock Text="{Binding NombreUsuario, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="White" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
 
                         <!--INDICADOR DE ESTADO-->
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
@@ -177,6 +178,8 @@
                                 </Ellipse.Fill>
                             </Ellipse>
                             <TextBlock Text="{Binding EstadoTexto}" Foreground="#FFB3B3B3" FontSize="12" />
+
+                            <TextBlock Text="{Binding Dinero, StringFormat={}{0} €}" Foreground="#FFB3B3B3" FontSize="12" Margin="10,0,0,0"/>
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>

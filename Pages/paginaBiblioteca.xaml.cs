@@ -163,6 +163,7 @@ namespace Cliente_TFG.Pages
 
                 ImagenLogo.ImageFailed += (s, e) =>
                 {
+                    txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
                     txtFalloLogo.Text = Nombres[0];
                 };
 
@@ -295,6 +296,7 @@ namespace Cliente_TFG.Pages
                     //QUITAMOS MANEJADORES ANTERIORES
                     imgFondo.ImageFailed -= ImgFondo_ImageFailed;
                     ImagenLogo.ImageFailed -= ImagenLogo_ImageFailed;
+                    txtFalloLogo.Background = Brushes.Transparent;
 
                     //ASIGNAMOS TAG PARA SABER QUÉ ÍNDICE ES EN EL EVENTO
                     ImagenLogo.Tag = index;
@@ -331,6 +333,7 @@ namespace Cliente_TFG.Pages
         {
             if (sender is Image img && img.Tag is int idx)
             {
+                txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
                 txtFalloLogo.Text = Nombres[idx];
             }
         }
