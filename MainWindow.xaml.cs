@@ -25,6 +25,7 @@ namespace Cliente_TFG
     {
 
         private Usuario user;
+        private bool online = false;
         public Usuario Usuario => user;
         public MainWindow()
         {
@@ -43,9 +44,13 @@ namespace Cliente_TFG
             Cabecera_top.VerPerfilPresionado += boton_verPerfil_presionado;
 
 
-            CargarDatosUsuario(2);
-            Cabecera_top.NombreUsuario = user.NombreUsuario;
-            Cabecera_top.Dinero = user.Dinero;
+            if (online)
+            {
+                CargarDatosUsuario(2);
+                Cabecera_top.NombreUsuario = user.NombreUsuario;
+                Cabecera_top.Dinero = user.Dinero;
+            }
+            
 
             CargarPrimeraVentana();
 
