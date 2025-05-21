@@ -53,7 +53,7 @@ namespace Cliente_TFG.Pages
 
             appids = new string[]
             {
-                /*"730",
+                "730",
                 "570",
                 "578080",
                 "252490",
@@ -74,12 +74,12 @@ namespace Cliente_TFG.Pages
                 "1551360",
                 "3164500",
                 "2842040",
-                "2488620",*/
+                "2488620",
             };
 
             Nombres = new string[]
             {
-                /*"Counter Strike 2",
+                "Counter Strike 2",
                 "Dota 2",
                 "PUBG: BATTLEGROUNDS",
                 "Rust",
@@ -100,7 +100,7 @@ namespace Cliente_TFG.Pages
                 "Forza Horizon 5",
                 "Schedule I",
                 "Star Wars Outlaws",
-                "F1® 24",*/
+                "F1® 24",
             };
 
         }
@@ -150,13 +150,23 @@ namespace Cliente_TFG.Pages
         private void CargarFondo()
         {
             imgFondo.Source = new BitmapImage(new Uri(imagenesFondo.First(), UriKind.Absolute));
+            imgFondo.ImageFailed += (s, e) =>
+            {
+                Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appids[0]}/header.jpg");
+                imgFondo.Source = new BitmapImage((fallbackUri));
+            };
+
 
             if (imagenesLogos.Count != 0)
             {
                 ImagenLogo.Source = new BitmapImage(new Uri(imagenesLogos.First(), UriKind.Absolute));
-            }
-            
 
+                ImagenLogo.ImageFailed += (s, e) =>
+                {
+                    txtFalloLogo.Text = Nombres[0];
+                };
+
+            }
         }
 
         //METODO PARA CARGAR TODOS LOS DEMAS JUEGOS DE LA BIBLIOTECA
@@ -164,26 +174,91 @@ namespace Cliente_TFG.Pages
         {
             for (int i = 0; i < imagenVerticalJuegos.Count; i++)
             {
-                var juegosBiblioteca = imagenVerticalJuegos[i];
+                int currentIndex = i;
+                var juegosBiblioteca = imagenVerticalJuegos[currentIndex];
 
-                // CREAMOS EL SCALE TRANSFORM PARA APLICAR LA ANIMACIÓN
                 var scale = new ScaleTransform(1.0, 1.0);
+                double altura = 170;
+                double proporcion = 600.0 / 900.0;
+                double ancho = altura * proporcion;
 
                 Image img = new Image
                 {
                     Source = new BitmapImage(new Uri(juegosBiblioteca)),
                     Stretch = Stretch.Uniform,
-                    Height = 170,
+                    Height = altura,
                     Margin = new Thickness(11),
                     Tag = i,
                     RenderTransform = scale,
                     RenderTransformOrigin = new Point(0.5, 0.5)
                 };
 
-                // EVENTO DE CLIC
+                img.ImageFailed += (s, e) =>
+                {
+                    var appid = appids[currentIndex];
+                    Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg");
+
+                    //FONDO DIFUMINADO
+                    Image fondoDifuminado = new Image
+                    {
+                        Source = new BitmapImage(fallbackUri),
+                        Stretch = Stretch.UniformToFill,
+                        Height = altura,
+                        Width = ancho,
+                        Effect = new System.Windows.Media.Effects.BlurEffect { Radius = 10 },
+                        Opacity = 0.6
+                    };
+
+                    //IMAGEN ENCIMA
+                    Image imagenPrincipal = new Image
+                    {
+                        Source = new BitmapImage(fallbackUri),
+                        Stretch = Stretch.Uniform,
+                        Height = altura,
+                        Width = ancho,
+                    };
+
+                    Grid contenedor = new Grid
+                    {
+                        Height = altura,
+                        Margin = new Thickness(11),
+                        Tag = currentIndex,
+                        RenderTransform = scale,
+                        RenderTransformOrigin = new Point(0.5, 0.5)
+                    };
+
+                    contenedor.Children.Add(fondoDifuminado);
+                    contenedor.Children.Add(imagenPrincipal);
+
+                    //EVENTOS
+                    contenedor.MouseLeftButtonUp += ImagenJuego_Click;
+
+                    contenedor.MouseEnter += (s2, e2) =>
+                    {
+                        var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
+                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                    };
+
+                    contenedor.MouseLeave += (s2, e2) =>
+                    {
+                        var anim = new DoubleAnimation(1.1, 1.0, TimeSpan.FromMilliseconds(150));
+                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                    };
+
+                    //SUSTITUIS LA IMAGEN POR EL GRID
+                    int pos = panelJuegosBiblioteca.Children.IndexOf((UIElement)s);
+                    if (pos >= 0)
+                    {
+                        panelJuegosBiblioteca.Children.RemoveAt(pos);
+                        panelJuegosBiblioteca.Children.Insert(pos, contenedor);
+                    }
+                };
+
+                //ANIMACIONES SI CARGA BIEN
                 img.MouseLeftButtonUp += ImagenJuego_Click;
 
-                // EVENTOS DE ANIMACIÓN AL PASAR EL RATÓN
                 img.MouseEnter += (s, e) =>
                 {
                     var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
@@ -200,33 +275,66 @@ namespace Cliente_TFG.Pages
 
                 panelJuegosBiblioteca.Children.Add(img);
             }
+
         }
 
         private void ImagenJuego_Click(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Image img && img.Tag is int index)
+            int? index = null;
+
+            if (sender is Image img && img.Tag is int i1)
+                index = i1;
+            else if (sender is Grid grid && grid.Tag is int i2)
+                index = i2;
+
+            if (index.HasValue)
             {
-                //ANIMACIÓN DE FADE OUT
                 var fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromMilliseconds(300)));
                 fadeOut.Completed += (s, _) =>
                 {
-                    //CAMBIAR IMAGEN DESPUÉS DEL FADE OUT
-                    imgFondo.Source = new BitmapImage(new Uri(imagenesFondo[index], UriKind.Absolute));
-                    ImagenLogo.Source = new BitmapImage(new Uri(imagenesLogos[index], UriKind.Absolute));
+                    //QUITAMOS MANEJADORES ANTERIORES
+                    imgFondo.ImageFailed -= ImgFondo_ImageFailed;
+                    ImagenLogo.ImageFailed -= ImagenLogo_ImageFailed;
 
-                    //ANIMACIÓN DE FADE IN
+                    //ASIGNAMOS TAG PARA SABER QUÉ ÍNDICE ES EN EL EVENTO
+                    ImagenLogo.Tag = index;
+
+                    //CAMBIAMOS IMÁGENES
+                    imgFondo.Source = new BitmapImage(new Uri(imagenesFondo[index.Value], UriKind.Absolute));
+                    ImagenLogo.Source = new BitmapImage(new Uri(imagenesLogos[index.Value], UriKind.Absolute));
+
+                    //ASIGNAMOS MANEJADORES DE NUEVO
+                    imgFondo.ImageFailed += ImgFondo_ImageFailed;
+                    ImagenLogo.ImageFailed += ImagenLogo_ImageFailed;
+
+                    txtFalloLogo.Text = "";
+
                     var fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(300)));
                     imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 };
 
-                //INICIAR FADE OUT
                 imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOut);
             }
         }
+
+        private void ImgFondo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appids[0]}/header.jpg");
+            imgFondo.Source = new BitmapImage(fallbackUri);
+        }
+
+        private void ImagenLogo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            if (sender is Image img && img.Tag is int idx)
+            {
+                txtFalloLogo.Text = Nombres[idx];
+            }
+        }
+
 
 
         //PARTE PARA EL BUSCADOR

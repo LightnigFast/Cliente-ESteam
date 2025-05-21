@@ -223,6 +223,8 @@
             </Grid.ColumnDefinitions>
 
             <Image x:Name="ImagenLogo" Grid.Column="0" Margin="20,50,50,50" HorizontalAlignment="Left"/>
+            <TextBlock x:Name="txtFalloLogo" Grid.Column="0" Margin="20,50,50,50"  FontSize="35" Foreground="White" FontWeight="Bold"
+                       VerticalAlignment="Center" HorizontalAlignment="Left" Background="#80000000" Padding="10"/>
 
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
