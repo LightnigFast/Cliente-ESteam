@@ -25,7 +25,7 @@ namespace Cliente_TFG
     {
 
         private Usuario user;
-        private bool online = false;
+        private bool online = true;
         public Usuario Usuario => user;
         public MainWindow()
         {
