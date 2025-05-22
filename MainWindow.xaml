@@ -9,15 +9,15 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="MainWindow" Width="1280" Height="720" MinWidth="1280" MinHeight="720">
-    <Grid>
-        <!--FONDO GRADIENTE-->
+    <Grid x:Name="mainGrid">
+        <!--FONDO GRADIENTE
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                 <GradientStop Color="#FF3A0C18" Offset="0.0" />
                 <GradientStop Color="#FF4A0F1D" Offset="0.5" />
                 <GradientStop Color="#FF0A0004" Offset="1.0" />
             </LinearGradientBrush>
-        </Grid.Background>
+        </Grid.Background>-->
 
 
         <Grid.RowDefinitions>

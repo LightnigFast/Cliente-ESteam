@@ -150,7 +150,9 @@ namespace Cliente_TFG.Pages
                                 AplicarFadeIn(imagenTiendaGrande);
                                 AplicarFadeIn(carruselTituloJuego);
                                 AplicarFadeIn(carruselPrecioJuego);
-                                panelJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
+                                //panelJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
+                                bordeJuegosDestacados.BorderBrush = AppTheme.Actual.BordePanel;
+
                             }
                         }
 
@@ -253,12 +255,14 @@ namespace Cliente_TFG.Pages
 
             panelJuegosDestacados.MouseEnter += (s, e) =>
             {
-                panelJuegosDestacados.Background = AppTheme.Actual.RatonEncima;
+                //panelJuegosDestacados.Background = AppTheme.Actual.RatonEncima;
+                panelJuegosDestacados.Cursor = Cursors.Hand;
             };
 
             panelJuegosDestacados.MouseLeave += (s, e) =>
             {
-                panelJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
+                //panelJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
+                panelJuegosDestacados.Cursor = Cursors.Arrow;
             };
 
             BtnAnterior.Click += (s, e) =>
@@ -366,6 +370,7 @@ namespace Cliente_TFG.Pages
                     imagenTiendaGrande.Source = new BitmapImage(new Uri(miniatura));
                     AplicarFadeIn(imagenTiendaGrande);
                     carruselTimer.Stop();
+                    img.Opacity = 0.5;
                 };
 
                 //EVENTO PARA VOLVER A LA IMAGEN DEL CARRUSEL AL SALIR
@@ -374,6 +379,7 @@ namespace Cliente_TFG.Pages
                     imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[indiceJuego]));
                     AplicarFadeIn(imagenTiendaGrande);
                     carruselTimer.Start();
+                    img.Opacity = 1;
                 };
                 
                 carruselMiniaturasImagenes.Children.Add(img);
@@ -381,21 +387,6 @@ namespace Cliente_TFG.Pages
             AplicarFadeIn(carruselMiniaturasImagenes);
         }
 
-        private async Task<bool> ImagenExiste(string url)
-        {
-            using (HttpClient client = new HttpClient())
-            {
-                try
-                {
-                    var response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Head, url));
-                    return response.IsSuccessStatusCode;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
 
 
         public class Precio
@@ -449,22 +440,41 @@ namespace Cliente_TFG.Pages
                 int col = i % columnas;
 
                 //CREO LA IMAGEN
+                Border bordeImagen = new Border
+                {
+                    Height = 160,
+                    CornerRadius = new CornerRadius(10, 10, 0, 0),
+                    SnapsToDevicePixels = true
+                };
+
                 Image img = new Image
                 {
                     Source = new BitmapImage(new Uri(imagenesOfertas[i])),
-                    Stretch = Stretch.UniformToFill,
-                    Height = 160,
-                    Margin = new Thickness(0)
+                    Stretch = Stretch.UniformToFill
                 };
 
+                AplicarClipRedondeado(bordeImagen, true);  //BORDES ARRIBA
+
+                bordeImagen.Child = img;
+
                 //CREA UN GRID CON DOS COLUMNAS
+                Border bordeGrid = new Border
+                {
+                    Height = 30,
+                    CornerRadius = new CornerRadius(0,0,10,10),
+                    SnapsToDevicePixels = true
+                };
+
                 Grid infoHorizontal = new Grid
                 {
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     Background = AppTheme.Actual.FondoPanel,
-                    Margin = new Thickness(0, 0, 0, 0),
-                    Height = 30,
+
                 };
+
+                AplicarClipRedondeado(bordeGrid, false);   //BORDES ABAJO
+
+                bordeGrid.Child = infoHorizontal;
 
                 //DEFINICIÓN DE COLUMNAS
                 infoHorizontal.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); //Nombre
@@ -507,31 +517,44 @@ namespace Cliente_TFG.Pages
                 //CONTENEDOR VERTICAL GENERAL
                 Thickness margen;
                 if (col == 0)
-                    margen = new Thickness(0, 0, 5, 0);
+                    margen = new Thickness(0, 5, 5, 5);
                 else if (col == columnas - 1)
-                    margen = new Thickness(5, 0, 0, 0);
+                    margen = new Thickness(5, 5, 0, 5);
                 else
-                    margen = new Thickness(5, 0, 5, 0);
+                    margen = new Thickness(5, 5, 5, 5);
 
                 StackPanel contenedor = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Margin = margen,
+                    Margin = new Thickness(0), // El margen va en el borde exterior ahora
+                    Background = Brushes.Transparent,
                     Tag = appidOfertas[i]
                 };
 
-                contenedor.Children.Add(img);
-                contenedor.Children.Add(infoHorizontal);
+                //CREA EL BORDE QUE ENVUELVE AL CONTENEDOR
+                Border borde = new Border
+                {
+                    Child = contenedor,
+                    CornerRadius = new CornerRadius(10),
+                    BorderBrush = AppTheme.Actual.BordePanel,
+                    BorderThickness = new Thickness(2),
+                    Background = AppTheme.Actual.FondoDescuento,
+                    Margin = margen,
+                    ClipToBounds = true // NECESARIO PARA RECORTAR EL CONTENIDO
+                };
+
+                contenedor.Children.Add(bordeImagen);
+                contenedor.Children.Add(bordeGrid);
 
                 //EVENTOS
                 contenedor.MouseLeftButtonDown += JuegoClick;
                 contenedor.MouseEnter += (s, e) => JuegoEnterOferta(s, e, infoHorizontal);
                 contenedor.MouseLeave += (s, e) => JuegoExitOferta(s, e, infoHorizontal);
 
-                Grid.SetRow(contenedor, row);
-                Grid.SetColumn(contenedor, col);
-                panelOfertasEspaciales.Children.Add(contenedor);
-                AplicarFadeIn(contenedor);
+                Grid.SetRow(borde, row);
+                Grid.SetColumn(borde, col);
+                panelOfertasEspaciales.Children.Add(borde);
+                AplicarFadeIn(borde);
             }
         }
 
@@ -583,6 +606,86 @@ namespace Cliente_TFG.Pages
                 }
             }
         }
+
+        //METODO PARA REDONDEAR LAS ESQUINAS DE LOS ELEMENTOS BORDER
+        private void AplicarClipRedondeado(Border border, bool arriba)
+        {
+            border.Loaded += (s, e) =>
+            {
+                double width = border.ActualWidth;
+                double height = border.ActualHeight;
+                double radius = 10;
+
+                var figure = new PathFigure();
+
+                if (arriba)
+                {
+                    //ESQUINAS SUPERIORES REDONDEADAS
+                    figure.StartPoint = new Point(0, radius);
+
+                    //SUPERIOR IZQUIERDA
+                    figure.Segments.Add(new ArcSegment(
+                        new Point(radius, 0),
+                        new Size(radius, radius),
+                        0,
+                        false,
+                        SweepDirection.Clockwise,
+                        true));
+
+                    //BORDE SUPERIOR
+                    figure.Segments.Add(new LineSegment(new Point(width - radius, 0), true));
+
+                    //SUPERIOR DERECHA
+                    figure.Segments.Add(new ArcSegment(
+                        new Point(width, radius),
+                        new Size(radius, radius),
+                        0,
+                        false,
+                        SweepDirection.Clockwise,
+                        true));
+
+                    //LATERALES Y BASE
+                    figure.Segments.Add(new LineSegment(new Point(width, height), true));
+                    figure.Segments.Add(new LineSegment(new Point(0, height), true));
+                }
+                else
+                {
+                    //ESQUINAS INFERIORES REDONDEADAS
+                    figure.StartPoint = new Point(0, 0);
+
+                    //BORDE SUPERIOR RECTO
+                    figure.Segments.Add(new LineSegment(new Point(width, 0), true));
+
+                    //LADO DERECHO
+                    figure.Segments.Add(new LineSegment(new Point(width, height - radius), true));
+
+                    //INFERIOR DERECHA
+                    figure.Segments.Add(new ArcSegment(
+                        new Point(width - radius, height),
+                        new Size(radius, radius),
+                        0,
+                        false,
+                        SweepDirection.Clockwise,
+                        true));
+
+                    //INFERIOR IZQUIERDA
+                    figure.Segments.Add(new LineSegment(new Point(radius, height), true));
+                    figure.Segments.Add(new ArcSegment(
+                        new Point(0, height - radius),
+                        new Size(radius, radius),
+                        0,
+                        false,
+                        SweepDirection.Clockwise,
+                        true));
+                }
+
+                figure.IsClosed = true;
+                border.Clip = new PathGeometry { Figures = new PathFigureCollection { figure } };
+            };
+        }
+
+
+
 
         public class CarruselResponseOferta
         {
@@ -653,18 +756,20 @@ namespace Cliente_TFG.Pages
                 //STACKPANEL PARA METER LA IMAGEN Y EL PRECIO
                 Thickness margen;
 
-                if (col == 0) //primera columna
-                    margen = new Thickness(0, 0, 5, 0);
-                else if (col == columnas - 1) //última columna
-                    margen = new Thickness(5, 0, 0, 0);
+                if (col == 0)
+                    margen = new Thickness(0, 5, 5, 5);
+                else if (col == columnas - 1)
+                    margen = new Thickness(5, 5, 0, 5);
                 else
-                    margen = new Thickness(5, 0, 5, 0);
+                    margen = new Thickness(5, 5, 5, 5);
 
                 StackPanel contenedor = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
                     Margin = margen,
+                    Background = AppTheme.Actual.BordePanel,
                     Tag = appidOfertasEspeciales[i]
+
                 };
 
                 contenedor.Children.Add(img);

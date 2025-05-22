@@ -31,6 +31,7 @@ namespace Cliente_TFG
         {
             InitializeComponent();
             this.DataContext = AppTheme.Actual;
+            cargarTema();
             user = new Usuario();
 
             framePrincipal.Navigated += FramePrincipal_Navigated;
@@ -57,6 +58,11 @@ namespace Cliente_TFG
 
         }
 
+        private void cargarTema()
+        {
+            mainGrid.Background = AppTheme.Actual.GridPrincipal;
+        }
+
         public void CargarDatosUsuario(int id)
         {
             user.CargarDatos(id);
@@ -65,14 +71,14 @@ namespace Cliente_TFG
 
         private void CargarPrimeraVentana()
         {
-            //var paginaTienda = new paginaTienda(this);
-            //framePrincipal.Navigate(paginaTienda);
+            var paginaTienda = new paginaTienda(this);
+            framePrincipal.Navigate(paginaTienda);
 
             //var paginaTienda = new paginaJuegoTienda(this, 3017860);
             //framePrincipal.Navigate(paginaTienda);
 
-            var paginaBiblioteca = new paginaBiblioteca();
-            framePrincipal.Navigate(paginaBiblioteca);
+            //var paginaBiblioteca = new paginaBiblioteca();
+            //framePrincipal.Navigate(paginaBiblioteca);
         }
 
         private void FramePrincipal_Navigated(object sender, NavigationEventArgs e)

@@ -30,34 +30,36 @@
             </Grid>
 
             <!--GRID PARA JUEGOS DESTACADOS-->
-            <Grid Name="panelJuegosDestacados" Background="Transparent" Width="1150" Height="366" VerticalAlignment="Top" Margin="0,70,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="6*"/>
-                    <ColumnDefinition Width="4*"/>
-                </Grid.ColumnDefinitions>
+            <Border x:Name="bordeJuegosDestacados" CornerRadius="12" BorderThickness="2" BorderBrush="Transparent" Margin="0,70,0,0" Width="1150" Height="366">
+                <Grid Name="panelJuegosDestacados" Background="Transparent" Width="1150" Height="366" VerticalAlignment="Top" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="6*"/>
+                        <ColumnDefinition Width="4*"/>
+                    </Grid.ColumnDefinitions>
 
-                <!--PARTE PARA LA IMAGEN-->
-                <Image x:Name="imagenTiendaGrande" Grid.Column="0" Margin="20"/>
+                    <!--PARTE PARA LA IMAGEN-->
+                    <Image x:Name="imagenTiendaGrande" Grid.Column="0" Margin="20"/>
 
-                <!--PARTE PARA EL TITULO, LAS DEMAS IMAGENES Y EL PRECIO-->
-                <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
+                    <!--PARTE PARA EL TITULO, LAS DEMAS IMAGENES Y EL PRECIO-->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
 
-                    <!--TITULO DEL JUEGO-->
-                    <TextBlock x:Name="carruselTituloJuego" Grid.Row="0" Height="70" FontSize="22" FontWeight="Bold" Background="Transparent"
+                        <!--TITULO DEL JUEGO-->
+                        <TextBlock x:Name="carruselTituloJuego" Grid.Row="0" Height="70" FontSize="22" FontWeight="Bold" Background="Transparent"
                                VerticalAlignment="Center" Padding="20"/>
 
-                    <WrapPanel Name="carruselMiniaturasImagenes" Grid.Row="1" HorizontalAlignment="Left" Margin="20,0,0,0" Background="Transparent"/>
+                        <WrapPanel Name="carruselMiniaturasImagenes" Grid.Row="1" HorizontalAlignment="Left" Margin="20,0,0,0" Background="Transparent"/>
 
-                    <!--PRECIO DEL JUEGO-->
-                    <TextBlock x:Name="carruselPrecioJuego" Grid.Row="2" Height="50" Margin="0,0,20,10" Padding="20" Background="Transparent"
+                        <!--PRECIO DEL JUEGO-->
+                        <TextBlock x:Name="carruselPrecioJuego" Grid.Row="2" Height="50" Margin="0,0,20,10" Padding="20" Background="Transparent"
                                VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="22" FontWeight="Bold"/>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </Border>
 
             <!--CONTENEDOR PARA LOS BOTONES DEL CARRUSEL-->
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
@@ -76,7 +78,7 @@
 
 
             <!--GRID PARA JUEGOS CON OFERTAS ESPECIALES-->
-            <Grid Name="panelOfertasEspaciales" Background="Transparent" Width="1150" Height="400" VerticalAlignment="Top" Margin="0,70,0,0">
+            <Grid Name="panelOfertasEspaciales" Background="Transparent" Width="1150" VerticalAlignment="Top" Margin="0,70,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -92,7 +94,7 @@
             </Grid>
 
             <!--GRID PARA JUEGOS CON CIERTA CANTIDAD DE OFERTA-->
-            <Grid Name="panelOfertaEspecifica" Background="Transparent" Width="1150" Height="130" VerticalAlignment="Top" Margin="0,70,0,0">
+            <Grid Name="panelOfertaEspecifica" Background="Transparent" Width="1150" VerticalAlignment="Top" Margin="0,70,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>

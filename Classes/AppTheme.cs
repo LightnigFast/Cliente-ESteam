@@ -19,6 +19,8 @@ namespace Cliente_TFG.Classes
         private Brush ratonEncima;
         private Brush fondoDescuento;
         private Brush fondoPanel;
+        private Brush bordePanel;
+        private Brush gridPrincipal;
 
         public Brush Fondo { get => fondo; set { fondo = value; OnPropertyChanged(); } }
         public Brush TextoPrincipal { get => textoPrincipal; set { textoPrincipal = value; OnPropertyChanged(); } }
@@ -27,6 +29,8 @@ namespace Cliente_TFG.Classes
         public Brush RatonEncima { get => ratonEncima; set { ratonEncima = value; OnPropertyChanged(); } }
         public Brush FondoDescuento { get => fondoDescuento; set { fondoDescuento = value; OnPropertyChanged(); } }
         public Brush FondoPanel { get => fondoPanel; set { fondoPanel = value; OnPropertyChanged(); } }
+        public Brush BordePanel { get => bordePanel; set { bordePanel = value; OnPropertyChanged(); } }
+        public Brush GridPrincipal { get => gridPrincipal; set { gridPrincipal = value; OnPropertyChanged(); } }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = "") =>
@@ -77,7 +81,10 @@ namespace Cliente_TFG.Classes
             Actual.TextoSecundario = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CCCCCC"));
             Actual.RatonEncima = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#997878"));
             Actual.FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4c6b22"));
-            Actual.FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#533939"));
+            //Actual.FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#533939"));
+            Actual.FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252525"));
+            Actual.BordePanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#d11f45"));
+            Actual.GridPrincipal = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#121212"));
         }
 
         public static void SetLight()
@@ -89,6 +96,8 @@ namespace Cliente_TFG.Classes
             Actual.RatonEncima = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D3BABA"));
             Actual.FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4c6b22"));
             Actual.FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E0E0E0"));
+            Actual.BordePanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#d11f45"));
+            Actual.GridPrincipal = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#533939"));
         }
 
         public static void Alternar()
