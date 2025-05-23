@@ -129,7 +129,7 @@
 
                 <StackPanel HorizontalAlignment="Center" Margin="0,70,0,0" >
                     <!--GRID PARA EL CARRUSEL DE IMAGENES-->
-                    <StackPanel Background="#80000000">
+                    <StackPanel Name="gridCarrusel" Background="#80000000">
                         <Grid Name="panelCarrusel"  Width="750" Height="422" VerticalAlignment="Top" Margin="10,10,10,0">
 
                         </Grid>
@@ -163,7 +163,7 @@
 
 
                 <!--PARTE DERECHA PARA EL PRECIO DEL JUEGO, UNA IMAGEN, LA DESCRIPCCION CORTA, EL BOTON DE COMPRAR ETC-->
-                <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="30,70,0,0" Background="#80000000">
+                <StackPanel x:Name="panelDatosJuego" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="30,70,0,0" Background="#80000000">
                     <!--IMAGEN DEL JUEGO-->
                     <Grid x:Name="panelImagenPrincipalJuego" Margin="10,10,10,0" />
 

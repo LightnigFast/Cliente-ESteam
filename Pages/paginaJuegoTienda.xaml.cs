@@ -70,6 +70,9 @@ namespace Cliente_TFG.Pages
 
         private async Task InicializarPaginaAsync()
         {
+            //CARGAR TEMA
+            cargarTema();
+
             //CARGAR LOS DATOS
             await CargarDatosJson();
 
@@ -93,6 +96,14 @@ namespace Cliente_TFG.Pages
 
             
 
+        }
+
+        private void cargarTema()
+        {
+            panelDatosJuego.Background = AppTheme.Actual.FondoPanel;
+            gridCarrusel.Background = AppTheme.Actual.FondoPanel;
+            gridDescripccionLarga.Background = AppTheme.Actual.FondoPanel;
+            gridCategoriasGeneros.Background = AppTheme.Actual.FondoPanel;
         }
 
         private void cargarFondo()
@@ -320,7 +331,7 @@ namespace Cliente_TFG.Pages
             doc.LoadHtml(html);
 
             ProcesarNodoRecursivo(doc.DocumentNode);
-            panelDescripcionLarga.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
+            //panelDescripcionLarga.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
         }
 
         private void ProcesarNodoRecursivo(HtmlNode node)
@@ -539,7 +550,7 @@ namespace Cliente_TFG.Pages
             }
 
 
-            gridCategoriasGeneros.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
+            //gridCategoriasGeneros.Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
         }
 
 
