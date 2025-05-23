@@ -8,8 +8,114 @@
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="paginaJuegoTienda">
 
+    <Page.Resources>
+        <!--ESTILO DEL SCROLLVIEW VERTICAL-->
+        <Style x:Key="VerticalScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Width" Value="3"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Orientation" Value="Vertical"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track Name="PART_Track" IsDirectionReversed="True" Orientation="Vertical">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineUpCommand" Visibility="Collapsed"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="#555" CornerRadius="3"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineDownCommand" Visibility="Collapsed"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent">
+        <!--SCROLLBAR HORIZONTAL-->
+        <Style x:Key="HorizontalScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Height" Value="3"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track Name="PART_Track" Orientation="Horizontal">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineLeftCommand" Visibility="Collapsed"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="#555" CornerRadius="3"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineRightCommand" Visibility="Collapsed"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--ESTILO PARA LOS SCROLLVIWER-->
+        <Style x:Key="CustomScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!--CONTENIDO PRINCIPAL-->
+                            <ScrollContentPresenter 
+                                 Grid.Column="0"  Grid.Row="0" CanContentScroll="{TemplateBinding CanContentScroll}"/>
+
+                            <!--BARRA VERTICAL-->
+                            <ScrollBar 
+                                x:Name="PART_VerticalScrollBar" Grid.Column="1" Grid.Row="0" Style="{StaticResource VerticalScrollBarStyle}"
+                                Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{TemplateBinding VerticalOffset}"
+                                Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}"/>
+
+                            <!--BARRA HORIZONTAL-->
+                            <ScrollBar 
+                                x:Name="PART_HorizontalScrollBar" Grid.Column="0" Grid.Row="1" Style="{StaticResource HorizontalScrollBarStyle}"
+                                Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{TemplateBinding HorizontalOffset}"
+                                Maximum="{TemplateBinding ScrollableWidth}" ViewportSize="{TemplateBinding ViewportWidth}"/>
+
+                            <Rectangle 
+                                Grid.Column="1" Grid.Row="1" Fill="Transparent"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Page.Resources>
+
+    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent"
+                  Style="{StaticResource CustomScrollViewerStyle}">
         <Grid Width="1150" Background="Transparent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -25,7 +131,8 @@
 
                     </Grid>
                     <!--GRID PARA LAS MINIATURAS DE IMÁGENES-->
-                    <ScrollViewer x:Name="ScrollMiniaturas" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Background="Transparent" Margin="10,10,10,10">
+                    <ScrollViewer x:Name="ScrollMiniaturas" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Background="Transparent" Margin="10,10,10,10"
+                                  Style="{StaticResource CustomScrollViewerStyle}">
                         <StackPanel Name="stackMiniaturas" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 10, 0, 0">
 
                         </StackPanel>
@@ -70,7 +177,7 @@
                 
                 
                 <!--BOTON PARA COMPRAR O AÑADIR A LA BIBLIOTECA-->
-                <Button x:Name="botonCompra" Margin="10,10,10,0" />
+                <Button x:Name="botonCompra" Margin="10,10,10,0" Opacity="0"/>
 
                 <!--GRID PARA LA DESCRIPCCION CORTA-->
                 <Grid x:Name="gridDescripccionCorta" Margin="0,10,0,0">

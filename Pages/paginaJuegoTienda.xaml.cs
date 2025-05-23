@@ -74,6 +74,7 @@ namespace Cliente_TFG.Pages
 
             //PARTE DERECHA
             CargarImagenPrincipal();
+            botonCompra.Opacity = 1;
             CargarPrecio();
             CargarBotonCompra();
             CargarDescripccionCorta();

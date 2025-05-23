@@ -82,14 +82,12 @@ namespace Cliente_TFG.Pages
             //DESHABILITAR ESTO PARA EVITAR ERRORES EN LA CARGA DEL PRORGAMA
             carruselMiniaturasImagenes.IsEnabled = false;
 
+
             CargarDatosJsonCarrusel();
             CargarDatosJsonOfertas();
             CargarDatosJsonOfertasDeterminadoPrecio();
             CargarDatosJsonNuevosLanzamientos();
 
-            //CargarCarrusel();
-            //CargarOfertas();
-            //CargarOfertasDeterminadoPrecio();
             CargarNuevosLanzamientos();
         }
 
@@ -152,6 +150,7 @@ namespace Cliente_TFG.Pages
                                 AplicarFadeIn(carruselPrecioJuego);
                                 //panelJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
                                 bordeJuegosDestacados.BorderBrush = AppTheme.Actual.BordePanel;
+                                bordeJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
 
                             }
                         }
@@ -206,7 +205,6 @@ namespace Cliente_TFG.Pages
                 }
             }
         }
-
 
 
         //PARTE PARA EL CARRUSEL
@@ -729,12 +727,28 @@ namespace Cliente_TFG.Pages
             {
                 int col = i % columnas;
 
+                Border bordeImagen = new Border
+                {
+                    CornerRadius = new CornerRadius(10, 10, 0, 0),
+                    SnapsToDevicePixels = true
+                };
+
                 //CREO LA IMAGEN
                 Image img = new Image
                 {
                     Source = new BitmapImage(new Uri(imagenesOfertasEspeciales[i])),
                     Stretch = Stretch.UniformToFill,
                     Margin = new Thickness(0)
+                };
+
+                AplicarClipRedondeado(bordeImagen, true);
+
+                bordeImagen.Child = img;
+
+                Border bordeTextBlock = new Border
+                {
+                    CornerRadius = new CornerRadius(0, 0, 10, 10),
+                    SnapsToDevicePixels = true
                 };
 
                 //TEXTO DEL PRECIO
@@ -753,27 +767,41 @@ namespace Cliente_TFG.Pages
 
                 };
 
+                AplicarClipRedondeado(bordeTextBlock, false);
+
+                bordeTextBlock.Child = textoPrecio;
+
                 //STACKPANEL PARA METER LA IMAGEN Y EL PRECIO
                 Thickness margen;
 
                 if (col == 0)
-                    margen = new Thickness(0, 5, 5, 5);
+                    margen = new Thickness(0, 0, 5, 0);
                 else if (col == columnas - 1)
-                    margen = new Thickness(5, 5, 0, 5);
+                    margen = new Thickness(5, 0, 0, 0);
                 else
-                    margen = new Thickness(5, 5, 5, 5);
+                    margen = new Thickness(5, 0, 5, 0);
 
                 StackPanel contenedor = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Margin = margen,
-                    Background = AppTheme.Actual.BordePanel,
+                    
                     Tag = appidOfertasEspeciales[i]
 
                 };
 
-                contenedor.Children.Add(img);
-                contenedor.Children.Add(textoPrecio);
+                Border borde = new Border
+                {
+                    Child = contenedor,
+                    CornerRadius = new CornerRadius(10),
+                    BorderBrush = AppTheme.Actual.BordePanel,
+                    BorderThickness = new Thickness(2),
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = margen,
+                    ClipToBounds = true //NECESARIO PARA RECORTAR EL CONTENIDO
+                };
+
+                contenedor.Children.Add(bordeImagen);
+                contenedor.Children.Add(bordeTextBlock);
 
                 //EVENTO DE CLICK
                 contenedor.MouseLeftButtonDown += JuegoClick;
@@ -782,8 +810,10 @@ namespace Cliente_TFG.Pages
                 contenedor.MouseEnter += (s, e) => JuegoEnter(s, e, textoPrecio);
                 contenedor.MouseLeave += (s, e) => JuegoExit(s, e, textoPrecio);
 
-                Grid.SetColumn(contenedor, col);
-                panelOfertaEspecifica.Children.Add(contenedor);
+
+
+                Grid.SetColumn(borde, col);
+                panelOfertaEspecifica.Children.Add(borde);
 
             }
 
@@ -889,10 +919,20 @@ namespace Cliente_TFG.Pages
                 Grid filaGrid = new Grid
                 {
                     Background = Brushes.Transparent, 
-                    Margin = margenFila,
                     Cursor = Cursors.Hand,
                     Tag = appidNuevosLanzamientos[i]
                 };
+
+                Border bordeFila = new Border
+                {
+                    CornerRadius = new CornerRadius(10),
+                    BorderBrush = AppTheme.Actual.BordePanel,
+                    BorderThickness = new Thickness(2),
+                    Margin = margenFila,
+                    ClipToBounds = true, // NECESARIO PARA RECORTAR EL CONTENIDO
+                    Child = filaGrid
+                };
+
 
                 filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(231) });
                 filaGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -907,8 +947,17 @@ namespace Cliente_TFG.Pages
                     Stretch = Stretch.UniformToFill,
                     HorizontalAlignment = HorizontalAlignment.Left
                 };
-                Grid.SetColumn(img, 0);
-                filaGrid.Children.Add(img);
+
+                Border bordeImagen = new Border
+                {
+                    CornerRadius = new CornerRadius(10, 0, 0, 10), // SOLO ESQUINAS IZQUIERDAS REDONDEADAS
+                    ClipToBounds = true,
+                    Child = img,
+                };
+                AplicarClipRedondeadoEsquinasIzquierdas(bordeImagen);
+
+                Grid.SetColumn(bordeImagen, 0);
+                filaGrid.Children.Add(bordeImagen);
 
                 //TEXTO DEL CONTENIDO
                 Label textoContenido = new Label
@@ -952,6 +1001,8 @@ namespace Cliente_TFG.Pages
                     Foreground = AppTheme.Actual.TextoPrincipal,
                     FontWeight = FontWeights.Bold,
                 };
+                AplicarClipRedondeadoEsquinasDerechas(textoPrecio);
+
                 Grid.SetColumn(textoPrecio, 3);
                 filaGrid.Children.Add(textoPrecio);
 
@@ -974,9 +1025,9 @@ namespace Cliente_TFG.Pages
 
 
                 //AÑADIR LA FILA AL GRID PRINCIPAL
-                Grid.SetRow(filaGrid, i);
-                Grid.SetColumnSpan(filaGrid, 4);
-                panelNuevosLanzamientos.Children.Add(filaGrid);
+                Grid.SetRow(bordeFila, i);
+                Grid.SetColumnSpan(bordeFila, 4);
+                panelNuevosLanzamientos.Children.Add(bordeFila);
             }
 
         }
@@ -1032,6 +1083,99 @@ namespace Cliente_TFG.Pages
                 }
             }
         }
+
+        private void AplicarClipRedondeadoEsquinasIzquierdas(FrameworkElement elemento)
+        {
+            elemento.Loaded += (s, e) =>
+            {
+                double width = elemento.ActualWidth;
+                double height = elemento.ActualHeight;
+                double radius = 10;
+
+                var figure = new PathFigure
+                {
+                    StartPoint = new Point(radius, 0) 
+                };
+
+                figure.Segments.Add(new ArcSegment(
+                    new Point(0, radius),
+                    new Size(radius, radius),
+                    0,
+                    false,
+                    SweepDirection.Counterclockwise,
+                    true));
+
+                figure.Segments.Add(new LineSegment(new Point(0, height - radius), true));
+
+                figure.Segments.Add(new ArcSegment(
+                    new Point(radius, height),
+                    new Size(radius, radius),
+                    0,
+                    false,
+                    SweepDirection.Counterclockwise,
+                    true));
+
+                figure.Segments.Add(new LineSegment(new Point(width, height), true));
+
+                // Lado superior derecho (recto)
+                figure.Segments.Add(new LineSegment(new Point(width, 0), true));
+
+                figure.IsClosed = true;
+
+                elemento.Clip = new PathGeometry { Figures = new PathFigureCollection { figure } };
+            };
+        }
+
+        private void AplicarClipRedondeadoEsquinasDerechas(FrameworkElement elemento)
+        {
+            elemento.Loaded += (s, e) =>
+            {
+                double width = elemento.ActualWidth;
+                double height = elemento.ActualHeight;
+                double radius = 10;
+
+                var figure = new PathFigure
+                {
+                    StartPoint = new Point(0, 0) // Empezamos en la esquina superior izquierda
+                };
+
+                // Lado superior izquierdo (recto)
+                figure.Segments.Add(new LineSegment(new Point(width - radius, 0), true));
+
+                // Arco superior derecho
+                figure.Segments.Add(new ArcSegment(
+                    new Point(width, radius),
+                    new Size(radius, radius),
+                    0,
+                    false, // IsLargeArc
+                    SweepDirection.Clockwise,
+                    true));
+
+                // Lado derecho hasta esquina inferior derecha redondeada
+                figure.Segments.Add(new LineSegment(new Point(width, height - radius), true));
+
+                // Arco inferior derecho
+                figure.Segments.Add(new ArcSegment(
+                    new Point(width - radius, height),
+                    new Size(radius, radius),
+                    0,
+                    false, // IsLargeArc
+                    SweepDirection.Clockwise,
+                    true));
+
+                // Lado inferior izquierdo (recto)
+                figure.Segments.Add(new LineSegment(new Point(0, height), true));
+
+                // Cerrar figura
+                figure.IsClosed = true;
+
+                elemento.Clip = new PathGeometry { Figures = new PathFigureCollection { figure } };
+            };
+        }
+
+
+
+
 
         public class NuevosLanzamientosResponse
         {

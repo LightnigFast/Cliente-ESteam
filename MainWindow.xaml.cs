@@ -31,6 +31,7 @@ namespace Cliente_TFG
         {
             InitializeComponent();
             this.DataContext = AppTheme.Actual;
+            AppTheme.SetDark();
             cargarTema();
             user = new Usuario();
 
