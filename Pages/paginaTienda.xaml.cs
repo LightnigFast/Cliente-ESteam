@@ -312,7 +312,7 @@ namespace Cliente_TFG.Pages
         //METODO PARA HACER EL EFECTO FADEIN EN TODOS LOS ELEMENTOS DE LA INTERFAZ
         private async Task FadeOutATodo()
         {
-            await AplicarFadeOutAsync(panelPrincipal);
+            await AplicarFadeOutAsync(gridPrincipal);
            
         }
 

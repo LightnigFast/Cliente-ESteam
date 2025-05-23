@@ -100,128 +100,133 @@
             </Setter>
         </Style>
     </Page.Resources>
-    
-    <ScrollViewer x:Name="panelPrincipal" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent"
-                  ScrollChanged="panelPrincipal_ScrollChanged">
-        <StackPanel HorizontalAlignment="Center">
-            
-            <!--GRID PARA LA CATEGORIA-->
-            <Grid x:Name="panelControlador" Background="Blue" Width="1150" Height="35" VerticalAlignment="Top" Margin="0,30,0,0">
-                <TextBox x:Name="txtBusqueda" Width="430" Height="25" Margin="10,5" TextChanged="txtBusqueda_TextChanged"
-                          HorizontalAlignment="Right" Style="{StaticResource DarkMinimalistSearchBox}"/>
 
-                <Popup x:Name="popupResultados" PlacementTarget="{Binding ElementName=txtBusqueda}" Placement="Bottom"
-                       StaysOpen="False" Width="{Binding ActualWidth, ElementName=txtBusqueda}">
-                    <Border Background="#252525" CornerRadius="3" BorderThickness="1" BorderBrush="#404040">
-                        <ScrollViewer MaxHeight="500">
-                            <ItemsControl x:Name="lstResultados">
-                                
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Border>
-                </Popup>
-            </Grid>
+    <Grid x:Name="gridPrincipal" Background="Transparent">
+        <Image Source="/res/store/fondoTienda.jpg" Stretch="Fill" Panel.ZIndex="0" Opacity="0.1"/>
 
-            <!--GRID PARA JUEGOS DESTACADOS-->
-            <Border x:Name="bordeJuegosDestacados" CornerRadius="12" BorderThickness="2" BorderBrush="Transparent" Margin="0,70,0,0" Width="1150" Height="366">
-                <Grid Name="panelJuegosDestacados" Background="Transparent" Width="1150" Height="366" VerticalAlignment="Top" >
+        <ScrollViewer x:Name="panelPrincipal" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="#50000000"
+              ScrollChanged="panelPrincipal_ScrollChanged">
+            <StackPanel HorizontalAlignment="Center">
+
+                <!--GRID PARA LA CATEGORIA-->
+                <Grid x:Name="panelControlador" Background="Blue" Width="1150" Height="35" VerticalAlignment="Top" Margin="0,30,0,0">
+                    <TextBox x:Name="txtBusqueda" Width="430" Height="25" Margin="10,5" TextChanged="txtBusqueda_TextChanged"
+                      HorizontalAlignment="Right" Style="{StaticResource DarkMinimalistSearchBox}"/>
+
+                    <Popup x:Name="popupResultados" PlacementTarget="{Binding ElementName=txtBusqueda}" Placement="Bottom"
+                   StaysOpen="False" Width="{Binding ActualWidth, ElementName=txtBusqueda}">
+                        <Border Background="#252525" CornerRadius="3" BorderThickness="1" BorderBrush="#404040">
+                            <ScrollViewer MaxHeight="500">
+                                <ItemsControl x:Name="lstResultados">
+
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                    </Popup>
+                </Grid>
+
+                <!--GRID PARA JUEGOS DESTACADOS-->
+                <Border x:Name="bordeJuegosDestacados" CornerRadius="12" BorderThickness="2" BorderBrush="Transparent" Margin="0,70,0,0" Width="1150" Height="366">
+                    <Grid Name="panelJuegosDestacados" Background="Transparent" Width="1150" Height="366" VerticalAlignment="Top" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="6*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!--PARTE PARA LA IMAGEN-->
+                        <Image x:Name="imagenTiendaGrande" Grid.Column="0" Margin="20"/>
+
+                        <!--PARTE PARA EL TITULO, LAS DEMAS IMAGENES Y EL PRECIO-->
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!--TITULO DEL JUEGO-->
+                            <TextBlock x:Name="carruselTituloJuego" Grid.Row="0" Height="70" FontSize="22" FontWeight="Bold" Background="Transparent"
+                           VerticalAlignment="Center" Padding="20"/>
+
+                            <WrapPanel Name="carruselMiniaturasImagenes" Grid.Row="1" HorizontalAlignment="Left" Margin="20,0,0,0" Background="Transparent"/>
+
+                            <!--PRECIO DEL JUEGO-->
+                            <TextBlock x:Name="carruselPrecioJuego" Grid.Row="2" Height="50" Margin="0,0,20,10" Padding="20" Background="Transparent"
+                           VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="22" FontWeight="Bold"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!--CONTENEDOR PARA LOS BOTONES DEL CARRUSEL-->
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
+
+                    <!--Botón izquierdo-->
+                    <Button Name="BtnAnterior" Content="◀" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>
+
+                    <!--PANEL PARA LOS BOTONES QUE TE SERVIRAN PARA IR A UN JUEGO DEL CARRUSEL-->
+                    <StackPanel x:Name="botonesCarrusel" Orientation="Horizontal" VerticalAlignment="Center" Margin="5"/>
+
+                    <!--Botón derecho-->
+                    <Button x:Name="BtnSiguiente" Content="▶" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>
+                </StackPanel>
+
+
+
+
+                <!--GRID PARA JUEGOS CON OFERTAS ESPECIALES-->
+                <Grid Name="panelOfertasEspaciales" Background="Transparent" Width="1150" VerticalAlignment="Top" Margin="0,70,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="6*"/>
-                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+
+
+                </Grid>
+
+                <!--GRID PARA JUEGOS CON CIERTA CANTIDAD DE OFERTA-->
+                <Grid Name="panelOfertaEspecifica" Background="Transparent" Width="1150" VerticalAlignment="Top" Margin="0,70,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!--PARTE PARA LA IMAGEN-->
-                    <Image x:Name="imagenTiendaGrande" Grid.Column="0" Margin="20"/>
-
-                    <!--PARTE PARA EL TITULO, LAS DEMAS IMAGENES Y EL PRECIO-->
-                    <Grid Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
-
-                        <!--TITULO DEL JUEGO-->
-                        <TextBlock x:Name="carruselTituloJuego" Grid.Row="0" Height="70" FontSize="22" FontWeight="Bold" Background="Transparent"
-                               VerticalAlignment="Center" Padding="20"/>
-
-                        <WrapPanel Name="carruselMiniaturasImagenes" Grid.Row="1" HorizontalAlignment="Left" Margin="20,0,0,0" Background="Transparent"/>
-
-                        <!--PRECIO DEL JUEGO-->
-                        <TextBlock x:Name="carruselPrecioJuego" Grid.Row="2" Height="50" Margin="0,0,20,10" Padding="20" Background="Transparent"
-                               VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="22" FontWeight="Bold"/>
-                    </Grid>
                 </Grid>
-            </Border>
 
-            <!--CONTENEDOR PARA LOS BOTONES DEL CARRUSEL-->
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
-                
-                <!--Botón izquierdo-->
-                <Button Name="BtnAnterior" Content="◀" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>
-                
-                <!--PANEL PARA LOS BOTONES QUE TE SERVIRAN PARA IR A UN JUEGO DEL CARRUSEL-->
-                <StackPanel x:Name="botonesCarrusel" Orientation="Horizontal" VerticalAlignment="Center" Margin="5"/>
+                <!--GRID PARA NUEVOS LANZAMIENTOS-->
+                <Grid Name="panelNuevosLanzamientos" Background="Transparent" Width="1150" Height="1000" VerticalAlignment="Top" Margin="0,70,0,70">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                </Grid>
 
-                <!--Botón derecho-->
-                <Button x:Name="BtnSiguiente" Content="▶" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>
             </StackPanel>
 
 
-
-
-            <!--GRID PARA JUEGOS CON OFERTAS ESPECIALES-->
-            <Grid Name="panelOfertasEspaciales" Background="Transparent" Width="1150" VerticalAlignment="Top" Margin="0,70,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                
-                
-                
-            </Grid>
-
-            <!--GRID PARA JUEGOS CON CIERTA CANTIDAD DE OFERTA-->
-            <Grid Name="panelOfertaEspecifica" Background="Transparent" Width="1150" VerticalAlignment="Top" Margin="0,70,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-            </Grid>
-
-            <!--GRID PARA NUEVOS LANZAMIENTOS-->
-            <Grid Name="panelNuevosLanzamientos" Background="Transparent" Width="1150" Height="1000" VerticalAlignment="Top" Margin="0,70,0,70">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="9*"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-            </Grid>
-
-        </StackPanel>
-       
-
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
+    
 
 </Page>
