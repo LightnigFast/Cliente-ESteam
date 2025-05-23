@@ -13,6 +13,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -72,6 +73,9 @@ namespace Cliente_TFG.Pages
             //CARGAR LOS DATOS
             await CargarDatosJson();
 
+            //CARGAR IMAGEN DE FONDO QUE SERA LA PRIMERA MINIATURA QUE TEGAMOS
+            cargarFondo();
+
             //PARTE DERECHA
             CargarImagenPrincipal();
             botonCompra.Opacity = 1;
@@ -88,6 +92,32 @@ namespace Cliente_TFG.Pages
             CargarCategoriasGeneros();
 
             
+
+        }
+
+        private void cargarFondo()
+        {
+            if (miniaturas.Count > 0)
+            {
+                imagenBackground.Source = new BitmapImage(new Uri(miniaturas[0], UriKind.Absolute));
+                AplicarFadeIn(imagenBackground);
+            }
+            else
+            {
+                imagenBackground.Source = null;
+            }
+        }
+
+        private void AplicarFadeIn(UIElement elemento)
+        {
+            var fadeIn = new DoubleAnimation
+            {
+                From = 0,
+                To = 0.1,
+                Duration = TimeSpan.FromMilliseconds(500),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
+            elemento.BeginAnimation(UIElement.OpacityProperty, fadeIn);
         }
 
         //PARTE DEL CARRUSEL

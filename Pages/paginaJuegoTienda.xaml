@@ -114,114 +114,119 @@
 
     </Page.Resources>
 
-    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent"
-                  Style="{StaticResource CustomScrollViewerStyle}">
-        <Grid Width="1150" Background="Transparent">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="400"/>
-            </Grid.ColumnDefinitions>
+    <Grid x:Name="gridPrincipal" Background="#80000000">
+        <Image x:Name="imagenBackground" Stretch="Fill" Panel.ZIndex="0" Opacity="0.1"/>
 
-            <!--PARTE IZQUIERDA CON LAS IMAGENES DEL JUEGO, SU DESCRIPCCION LARGA, ETC-->
+        <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+              Style="{StaticResource CustomScrollViewerStyle}">
+            <Grid Width="1150" Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="400"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel HorizontalAlignment="Center" Margin="0,70,0,0" >
-                <!--GRID PARA EL CARRUSEL DE IMAGENES-->
-                <StackPanel Background="#80000000">
-                    <Grid Name="panelCarrusel"  Width="750" Height="422" VerticalAlignment="Top" Margin="10,10,10,0">
+                <!--PARTE IZQUIERDA CON LAS IMAGENES DEL JUEGO, SU DESCRIPCCION LARGA, ETC-->
+
+                <StackPanel HorizontalAlignment="Center" Margin="0,70,0,0" >
+                    <!--GRID PARA EL CARRUSEL DE IMAGENES-->
+                    <StackPanel Background="#80000000">
+                        <Grid Name="panelCarrusel"  Width="750" Height="422" VerticalAlignment="Top" Margin="10,10,10,0">
+
+                        </Grid>
+                        <!--GRID PARA LAS MINIATURAS DE IMÁGENES-->
+                        <ScrollViewer x:Name="ScrollMiniaturas" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Background="Transparent" Margin="10,10,10,10"
+                              Style="{StaticResource CustomScrollViewerStyle}">
+                            <StackPanel Name="stackMiniaturas" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 10, 0, 0">
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </StackPanel>
+
+
+                    <!--GRID PARA LA DESCRIPCCION LARGA-->
+                    <Grid x:Name="gridDescripccionLarga" Margin="0,50,0,0">
+
+
+                        <StackPanel x:Name="panelDescripcionLarga" Margin="10" />
+                    </Grid>
+
+
+                    <!--GRID PARA LAS CATEGORIAS Y GENEROS-->
+                    <Grid x:Name="gridCategoriasGeneros" Margin="0,50,0,70">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
                     </Grid>
-                    <!--GRID PARA LAS MINIATURAS DE IMÁGENES-->
-                    <ScrollViewer x:Name="ScrollMiniaturas" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Background="Transparent" Margin="10,10,10,10"
-                                  Style="{StaticResource CustomScrollViewerStyle}">
-                        <StackPanel Name="stackMiniaturas" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 10, 0, 0">
-
-                        </StackPanel>
-                    </ScrollViewer>
-                </StackPanel>
-                
-
-                <!--GRID PARA LA DESCRIPCCION LARGA-->
-                <Grid x:Name="gridDescripccionLarga" Margin="0,50,0,0">
-                    
-
-                    <StackPanel x:Name="panelDescripcionLarga" Margin="10" />
-                </Grid>
-                
-                
-                <!--GRID PARA LAS CATEGORIAS Y GENEROS-->
-                <Grid x:Name="gridCategoriasGeneros" Margin="0,50,0,70">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                </Grid>
-            </StackPanel>
-
-
-            <!--PARTE DERECHA PARA EL PRECIO DEL JUEGO, UNA IMAGEN, LA DESCRIPCCION CORTA, EL BOTON DE COMPRAR ETC-->
-            <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="30,70,0,0" Background="#80000000">
-                <!--IMAGEN DEL JUEGO-->
-                <Grid x:Name="panelImagenPrincipalJuego" Margin="10,10,10,0" />
-                
-                <!--TEXTO CON EL PRECIO-->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock x:Name="textoPrecio" Grid.Column="0" Margin="0,20,0,0" Padding="10"/>
-                    <TextBlock x:Name="textoDescuento" Grid.Column="1" Margin="10,20,0,0"/>
-                </Grid>
-                
-                
-                <!--BOTON PARA COMPRAR O AÑADIR A LA BIBLIOTECA-->
-                <Button x:Name="botonCompra" Margin="10,10,10,0" Opacity="0"/>
-
-                <!--GRID PARA LA DESCRIPCCION CORTA-->
-                <Grid x:Name="gridDescripccionCorta" Margin="0,10,0,0">
-                    <TextBlock Name="textDescripccionCorta" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="10,10,10,0"
-                               FontSize="13"/>
-                </Grid>
-
-                <!--GRID PARA LA FECHA DE LANZAMIENTO-->
-                <StackPanel x:Name="gridFechaLanzamiento" Margin="0,10,0,0" Orientation="Horizontal">
-                    <TextBlock Name="textLanzamiento" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="10,10,0,0"
-                               FontSize="13"/>
-                    
-                    <TextBlock Name="textFechaLanzamiento" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="0,10,0,0"
-                               FontSize="15" FontWeight="Bold"/>
                 </StackPanel>
 
-                <!--GRID PARA LOS DESARROLLADORES-->
-                <Grid x:Name="gridDesarrollador" Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Name="textEtiquetaDesarrollador" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="10,10,0,10"
-                               FontSize="13" Grid.Column ="0"/>
 
-                    <TextBlock Name="textDesarrollador" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="0,10,0,10"
-                               FontSize="15" FontWeight="Bold"  Grid.Column ="1"/>
-                </Grid>
+                <!--PARTE DERECHA PARA EL PRECIO DEL JUEGO, UNA IMAGEN, LA DESCRIPCCION CORTA, EL BOTON DE COMPRAR ETC-->
+                <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="30,70,0,0" Background="#80000000">
+                    <!--IMAGEN DEL JUEGO-->
+                    <Grid x:Name="panelImagenPrincipalJuego" Margin="10,10,10,0" />
 
-                <!--GRID PARA LOS EDITORES-->
-                <Grid x:Name="gridEditor" Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Name="textEtiquetaEditor" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="Wrap" Padding="10,10,0,10"
-                               FontSize="13"  Grid.Column ="0"/>
+                    <!--TEXTO CON EL PRECIO-->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Name="textEditor" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap" Padding="0,10,0,10"
-                               FontSize="15" FontWeight="Bold" Grid.Column ="1"/>
-                </Grid>
-            </StackPanel>
+                        <TextBlock x:Name="textoPrecio" Grid.Column="0" Margin="0,20,0,0" Padding="10"/>
+                        <TextBlock x:Name="textoDescuento" Grid.Column="1" Margin="10,20,0,0"/>
+                    </Grid>
 
-        </Grid>
-    </ScrollViewer>
+
+                    <!--BOTON PARA COMPRAR O AÑADIR A LA BIBLIOTECA-->
+                    <Button x:Name="botonCompra" Margin="10,10,10,0" Opacity="0"/>
+
+                    <!--GRID PARA LA DESCRIPCCION CORTA-->
+                    <Grid x:Name="gridDescripccionCorta" Margin="0,10,0,0">
+                        <TextBlock Name="textDescripccionCorta" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="10,10,10,0"
+                           FontSize="13"/>
+                    </Grid>
+
+                    <!--GRID PARA LA FECHA DE LANZAMIENTO-->
+                    <StackPanel x:Name="gridFechaLanzamiento" Margin="0,10,0,0" Orientation="Horizontal">
+                        <TextBlock Name="textLanzamiento" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="10,10,0,0"
+                           FontSize="13"/>
+
+                        <TextBlock Name="textFechaLanzamiento" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="0,10,0,0"
+                           FontSize="15" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <!--GRID PARA LOS DESARROLLADORES-->
+                    <Grid x:Name="gridDesarrollador" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Name="textEtiquetaDesarrollador" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="10,10,0,10"
+                           FontSize="13" Grid.Column ="0"/>
+
+                        <TextBlock Name="textDesarrollador" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Padding="0,10,0,10"
+                           FontSize="15" FontWeight="Bold"  Grid.Column ="1"/>
+                    </Grid>
+
+                    <!--GRID PARA LOS EDITORES-->
+                    <Grid x:Name="gridEditor" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Name="textEtiquetaEditor" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="Wrap" Padding="10,10,0,10"
+                           FontSize="13"  Grid.Column ="0"/>
+
+                        <TextBlock Name="textEditor" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap" Padding="0,10,0,10"
+                           FontSize="15" FontWeight="Bold" Grid.Column ="1"/>
+                    </Grid>
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+    
 </Page>

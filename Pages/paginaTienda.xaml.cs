@@ -524,7 +524,7 @@ namespace Cliente_TFG.Pages
                 StackPanel contenedor = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Margin = new Thickness(0), // El margen va en el borde exterior ahora
+                    Margin = new Thickness(0),
                     Background = Brushes.Transparent,
                     Tag = appidOfertas[i]
                 };
@@ -536,9 +536,8 @@ namespace Cliente_TFG.Pages
                     CornerRadius = new CornerRadius(10),
                     BorderBrush = AppTheme.Actual.BordePanel,
                     BorderThickness = new Thickness(2),
-                    Background = AppTheme.Actual.FondoDescuento,
                     Margin = margen,
-                    ClipToBounds = true // NECESARIO PARA RECORTAR EL CONTENIDO
+                    ClipToBounds = true //NECESARIO PARA RECORTAR EL CONTENIDO
                 };
 
                 contenedor.Children.Add(bordeImagen);
