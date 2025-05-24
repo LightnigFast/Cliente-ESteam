@@ -41,6 +41,7 @@ namespace Cliente_TFG.Pages
         private List<string> precioCarrusel = new List<string>();
         private DispatcherTimer carruselTimer;
         private int indiceActual = 0;
+        private List<Button> botonesCarruselLista = new List<Button>();
 
         //OFERTAS
         private List<string> imagenesOfertas = new List<string>();
@@ -161,35 +162,10 @@ namespace Cliente_TFG.Pages
 
                         //CREO LOS BOTONES PARA NAVEGAR POR EL CARRUSEL
                         int index = imagenesCarrusel.Count - 1; //ÍNDICE ACTUAL DEL JUEGO QUE ACABO DE AÑADIR
-                        Button btn = new Button
-                        {
-                            //Content = (index + 1).ToString(),
-                            Margin = new Thickness(2),
-                            Padding = new Thickness(5),
-                            Width = 30,
-                            Height = 20,
-                            FontSize = 18,
-                            Background = Brushes.Transparent,
-                            Foreground = AppTheme.Actual.TextoPrincipal,
-                            BorderBrush = AppTheme.Actual.TextoPrincipal,
-                            Cursor = Cursors.Hand
-                        };
-
-                        //EVENTO CLICK PARA NAVEGAR A ESE JUEGO
-                        btn.Click += (s, e) =>
-                        {
-                            indiceActual = index;
-                            imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[index]));
-                            carruselTituloJuego.Text = nombresCarrusel[index];
-                            carruselPrecioJuego.Text = precioCarrusel[index];
-                            CargarMiniaturas(index);
-                            AplicarFadeIn(imagenTiendaGrande);
-                            AplicarFadeIn(carruselTituloJuego);
-                            AplicarFadeIn(carruselPrecioJuego);
-                            ReiniciarTimer();
-                        };
-
+                        Button btn = CrearBotonCarrusel(index);
                         botonesCarrusel.Children.Add(btn);
+                        botonesCarruselLista.Add(btn);
+
 
                     }
 
@@ -201,6 +177,7 @@ namespace Cliente_TFG.Pages
                     {
                         //SI AL MENOS UNA IMAGEN ESTA DISPONIBLE, MUESTRO EL CARRUSEL
                         CargarCarrusel();
+                        ActualizarColoresBotones();
                     }
                 }
                 catch (Exception ex)
@@ -239,7 +216,7 @@ namespace Cliente_TFG.Pages
                     AplicarFadeIn(imagenTiendaGrande);
                     AplicarFadeIn(carruselTituloJuego);
                     AplicarFadeIn(carruselPrecioJuego);
-
+                    ActualizarColoresBotones();
                 };
             }
             //VUELVO A ACTIVARLO PARA QUE FUNCIONEN LOS EVENTOS
@@ -278,6 +255,7 @@ namespace Cliente_TFG.Pages
                 AplicarFadeIn(carruselTituloJuego);
                 AplicarFadeIn(carruselPrecioJuego);
                 ReiniciarTimer();
+                ActualizarColoresBotones();
             };
 
             BtnSiguiente.Click += (s, e) =>
@@ -291,6 +269,7 @@ namespace Cliente_TFG.Pages
                 AplicarFadeIn(carruselTituloJuego);
                 AplicarFadeIn(carruselPrecioJuego);
                 ReiniciarTimer();
+                ActualizarColoresBotones();
             };
 
             //IMAGEN INICIAL
@@ -305,6 +284,90 @@ namespace Cliente_TFG.Pages
             //INICIA EL TIMER
             carruselTimer.Start();
         }
+
+        //METODO PARA CAMBIAR LOS COLORES DE LOS BOTONES DEL CARRUSEL
+        private void ActualizarColoresBotones()
+        {
+            for (int i = 0; i < botonesCarruselLista.Count; i++)
+            {
+                var btn = botonesCarruselLista[i];
+                btn.ApplyTemplate();
+                var border = (Border)btn.Template.FindName("border", btn);
+                if (border != null)
+                {
+                    border.Background = (i == indiceActual) ? AppTheme.Actual.BordePanel : AppTheme.Actual.FondoPanel;
+                }
+            }
+        }
+
+
+        private Button CrearBotonCarrusel(int index)
+        {
+            Button btn = new Button
+            {
+                Margin = new Thickness(2),
+                Padding = new Thickness(5),
+                Width = 30,
+                Height = 20,
+                FontSize = 18,
+                Cursor = Cursors.Hand,
+                FocusVisualStyle = null
+            };
+
+            //PLANTILLA PERSONALIZADA SIN AZUL
+            FrameworkElementFactory border = new FrameworkElementFactory(typeof(Border));
+            border.Name = "border";
+            border.SetValue(Border.BackgroundProperty, AppTheme.Actual.FondoPanel);
+            border.SetValue(Border.BorderBrushProperty, AppTheme.Actual.BordePanel);
+            border.SetValue(Border.BorderThicknessProperty, new Thickness(1));
+            border.SetValue(Border.CornerRadiusProperty, new CornerRadius(5));
+
+            FrameworkElementFactory contentPresenter = new FrameworkElementFactory(typeof(ContentPresenter));
+            contentPresenter.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            contentPresenter.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
+
+            border.AppendChild(contentPresenter);
+
+            btn.Template = new ControlTemplate(typeof(Button))
+            {
+                VisualTree = border
+            };
+
+            //EVENTO CLICK → CAMBIAR DE JUEGO
+            btn.Click += (s, e) =>
+            {
+                indiceActual = index;
+                imagenTiendaGrande.Source = new BitmapImage(new Uri(imagenesCarrusel[index]));
+                carruselTituloJuego.Text = nombresCarrusel[index];
+                carruselPrecioJuego.Text = precioCarrusel[index];
+                CargarMiniaturas(index);
+                AplicarFadeIn(imagenTiendaGrande);
+                AplicarFadeIn(carruselTituloJuego);
+                AplicarFadeIn(carruselPrecioJuego);
+                ReiniciarTimer();
+
+                //ACTUALIZAR ESTADO VISUAL DE BOTONES
+                ActualizarColoresBotones();
+            };
+
+            //EFECTO AL PASAR EL RATÓN
+            btn.MouseEnter += (s, e) =>
+            {
+                var borderElement = (Border)btn.Template.FindName("border", btn);
+                if (borderElement != null && index != indiceActual)
+                    borderElement.Background = AppTheme.Actual.BordePanel;
+            };
+
+            btn.MouseLeave += (s, e) =>
+            {
+                var borderElement = (Border)btn.Template.FindName("border", btn);
+                if (borderElement != null && index != indiceActual)
+                    borderElement.Background = AppTheme.Actual.FondoPanel;
+            };
+
+            return btn;
+        }
+
 
         //MÉTODO PARA REINICIAR EL TIMER
         private void ReiniciarTimer()
