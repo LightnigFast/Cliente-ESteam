@@ -127,7 +127,7 @@
 
                 <!--GRID PARA JUEGOS DESTACADOS-->
                 <TextBlock Name="txtTituloDestacados" Text="Juegos destacados" Foreground="White" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center" 
-                            Margin="0,60,0,0"/>
+                            Margin="0,60,0,0" Opacity="0"/>
                 <Border x:Name="bordeJuegosDestacados" CornerRadius="12" BorderThickness="2" BorderBrush="Transparent" Margin="0,10,0,0" Width="1150" Height="366">
                     <Grid Name="panelJuegosDestacados" Background="Transparent" Width="1150" Height="366" VerticalAlignment="Top" >
                         <Grid.ColumnDefinitions>
@@ -160,7 +160,7 @@
                 </Border>
 
                 <!--CONTENEDOR PARA LOS BOTONES DEL CARRUSEL-->
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
+                <StackPanel x:Name="panelBotonesCarrusel" HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0" Opacity="0">
 
                     <!--Botón izquierdo-->
                     <Button Name="BtnAnterior" Content="◀" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>

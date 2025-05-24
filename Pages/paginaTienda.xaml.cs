@@ -153,6 +153,8 @@ namespace Cliente_TFG.Pages
                                 AplicarFadeIn(imagenTiendaGrande);
                                 AplicarFadeIn(carruselTituloJuego);
                                 AplicarFadeIn(carruselPrecioJuego);
+                                AplicarFadeIn(txtTituloDestacados);
+                                AplicarFadeIn(panelBotonesCarrusel);
                                 //panelJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
                                 bordeJuegosDestacados.BorderBrush = AppTheme.Actual.BordePanel;
                                 bordeJuegosDestacados.Background = AppTheme.Actual.FondoPanel;
