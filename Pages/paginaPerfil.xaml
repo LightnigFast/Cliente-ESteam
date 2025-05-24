@@ -75,7 +75,7 @@
     <Grid Background="Transparent">
         
         <!--GRID CENTRAR PARA LA INFO DEL USER-->
-        <Grid Name="gridCnetral" HorizontalAlignment="Center" Width="1150" Background="#40000000" Margin="50">
+        <Grid Name="gridCnetral" HorizontalAlignment="Center" Width="1150" Margin="50">
 
             
             <Grid.ColumnDefinitions>

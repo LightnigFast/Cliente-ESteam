@@ -76,6 +76,10 @@ namespace Cliente_TFG.Pages
             //CARGO LOS COLORES LO PRIMERO DE TODO
             carruselTituloJuego.Foreground = AppTheme.Actual.TextoPrincipal;
             carruselPrecioJuego.Foreground = AppTheme.Actual.TextoPrincipal;
+            txtTituloDestacados.Foreground = AppTheme.Actual.BordePanel;
+            txtTituloOfertasEspeciales.Foreground = AppTheme.Actual.BordePanel;
+            txtTituloJuegosPrecioEspecifico.Foreground = AppTheme.Actual.BordePanel;
+            txtTituloNuevosLanzamientos.Foreground = AppTheme.Actual.BordePanel;
 
             ventanaPrincipal = mainWindow;
 

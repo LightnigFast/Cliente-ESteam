@@ -41,7 +41,10 @@ namespace Cliente_TFG.Pages
             nombreUser.Foreground = AppTheme.Actual.TextoPrincipal;
             nombreCuenta.Foreground = AppTheme.Actual.TextoPrincipal;
             descripccionCuenta.Foreground = AppTheme.Actual.TextoPrincipal;
-            txtBiografia.Foreground = AppTheme.Actual.TextoPrincipal;   
+            txtBiografia.Foreground = AppTheme.Actual.TextoPrincipal;
+
+            gridCnetral.Background = AppTheme.Actual.FondoPanel;
+
         }
 
         private void cargarDatosUser()
