@@ -62,11 +62,43 @@ namespace Cliente_TFG.Pages
             this.ventanaPrincipal = ventanaPrincipal;
             this.appid = appid;
 
+            //APLICAMOS LOS BORDES A TODOS LOS COMPONENTES
+            bordeDatosJuegos.BorderBrush = AppTheme.Actual.BordePanel;
+            bordeCarrusel.BorderBrush = AppTheme.Actual.BordePanel;
+            bordeDescripccionLarga.BorderBrush = AppTheme.Actual.BordePanel;
+            bordeCategoriasGeneros.BorderBrush = AppTheme.Actual.BordePanel;
+
+            AplicarEsquinasRedondeadas(clipContainer, 15);
+            AplicarEsquinasRedondeadas(gridCarrusel, 15);
+            AplicarEsquinasRedondeadas(gridDescripccionLarga, 15);
+            AplicarEsquinasRedondeadas(gridCategoriasGeneros, 15);
+
             // LLAMADA ASÍNCRONA CORRECTA
             _ = InicializarPaginaAsync();
 
 
         }
+
+        private void AplicarEsquinasRedondeadas(FrameworkElement contenedor, double radio)
+        {
+            contenedor.Loaded += (s, e) =>
+            {
+                var rect = new RectangleGeometry
+                {
+                    RadiusX = radio,
+                    RadiusY = radio,
+                    Rect = new Rect(0, 0, contenedor.ActualWidth, contenedor.ActualHeight)
+                };
+
+                contenedor.Clip = rect;
+
+                contenedor.SizeChanged += (s2, e2) =>
+                {
+                    rect.Rect = new Rect(0, 0, contenedor.ActualWidth, contenedor.ActualHeight);
+                };
+            };
+        }
+
 
         private async Task InicializarPaginaAsync()
         {
