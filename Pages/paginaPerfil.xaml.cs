@@ -53,6 +53,8 @@ namespace Cliente_TFG.Pages
             nombreCuenta.Text = ventanaPrincipal.Usuario.NombreCuenta;
             descripccionCuenta.Text = ventanaPrincipal.Usuario.Descripcion;
 
+            string urlImagen = $"http://127.0.0.1:5000{ventanaPrincipal.Usuario.FotoPerfil}";
+            imagenUser.Source = new BitmapImage(new Uri(urlImagen, UriKind.Absolute));
 
 
         }
