@@ -79,7 +79,6 @@ namespace Cliente_TFG.Pages
                     string json = await client.GetStringAsync("http://127.0.0.1:5000/library/" + ventanaPrincipal.Usuario.IdUsuario);
                     var response = JsonConvert.DeserializeObject<BibliotecaResponse>(json);
                         
-                    // Usa listas temporales para evitar duplicados
                     List<string> listaAppids = new List<string>();
                     List<string> listaNombres = new List<string>();
 
@@ -94,15 +93,9 @@ namespace Cliente_TFG.Pages
                         }
                     }
 
-                    // Convierte a arrays si lo necesitas en ese formato
                     appids = listaAppids.ToArray();
                     Nombres = listaNombres.ToArray();
 
-                    // OPCIONAL: Mostrar por consola para comprobar
-                    for (int i = 0; i < appids.Length; i++)
-                    {
-                        Console.WriteLine("APP ID: " + appids[i] + " - NOMBRE: " + Nombres[i]);
-                    }
                 }
                 catch (Exception ex)
                 {
