@@ -82,6 +82,19 @@ namespace Cliente_TFG.Pages
             txtTituloJuegosPrecioEspecifico.Foreground = AppTheme.Actual.BordePanel;
             txtTituloNuevosLanzamientos.Foreground = AppTheme.Actual.BordePanel;
 
+            //BOTONES
+            BtnAnterior.Background = AppTheme.Actual.FondoPanel;
+            BtnAnterior.Foreground = AppTheme.Actual.BordePanel;
+            BtnAnterior.BorderBrush = AppTheme.Actual.BordePanel;
+            BtnAnterior.MouseEnter += BotonCarrusel_MouseEnter;
+            BtnAnterior.MouseLeave += BotonCarrusel_MouseLeave;
+
+            BtnSiguiente.Background = AppTheme.Actual.FondoPanel;
+            BtnSiguiente.Foreground = AppTheme.Actual.BordePanel;
+            BtnSiguiente.BorderBrush = AppTheme.Actual.BordePanel;
+            BtnSiguiente.MouseEnter += BotonCarrusel_MouseEnter;
+            BtnSiguiente.MouseLeave += BotonCarrusel_MouseLeave;
+
             ventanaPrincipal = mainWindow;
 
             //DESHABILITAR ESTO PARA EVITAR ERRORES EN LA CARGA DEL PRORGAMA
@@ -1520,7 +1533,24 @@ namespace Cliente_TFG.Pages
             stackHorizontal.Background = AppTheme.Actual.FondoPanel;
         }
 
+        //EVENTOS DE LOS BOTONES DEL CARRUSEL
+        private void BotonCarrusel_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                btn.Background = AppTheme.Actual.BordePanel;
+                btn.Foreground = AppTheme.Actual.FondoPanel;
+            }
+        }
 
+        private void BotonCarrusel_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                btn.Background = AppTheme.Actual.FondoPanel;
+                btn.Foreground = AppTheme.Actual.BordePanel;
+            }
+        }
 
         private void RefrescarTemas()
         {

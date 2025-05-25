@@ -99,6 +99,47 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="BotonCarruselStyle" TargetType="Button">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="10,0"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{DynamicResource FondoPanel}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BordePanel}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextoPrincipal}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource BordePanel}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource FondoPanel}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource TextoPrincipal}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource FondoPanel}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="Gray"/>
+                                <Setter Property="Foreground" Value="LightGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <Grid x:Name="gridPrincipal" Background="Transparent">
@@ -163,13 +204,13 @@
                 <StackPanel x:Name="panelBotonesCarrusel" HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0" Opacity="0">
 
                     <!--Botón izquierdo-->
-                    <Button Name="BtnAnterior" Content="◀" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>
+                    <Button Name="BtnAnterior" Content="◀" Style="{StaticResource BotonCarruselStyle}"/>
 
                     <!--PANEL PARA LOS BOTONES QUE TE SERVIRAN PARA IR A UN JUEGO DEL CARRUSEL-->
                     <StackPanel x:Name="botonesCarrusel" Orientation="Horizontal" VerticalAlignment="Center" Margin="5"/>
 
                     <!--Botón derecho-->
-                    <Button x:Name="BtnSiguiente" Content="▶" Width="40" Padding="5" VerticalAlignment="Center" Margin="10,0"/>
+                    <Button x:Name="BtnSiguiente" Content="▶" Style="{StaticResource BotonCarruselStyle}"/>
                 </StackPanel>
 
 
