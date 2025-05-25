@@ -48,7 +48,7 @@ namespace Cliente_TFG
 
             if (online)
             {
-                CargarDatosUsuario(3);
+                CargarDatosUsuario(14);
                 Cabecera_top.NombreUsuario = user.NombreUsuario;
                 Cabecera_top.Dinero = user.Dinero;
             }
