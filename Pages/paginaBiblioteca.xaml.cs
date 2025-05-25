@@ -48,6 +48,7 @@ namespace Cliente_TFG.Pages
             //CARGAR DATOS DEL JSON
             this.Loaded += async (s, e) =>
             {
+                borrarDatos();
                 await CargarDatosJson();
 
                 //PARA EL FONDO
@@ -56,28 +57,49 @@ namespace Cliente_TFG.Pages
 
         }
 
+        //METODO PARA BORRAR LOS DATOS CUANDO VUELVAS ATRAS (SI NO SE HACE, SE DUPLICAN LOS JUEGOS)
+        private void borrarDatos()
+        {
+            appids = Array.Empty<string>();
+            Nombres = Array.Empty<string>();
+            imagenesFondo.Clear();
+            imagenesLogos.Clear();
+            imagenVerticalJuegos.Clear();
+            panelJuegosBiblioteca.Children.Clear();
+        }
+
         private async Task CargarDatosJson()
         {
             using (HttpClient client = new HttpClient())
             {
+               
+
                 try
                 {
                     string json = await client.GetStringAsync("http://127.0.0.1:5000/library/" + ventanaPrincipal.Usuario.IdUsuario);
                     var response = JsonConvert.DeserializeObject<BibliotecaResponse>(json);
+                        
+                    // Usa listas temporales para evitar duplicados
+                    List<string> listaAppids = new List<string>();
+                    List<string> listaNombres = new List<string>();
 
-                    // Inicializa los arrays
-                    int cantidad = response.juegos.Count;
-                    appids = new string[cantidad];
-                    Nombres = new string[cantidad];
-
-                    for (int i = 0; i < cantidad; i++)
+                    foreach (var juego in response.juegos)
                     {
-                        appids[i] = response.juegos[i].app_id.ToString();
-                        Nombres[i] = response.juegos[i].nombre;
+                        string id = juego.app_id.ToString();
+
+                        if (!listaAppids.Contains(id))
+                        {
+                            listaAppids.Add(id);
+                            listaNombres.Add(juego.nombre);
+                        }
                     }
 
+                    // Convierte a arrays si lo necesitas en ese formato
+                    appids = listaAppids.ToArray();
+                    Nombres = listaNombres.ToArray();
+
                     // OPCIONAL: Mostrar por consola para comprobar
-                    for (int i = 0; i < cantidad; i++)
+                    for (int i = 0; i < appids.Length; i++)
                     {
                         Console.WriteLine("APP ID: " + appids[i] + " - NOMBRE: " + Nombres[i]);
                     }
@@ -87,8 +109,8 @@ namespace Cliente_TFG.Pages
                     Console.WriteLine("ERROR AL CARGAR LA BIBLIOTECA: " + ex.Message);
                 }
             }
-
         }
+
 
         public class Juego
         {
