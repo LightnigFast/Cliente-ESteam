@@ -92,6 +92,18 @@ namespace Cliente_TFG.UserControls
             botonAmigos.MouseEnter += BotonCabecera_MouseEnter;
             botonAmigos.MouseLeave += BotonCabecera_MouseLeave;
 
+            botonAtras.Background = AppTheme.Actual.FondoPanel;
+            pathFlechaIzq.Fill = AppTheme.Actual.BordePanel;
+            botonAtras.BorderBrush = AppTheme.Actual.BordePanel;
+            botonAtras.MouseEnter += BotonCabecera_MouseEnter;
+            botonAtras.MouseLeave += BotonCabecera_MouseLeave;
+
+            botonAdelante.Background = AppTheme.Actual.FondoPanel;
+            pathFlechaDer.Fill = AppTheme.Actual.BordePanel;
+            botonAdelante.BorderBrush = AppTheme.Actual.BordePanel;
+            botonAdelante.MouseEnter += BotonCabecera_MouseEnter;
+            botonAdelante.MouseLeave += BotonCabecera_MouseLeave;
+
 
             EstadoActual = "Conectado";
         }
@@ -136,6 +148,11 @@ namespace Cliente_TFG.UserControls
             {
                 btn.Background = AppTheme.Actual.BordePanel;
                 btn.Foreground = AppTheme.Actual.FondoPanel;
+
+                if (btn.Content is Path path)
+                {
+                    path.Fill = AppTheme.Actual.FondoPanel;
+                }
             }
         }
 
@@ -145,6 +162,11 @@ namespace Cliente_TFG.UserControls
             {
                 btn.Background = AppTheme.Actual.FondoPanel;
                 btn.Foreground = AppTheme.Actual.BordePanel;
+
+                if (btn.Content is Path path)
+                {
+                    path.Fill = AppTheme.Actual.BordePanel;
+                }
             }
         }
 
