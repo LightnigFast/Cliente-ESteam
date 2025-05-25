@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cliente_TFG.Classes;
 
 namespace Cliente_TFG.UserControls
 {
@@ -72,7 +73,26 @@ namespace Cliente_TFG.UserControls
             InitializeComponent();
             this.DataContext = this;
 
-            // PRUEBA: CAMBIAR ESTADO MANUALMENTE
+            //CARGAR BOTONES
+            botonTienda.Background = AppTheme.Actual.FondoPanel;
+            botonTienda.Foreground = AppTheme.Actual.BordePanel;
+            botonTienda.BorderBrush = AppTheme.Actual.BordePanel;
+            botonTienda.MouseEnter += BotonCabecera_MouseEnter;
+            botonTienda.MouseLeave += BotonCabecera_MouseLeave;
+
+            botonBiblioteca.Background = AppTheme.Actual.FondoPanel;
+            botonBiblioteca.Foreground = AppTheme.Actual.BordePanel;
+            botonBiblioteca.BorderBrush = AppTheme.Actual.BordePanel;
+            botonBiblioteca.MouseEnter += BotonCabecera_MouseEnter;
+            botonBiblioteca.MouseLeave += BotonCabecera_MouseLeave;
+
+            botonAmigos.Background = AppTheme.Actual.FondoPanel;
+            botonAmigos.Foreground = AppTheme.Actual.BordePanel;
+            botonAmigos.BorderBrush = AppTheme.Actual.BordePanel;
+            botonAmigos.MouseEnter += BotonCabecera_MouseEnter;
+            botonAmigos.MouseLeave += BotonCabecera_MouseLeave;
+
+
             EstadoActual = "Conectado";
         }
 
@@ -110,7 +130,23 @@ namespace Cliente_TFG.UserControls
             AmigosPresionado?.Invoke(this, e);
         }
 
+        private void BotonCabecera_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                btn.Background = AppTheme.Actual.BordePanel;
+                btn.Foreground = AppTheme.Actual.FondoPanel;
+            }
+        }
 
+        private void BotonCabecera_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                btn.Background = AppTheme.Actual.FondoPanel;
+                btn.Foreground = AppTheme.Actual.BordePanel;
+            }
+        }
 
 
         //PARTE PARA EL USUARIO

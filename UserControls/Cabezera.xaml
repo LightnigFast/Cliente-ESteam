@@ -31,6 +31,73 @@
             </Setter>
         </Style>
 
+        <!-- Estilo personalizado para el botón "Tienda" -->
+        <Style x:Key="BotonChuloStyle" TargetType="Button">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#FF5E9DFC" Offset="0"/>
+                        <GradientStop Color="#FF2A52BE" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF1A3A8F"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                                CornerRadius="8"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="5" ShadowDepth="2" Color="#40000000"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#FF7CADFC" Offset="0"/>
+                                            <GradientStop Color="#FF3A6BD6" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="BorderBrush" Value="#FF2A52BE"/>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="8" ShadowDepth="3" Color="#60000000"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#FF2A52BE" Offset="0"/>
+                                            <GradientStop Color="#FF5E9DFC" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="3" ShadowDepth="1" Color="#20000000"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
     </UserControl.Resources>
     
     <Grid Background="Black">
@@ -55,13 +122,13 @@
             </Grid.ColumnDefinitions>
             
             <!--BOTON PARA LA BIBLIOTECA-->
-            <Button Grid.Column="0" x:Name="botonBiblioteca" Content="Biblioteca" Click="biblioteca_click"/>
+            <Button Grid.Column="0" x:Name="botonBiblioteca" Content="BIBLIOTECA" Click="biblioteca_click"  Style="{StaticResource BotonChuloStyle}" Margin="5"/>
 
             <!--BOTON PARA LA TIENDA-->
-            <Button Grid.Column="1" x:Name="botonTienda" Content="Tienda" Click="tienda_click"/>
+            <Button Grid.Column="1" x:Name="botonTienda" Content="TIENDA" Click="tienda_click"  Style="{StaticResource BotonChuloStyle}" Margin="5"/>
             
             <!--BOTON PARA LOS AMIGOS-->
-            <Button Grid.Column="2" x:Name="botonAmigos" Content="Amigos" Click="amigos_click"/>
+            <Button Grid.Column="2" x:Name="botonAmigos" Content="AMIGOS" Click="amigos_click"  Style="{StaticResource BotonChuloStyle}" Margin="5"/>
 
         </Grid>
 
