@@ -16,7 +16,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using Newtonsoft.Json;
 namespace Cliente_TFG.Pages
 {
     /// <summary>
@@ -24,6 +24,8 @@ namespace Cliente_TFG.Pages
     /// </summary>
     public partial class paginaBiblioteca : Page
     {
+        private MainWindow ventanaPrincipal;
+
         //DATOS DE PRUEBA
         private string[] appids;
         private string[] Nombres;
@@ -35,18 +37,70 @@ namespace Cliente_TFG.Pages
         //PARA LOS DEMAS JUEGOS DE LA BIBLIOTECA
         private List<string> imagenVerticalJuegos = new List<string>();
 
-        public paginaBiblioteca()
+        public paginaBiblioteca(MainWindow ventanaPrincipal)
         {
             InitializeComponent();
+            this.ventanaPrincipal = ventanaPrincipal;
 
             //CARGAR DATOS DE PRUEBA
-            CargarDatosDePrueba();
+            //CargarDatosDePrueba();
 
-            //PARA EL FONDO
-            CargarImagenesFondo();
+            //CARGAR DATOS DEL JSON
+            this.Loaded += async (s, e) =>
+            {
+                await CargarDatosJson();
+
+                //PARA EL FONDO
+                CargarImagenesFondo();
+            };
 
         }
 
+        private async Task CargarDatosJson()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    string json = await client.GetStringAsync("http://127.0.0.1:5000/library/" + ventanaPrincipal.Usuario.IdUsuario);
+                    var response = JsonConvert.DeserializeObject<BibliotecaResponse>(json);
+
+                    // Inicializa los arrays
+                    int cantidad = response.juegos.Count;
+                    appids = new string[cantidad];
+                    Nombres = new string[cantidad];
+
+                    for (int i = 0; i < cantidad; i++)
+                    {
+                        appids[i] = response.juegos[i].app_id.ToString();
+                        Nombres[i] = response.juegos[i].nombre;
+                    }
+
+                    // OPCIONAL: Mostrar por consola para comprobar
+                    for (int i = 0; i < cantidad; i++)
+                    {
+                        Console.WriteLine("APP ID: " + appids[i] + " - NOMBRE: " + Nombres[i]);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERROR AL CARGAR LA BIBLIOTECA: " + ex.Message);
+                }
+            }
+
+        }
+
+        public class Juego
+        {
+            public int app_id { get; set; }
+            public string captura { get; set; }
+            public string nombre { get; set; }
+        }
+
+        public class BibliotecaResponse
+        {
+            public List<Juego> juegos { get; set; }
+        }
 
         private void CargarDatosDePrueba()
         {

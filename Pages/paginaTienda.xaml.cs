@@ -608,6 +608,7 @@ namespace Cliente_TFG.Pages
                     Orientation = Orientation.Vertical,
                     Margin = new Thickness(0),
                     Background = Brushes.Transparent,
+                    Cursor = Cursors.Hand,
                     Tag = appidOfertas[i]
                 };
 
@@ -865,7 +866,7 @@ namespace Cliente_TFG.Pages
                 StackPanel contenedor = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    
+                    Cursor = Cursors.Hand,
                     Tag = appidOfertasEspeciales[i]
 
                 };

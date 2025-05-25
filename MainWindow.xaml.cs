@@ -48,7 +48,7 @@ namespace Cliente_TFG
 
             if (online)
             {
-                CargarDatosUsuario(3);
+                CargarDatosUsuario(5);
                 Cabecera_top.NombreUsuario = user.NombreUsuario;
                 Cabecera_top.Dinero = user.Dinero;
             }
@@ -72,14 +72,14 @@ namespace Cliente_TFG
 
         private void CargarPrimeraVentana()
         {
-            var paginaTienda = new paginaTienda(this);
-            framePrincipal.Navigate(paginaTienda);
+            //var paginaTienda = new paginaTienda(this);
+            //framePrincipal.Navigate(paginaTienda);
 
             //var paginaTienda = new paginaJuegoTienda(this, 3017860);
             //framePrincipal.Navigate(paginaTienda);
 
-            //var paginaBiblioteca = new paginaBiblioteca();
-            //framePrincipal.Navigate(paginaBiblioteca);
+            var paginaBiblioteca = new paginaBiblioteca(this);
+            framePrincipal.Navigate(paginaBiblioteca);
         }
 
         private void FramePrincipal_Navigated(object sender, NavigationEventArgs e)
@@ -104,7 +104,7 @@ namespace Cliente_TFG
 
         private void boton_biblioteca_presionado(object sender, RoutedEventArgs e)
         {
-            framePrincipal.Navigate(new paginaBiblioteca());
+            framePrincipal.Navigate(new paginaBiblioteca(this));
         }
 
         private void boton_tienda_presionado(object sender, RoutedEventArgs e)

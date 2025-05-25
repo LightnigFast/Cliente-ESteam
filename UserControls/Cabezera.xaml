@@ -31,7 +31,7 @@
             </Setter>
         </Style>
 
-        <!-- Estilo personalizado para el botón "Tienda" -->
+        <!--ESTILO PARA LOS BOTONES DEL MENU-->
         <Style x:Key="BotonChuloStyle" TargetType="Button">
             <Setter Property="Background">
                 <Setter.Value>
@@ -109,14 +109,14 @@
 
         <!--BOTONES DE NAVEGACIÓN-->
         <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" Margin="10,0">
-            <Button x:Name="botonAtras" Width="30" Height="30" Margin="0,0,5,0" Click="BtnAtras_Click" Style="{StaticResource BotonChuloStyle}">
+            <Button x:Name="botonAtras" Width="30" Height="30" Margin="0,0,5,0" Click="BtnAtras_Click" Style="{StaticResource BotonChuloStyle}" Cursor="Hand">
                 <Button.Content>
                     <Path x:Name="pathFlechaIzq" Data="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" Fill="White" Stretch="Uniform"
                           Width="15" Height="15"/>
 
                 </Button.Content>
             </Button>
-            <Button x:Name="botonAdelante" Width="30" Height="30" Click="BtnAdelante_Click" Style="{StaticResource BotonChuloStyle}">
+            <Button x:Name="botonAdelante" Width="30" Height="30" Click="BtnAdelante_Click" Style="{StaticResource BotonChuloStyle}" Cursor="Hand">
                 <Button.Content>
                     <Path x:Name="pathFlechaDer" Data="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" Fill="White" Stretch="Uniform"
                           Width="15" Height="15"/>
@@ -134,19 +134,19 @@
             </Grid.ColumnDefinitions>
             
             <!--BOTON PARA LA BIBLIOTECA-->
-            <Button Grid.Column="0" x:Name="botonBiblioteca" Content="BIBLIOTECA" Click="biblioteca_click"  Style="{StaticResource BotonChuloStyle}" Margin="5"/>
+            <Button Grid.Column="0" x:Name="botonBiblioteca" Content="BIBLIOTECA" Click="biblioteca_click"  Style="{StaticResource BotonChuloStyle}" Margin="5" Cursor="Hand"/>
 
             <!--BOTON PARA LA TIENDA-->
-            <Button Grid.Column="1" x:Name="botonTienda" Content="TIENDA" Click="tienda_click"  Style="{StaticResource BotonChuloStyle}" Margin="5"/>
+            <Button Grid.Column="1" x:Name="botonTienda" Content="TIENDA" Click="tienda_click"  Style="{StaticResource BotonChuloStyle}" Margin="5" Cursor="Hand"/>
             
             <!--BOTON PARA LOS AMIGOS-->
-            <Button Grid.Column="2" x:Name="botonAmigos" Content="AMIGOS" Click="amigos_click"  Style="{StaticResource BotonChuloStyle}" Margin="5"/>
+                <Button Grid.Column="2" x:Name="botonAmigos" Content="AMIGOS" Click="amigos_click"  Style="{StaticResource BotonChuloStyle}" Margin="5" Cursor="Hand"/>
 
         </Grid>
 
 
         <!--GRID PARA LA PESTAÑA DE USUARIO-->
-        <Grid x:Name="gridPerfilUsuario" Grid.Column="2" MouseDown="GridPerfilUsuario_MouseDown">
+        <Grid x:Name="gridPerfilUsuario" Grid.Column="2" MouseDown="GridPerfilUsuario_MouseDown" Cursor="Hand">
             <Grid.ContextMenu>
                 <ContextMenu x:Name="StatusMenu"
                              Background="#FF2D2D2D"
