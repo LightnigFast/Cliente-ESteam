@@ -49,14 +49,24 @@ namespace Cliente_TFG.Pages
 
         private void cargarDatosUser()
         {
-            nombreUser.Text = ventanaPrincipal.Usuario.NombreUsuario;
-            nombreCuenta.Text = ventanaPrincipal.Usuario.NombreCuenta;
-            descripccionCuenta.Text = ventanaPrincipal.Usuario.Descripcion;
+            Usuario usuario = ventanaPrincipal.Usuario;
 
-            string urlImagen = $"http://127.0.0.1:5000{ventanaPrincipal.Usuario.FotoPerfil}";
-            imagenUser.Source = new BitmapImage(new Uri(urlImagen, UriKind.Absolute));
+            nombreUser.Text = usuario.NombreUsuario;
+            nombreCuenta.Text = usuario.NombreCuenta;
+            descripccionCuenta.Text = usuario.Descripcion;
 
+            string urlImagen = usuario.FotoPerfil;
 
+            if (!string.IsNullOrEmpty(urlImagen) && Uri.IsWellFormedUriString(urlImagen, UriKind.Absolute))
+            {
+                imagenUser.Source = new BitmapImage(new Uri(urlImagen, UriKind.Absolute));
+            }
+            else
+            {
+                string rutaImagenLocal = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "imagenes", "default.png"); // Esta foto es la default. Por si no se ponen nada. 
+                imagenUser.Source = new BitmapImage(new Uri(rutaImagenLocal, UriKind.Absolute));
+                MessageBox.Show("URL de la foto inválida o vacía: " + urlImagen);
+            }
         }
     }
 }
