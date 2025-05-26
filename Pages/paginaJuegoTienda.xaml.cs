@@ -54,6 +54,8 @@ namespace Cliente_TFG.Pages
         private string descuento;
         private string precioInicial;
 
+        private static readonly HttpClient client = new HttpClient();
+
 
 
         public paginaJuegoTienda(MainWindow ventanaPrincipal, int appid)
@@ -652,15 +654,63 @@ namespace Cliente_TFG.Pages
         {
             string textoBoton;
 
-            if (string.IsNullOrEmpty(precioInicial) || precioInicial == "0")
+            if (ventanaPrincipal.Usuario.BibliotecaJuegos.Contains(appid))
+                textoBoton = "EN BIBLIOTECA";
+            else if (string.IsNullOrEmpty(precioInicial) || precioInicial == "0")
                 textoBoton = "AÑADIR A BIBLIOTECA";
-            else 
+            else
                 textoBoton = "COMPRAR";
-
 
             botonCompra.Content = textoBoton;
             botonCompra.Height = 40;
+        }
 
+        private async void botonCompra_Click(object sender, RoutedEventArgs e)
+        {
+            int userId = ventanaPrincipal.Usuario.IdUsuario; 
+            int gameId = appid; 
+
+            bool exito = await ComprarJuegoAsync(userId, gameId);
+
+        }
+
+        //METODO PARA COMPRAR UN JUEGO HACIENDO UNA PETICION POST AL SERVER
+        private async Task<bool> ComprarJuegoAsync(int userId, int gameId)
+        {
+            try
+            {
+                string baseUrl = "http://127.0.0.1:5000/store/buy";
+
+                string url = $"{baseUrl}?user={userId}&game={gameId}";
+
+                //HACER POST
+                HttpResponseMessage response = await client.PostAsync(url, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                    MessageBox.Show("Compra realizada con éxito.");
+
+                    ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
+                    CargarBotonCompra();
+
+                    return true;
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"Error al comprar el juego: {errorResponse}");
+                    return false;
+                }
+
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Excepción al comprar: {ex.Message}");
+                return false;
+            }
         }
 
         //PARTE PARA LA DESCRIPCCION CORTA

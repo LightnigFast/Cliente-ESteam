@@ -192,7 +192,7 @@
 
 
                             <!--BOTON PARA COMPRAR O AÑADIR A LA BIBLIOTECA-->
-                            <Button x:Name="botonCompra" Margin="10,10,10,0" Opacity="0"/>
+                            <Button x:Name="botonCompra" Margin="10,10,10,0" Opacity="0" Click="botonCompra_Click"/>
 
                             <!--GRID PARA LA DESCRIPCCION CORTA-->
                             <Grid x:Name="gridDescripccionCorta" Margin="0,10,0,0">

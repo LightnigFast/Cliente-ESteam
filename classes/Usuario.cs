@@ -23,6 +23,7 @@ namespace Cliente_TFG.Classes
         private string nombre_cuenta;
         private string nombre_usuario;
         private string token;
+        private List<int> bibliotecaJuegos = new List<int>();
 
 
 
@@ -48,7 +49,29 @@ namespace Cliente_TFG.Classes
                 nombre_usuario = (string)usuarioJson["nombre_usuario"];
                 token = ((string)usuarioJson["token"]).Trim();
             }
+            CargarBiblioteca(idUser);
         }
+
+        public void CargarBiblioteca(int idUser)
+        {
+            var url = $"http://127.0.0.1:5000/library/{idUser}";
+            using (var webClient = new WebClient())
+            {
+                string jsonString = webClient.DownloadString(url);
+
+                var jsonObj = JObject.Parse(jsonString);
+                var juegosArray = jsonObj["juegos"] as JArray;
+
+                bibliotecaJuegos.Clear();
+
+                foreach (var juego in juegosArray)
+                {
+                    int appId = (int)juego["app_id"];
+                    bibliotecaJuegos.Add(appId);
+                }
+            }
+        }
+
 
 
 
@@ -64,6 +87,7 @@ namespace Cliente_TFG.Classes
         public string NombreCuenta => nombre_cuenta;
         public string NombreUsuario => nombre_usuario;
         public string Token => token;
+        public List<int> BibliotecaJuegos => bibliotecaJuegos;
 
 
     }
