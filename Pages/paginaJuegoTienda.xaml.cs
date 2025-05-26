@@ -690,6 +690,21 @@ namespace Cliente_TFG.Pages
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
 
+                    //PARSING DEL DINERO NUEVO 
+                    var resultado = Newtonsoft.Json.JsonConvert.DeserializeObject<RespuestaCompra>(jsonResponse);
+
+                    if (resultado != null)
+                    {
+                        double nuevoDinero = resultado.DineroRestante;
+                        ventanaPrincipal.Cabecera_top.Dinero = nuevoDinero;
+                        MessageBox.Show(resultado.Mensaje);
+
+                        ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
+                        CargarBotonCompra();
+
+                        return true;
+                    }
+
                     MessageBox.Show("Compra realizada con éxito.");
 
                     ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
@@ -697,6 +712,7 @@ namespace Cliente_TFG.Pages
 
                     return true;
                 }
+
                 else
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
@@ -712,6 +728,19 @@ namespace Cliente_TFG.Pages
                 return false;
             }
         }
+
+        public class RespuestaCompra
+        {
+            [JsonProperty("dinero_restante")]
+            public double DineroRestante { get; set; }
+
+            [JsonProperty("message")]
+            public string Mensaje { get; set; }
+
+            [JsonProperty("success")]
+            public bool Success { get; set; }
+        }
+
 
         //PARTE PARA LA DESCRIPCCION CORTA
         private void CargarDescripccionCorta()
