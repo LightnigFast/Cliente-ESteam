@@ -369,6 +369,7 @@ namespace Cliente_TFG.Pages
 
                     //ASIGNAMOS TAG PARA SABER QUÉ ÍNDICE ES EN EL EVENTO
                     ImagenLogo.Tag = index;
+                    imgFondo.Tag = index;
 
                     //CAMBIAMOS IMÁGENES
                     imgFondo.Source = new BitmapImage(new Uri(imagenesFondo[index.Value], UriKind.Absolute));
@@ -394,8 +395,11 @@ namespace Cliente_TFG.Pages
 
         private void ImgFondo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
         {
-            Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appids[0]}/header.jpg");
-            imgFondo.Source = new BitmapImage(fallbackUri);
+            if (sender is Image img && img.Tag is int index)
+            {
+                Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appids[index]}/header.jpg");
+                img.Source = new BitmapImage(fallbackUri);
+            }
         }
 
         private void ImagenLogo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
