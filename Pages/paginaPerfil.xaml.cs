@@ -129,11 +129,11 @@ namespace Cliente_TFG.Pages
 
             var content = new FormUrlEncodedContent(new[]
             {
-        new KeyValuePair<string, string>("id_usuario", ventanaPrincipal.Usuario.id_usuario.ToString()),
-        new KeyValuePair<string, string>("foto_perfil", urlImagen)
-    });
+            new KeyValuePair<string, string>("id_usuario", ventanaPrincipal.Usuario.id_usuario.ToString()),
+            new KeyValuePair<string, string>("foto_perfil", urlImagen)
+        });
 
-            var response = await httpClient.PostAsync($"http://" + ventanaPrincipal.IP +  "/user_profile/actualizar_foto", content);
+            var response = await httpClient.PostAsync($"http://" + ventanaPrincipal.IP + "/user_profile/actualizar_foto", content);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -149,31 +149,32 @@ namespace Cliente_TFG.Pages
 
 
         // Método para recargar usuario desde servidor
-private async Task RecargarUsuarioDesdeServidor()
-{
-    int idUsuario = ventanaPrincipal.Usuario.IdUsuario;
-    Usuario usuarioActualizado = await ObtenerUsuarioActualizadoAsync(idUsuario);
+        private async Task RecargarUsuarioDesdeServidor()
+        {
+            int idUsuario = ventanaPrincipal.Usuario.IdUsuario;
+            Usuario usuarioActualizado = await ObtenerUsuarioActualizadoAsync(idUsuario);
 
-    if (usuarioActualizado != null)
-    {
-        // Actualiza el objeto usuario local con los nuevos datos
-        ventanaPrincipal.user = usuarioActualizado;
+            if (usuarioActualizado != null)
+            {
+                // Actualiza el objeto usuario local con los nuevos datos
+                ventanaPrincipal.user = usuarioActualizado;
 
-        // También actualiza la interfaz principal si tienes controles que muestran info del usuario
-        ventanaPrincipal.Cabecera_top.NombreUsuario = usuarioActualizado.NombreUsuario;
-        ventanaPrincipal.Cabecera_top.Dinero = usuarioActualizado.Dinero;
+                // También actualiza la interfaz principal si tienes controles que muestran info del usuario
+                ventanaPrincipal.Cabecera_top.NombreUsuario = usuarioActualizado.NombreUsuario;
+                ventanaPrincipal.Cabecera_top.Dinero = usuarioActualizado.Dinero;
 
-        // Refresca el UI en esta página
-        cargarDatosUser();
-    }
-}
+                // Refresca el UI en esta página
+                cargarDatosUser();
+            }
+        }
+
         private async Task<Usuario> ObtenerUsuarioActualizadoAsync(int idUsuario)
         {
             using (HttpClient client = new HttpClient())
             {
                 try
                 {
-                    string url = $"http://" + ventanaPrincipal.IP + " /users/{idUsuario}";
+                    string url = $"http://" + ventanaPrincipal.IP + $":50000/users/{idUsuario}";
                     HttpResponseMessage response = await client.GetAsync(url);
 
                     if (response.IsSuccessStatusCode)
