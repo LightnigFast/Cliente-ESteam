@@ -76,7 +76,7 @@ namespace Cliente_TFG.Pages
 
                 try
                 {
-                    string json = await client.GetStringAsync("http://127.0.0.1:5000/library/" + ventanaPrincipal.Usuario.IdUsuario);
+                    string json = await client.GetStringAsync("http://127.0.0.1:50000/library/" + ventanaPrincipal.Usuario.IdUsuario);
                     var response = JsonConvert.DeserializeObject<BibliotecaResponse>(json);
                         
                     List<string> listaAppids = new List<string>();
