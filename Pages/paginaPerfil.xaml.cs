@@ -27,6 +27,7 @@ namespace Cliente_TFG.Pages
     public partial class paginaPerfil : Page
     {
 
+        private const string URL_API = "http://26.84.183.227:50000/";
         private MainWindow ventanaPrincipal;
 
         public paginaPerfil(MainWindow ventanaPrincipal)
@@ -124,7 +125,7 @@ namespace Cliente_TFG.Pages
         new KeyValuePair<string, string>("foto_perfil", urlImagen)
     });
 
-            var response = await httpClient.PostAsync("http://localhost:5000/user_profile/actualizar_foto", content);
+            var response = await httpClient.PostAsync($"{URL_API}/user_profile/actualizar_foto", content);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -164,7 +165,7 @@ private async Task RecargarUsuarioDesdeServidor()
             {
                 try
                 {
-                    string url = $"http://localhost:5000/users/{idUsuario}";
+                    string url = $"{URL_API}/users/{idUsuario}";
                     HttpResponseMessage response = await client.GetAsync(url);
 
                     if (response.IsSuccessStatusCode)
