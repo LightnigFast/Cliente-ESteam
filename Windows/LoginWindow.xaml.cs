@@ -23,5 +23,24 @@ namespace Cliente_TFG.Windows
         {
             InitializeComponent();
         }
+
+        //PARA LA VENTANA DE REGISTRO
+        private void AbrirRegistro_Click(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show("Aquí abrirías la ventana de registro.");
+        }
+
+        //METODO PARA PODER CERRAR LA VENTANA
+        private void Cerrar_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        //METODO PARA PODER MOVER LA VENTANA CON EL RATON
+        private void Header_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                this.DragMove();
+        }
     }
 }

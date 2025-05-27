@@ -5,8 +5,111 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Cliente_TFG.Windows"
         mc:Ignorable="d"
-        Title="VentanaLogin" Height="450" Width="800">
-    <Grid>
-        
+        Title="Iniciar sesión"
+        Height="500"
+        Width="900"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{Binding Source={StaticResource AppTheme}, Path=Fondo}"
+        WindowStyle="None"
+        AllowsTransparency="True">
+
+    <Grid Background="{Binding Source={StaticResource AppTheme}, Path=Fondo}">
+        <Grid Height="40" VerticalAlignment="Top" MouseDown="Header_MouseDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="OSIRIS LOGIN" VerticalAlignment="Center" Margin="20,0,0,0" FontWeight="Bold" FontSize="14"
+                       Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"/>
+
+            <!--BOTÓN CERRAR LA VENTANA-->
+            <Button Grid.Column="1" Width="40" Height="40" Background="Transparent" BorderThickness="0" Cursor="Hand"  Click="Cerrar_Click">
+                <TextBlock Text="✕" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"/>
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Background="{TemplateBinding Background}">
+                            <TextBlock Text="✕"
+                           FontSize="16"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           x:Name="CloseIcon"
+                           Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CloseIcon" Property="Foreground" Value="Red"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </Grid>
+
+        <!--PANEL DEL LOGIN-->
+        <Border Background="{Binding Source={StaticResource AppTheme}, Path=FondoPanel}"
+                BorderBrush="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
+                BorderThickness="2" CornerRadius="15" Padding="40" Width="400" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+            <StackPanel>
+                <!--TITULO GRANDE DE ARRIBA DEL LOGIN-->
+                <TextBlock Text="INICIAR SESIÓN" Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}" FontSize="26"
+                           FontWeight="Bold" HorizontalAlignment="Center"  Margin="0 0 0 30"/>
+
+                <!--PARTE PARA ESCRIBIR EL USUARIO-->
+                <TextBlock Text="Usuario"
+                           Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoSecundario}" FontSize="14"/>
+                <TextBox Margin="0 5 0 20" Height="35" FontSize="14" Padding="6"
+                         Background="{Binding Source={StaticResource AppTheme}, Path=Fondo}"
+                         Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"
+                         BorderBrush="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
+                         BorderThickness="1"/>
+
+                <!--PARTE PARA LA CONTRASEÑA-->
+                <TextBlock Text="Contraseña"
+                           Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoSecundario}"
+                           FontSize="14"/>
+                <PasswordBox Margin="0 5 0 30" Height="35" FontSize="14" Padding="6"
+                             Background="{Binding Source={StaticResource AppTheme}, Path=Fondo}"
+                             Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"
+                             BorderBrush="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
+                             BorderThickness="1"/>
+
+                <!--BOTÓN LOGIN-->
+                <Button Content="Iniciar sesión" Height="40"  FontSize="16" FontWeight="Bold"
+                        Background="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
+                        Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"
+                        BorderThickness="0" Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="{Binding Source={StaticResource AppTheme}, Path=BordePanel}" />
+                            <Setter Property="Foreground" Value="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{Binding Source={StaticResource AppTheme}, Path=RatonEncima}" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!--ENLACES-->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 20 0 0">
+                    <TextBlock Text="¿No tienes cuenta? " Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoSecundario}" FontSize="12"/>
+                    <TextBlock Text="Regístrate"  Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrecio}"
+                               FontSize="12" Cursor="Hand" TextDecorations="Underline" MouseDown="AbrirRegistro_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
