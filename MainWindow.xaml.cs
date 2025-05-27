@@ -26,6 +26,8 @@ namespace Cliente_TFG
 
         public Usuario user;
         private bool online = true;
+        public string ip = "26.84.183.227";
+        //public string ip = "127.0.0.1";
         public Usuario Usuario
         {
             get => user;
@@ -38,7 +40,7 @@ namespace Cliente_TFG
             this.DataContext = AppTheme.Actual;
             AppTheme.SetDark();
             cargarTema();
-            user = new Usuario();
+            user = new Usuario(this);
 
             framePrincipal.Navigated += FramePrincipal_Navigated;
 
@@ -127,6 +129,9 @@ namespace Cliente_TFG
             framePrincipal.Navigate(new paginaPerfil(this));
         }
 
+
+
+        public string IP => ip;
 
 
     }

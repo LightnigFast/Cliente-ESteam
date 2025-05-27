@@ -679,7 +679,7 @@ namespace Cliente_TFG.Pages
         {
             try
             {
-                string baseUrl = "http://127.0.0.1:50000/store/buy";
+                string baseUrl = "http://" + ventanaPrincipal.IP + ":50000/store/buy";
 
                 string url = $"{baseUrl}?user={userId}&game={gameId}";
 
@@ -800,7 +800,7 @@ namespace Cliente_TFG.Pages
             {
                 try
                 {
-                    string json = await client.GetStringAsync("http://127.0.0.1:50000/games/" + appid + "?full");
+                    string json = await client.GetStringAsync("http://" + ventanaPrincipal.IP + ":50000 /games/" + appid + "?full");
                     var response = JsonConvert.DeserializeObject<CarruselResponse>(json);
 
                     if (response?.juegos != null && response.juegos.Count > 0)
