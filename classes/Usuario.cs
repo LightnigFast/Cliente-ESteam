@@ -12,18 +12,18 @@ namespace Cliente_TFG.Classes
 {
     public class Usuario
     {
-        private string codigo_amigo;
-        private string contraseña;
-        private string correo;
-        private string descripcion;
-        private double dinero;
-        private string estado;
-        private string foto_perfil;
-        private int id_usuario;
-        private string nombre_cuenta;
-        private string nombre_usuario;
-        private string token;
-        private List<int> bibliotecaJuegos = new List<int>();
+        public string codigo_amigo;
+        public string contraseña;
+        public string correo;
+        public string descripcion;
+        public double dinero;
+        public string estado;
+        public string foto_perfil;
+        public int id_usuario;
+        public string nombre_cuenta;
+        public string nombre_usuario;
+        public string token;
+        public List<int> bibliotecaJuegos = new List<int>();
 
 
 

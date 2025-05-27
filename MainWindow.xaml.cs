@@ -24,9 +24,14 @@ namespace Cliente_TFG
     public partial class MainWindow : Window
     {
 
-        private Usuario user;
+        public Usuario user;
         private bool online = true;
-        public Usuario Usuario => user;
+        public Usuario Usuario
+        {
+            get => user;
+            set => user = value;
+        }
+
         public MainWindow()
         {
             InitializeComponent();

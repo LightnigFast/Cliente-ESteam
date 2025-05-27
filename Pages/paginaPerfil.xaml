@@ -140,7 +140,8 @@
                            Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion..."/>
 
             </StackPanel>
-            
+            <Button Content="Cambiar foto" x:Name="btnSubirImagen" HorizontalAlignment="Left" Margin="180,0,0,0" Grid.Row="1" VerticalAlignment="Top" Click="btnSubirImagen_Click_1"/>
+
         </Grid>
         
     </Grid>
