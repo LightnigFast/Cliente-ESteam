@@ -133,7 +133,7 @@ namespace Cliente_TFG.Pages
             new KeyValuePair<string, string>("foto_perfil", urlImagen)
         });
 
-            var response = await httpClient.PostAsync($"http://" + ventanaPrincipal.IP + "/user_profile/actualizar_foto", content);
+            var response = await httpClient.PostAsync($"http://" + ventanaPrincipal.IP + ":50000/user_profile/actualizar_foto", content);
 
             if (!response.IsSuccessStatusCode)
             {
