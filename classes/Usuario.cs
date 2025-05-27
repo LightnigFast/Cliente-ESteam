@@ -29,7 +29,7 @@ namespace Cliente_TFG.Classes
 
         public void CargarDatos(int idUser)
         {
-            var url = $"http://127.0.0.1:5000/users/{idUser}";
+            var url = $"http://127.0.0.1:50000/users/{idUser}";
             using (var webClient = new WebClient())
             {
                 string jsonString = webClient.DownloadString(url);
@@ -54,7 +54,7 @@ namespace Cliente_TFG.Classes
 
         public void CargarBiblioteca(int idUser)
         {
-            var url = $"http://127.0.0.1:5000/library/{idUser}";
+            var url = $"http://127.0.0.1:50000/library/{idUser}";
             using (var webClient = new WebClient())
             {
                 string jsonString = webClient.DownloadString(url);
