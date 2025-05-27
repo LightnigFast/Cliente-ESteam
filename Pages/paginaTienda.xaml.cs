@@ -1317,7 +1317,7 @@ namespace Cliente_TFG.Pages
                 _searchCts.CancelAfter(TimeSpan.FromSeconds(3)); //TIMER DE 3 SEGUNODS
 
                 var response = await _client.GetAsync(
-                    $"http://" + ventanaPrincipal.IP + ":50000/games/?name={Uri.EscapeDataString(texto)}&limit=10",
+                    $"http://" + ventanaPrincipal.IP + $":50000/games/?name={Uri.EscapeDataString(texto)}&limit=10",
                     _searchCts.Token
                 );
 
