@@ -34,7 +34,7 @@ namespace Cliente_TFG.Pages
         {
             InitializeComponent();
             this.ventanaPrincipal = ventanaPrincipal;
-
+            this.Loaded += Page_Loaded;
             cargarTemas();
 
             cargarDatosUser();
@@ -48,6 +48,14 @@ namespace Cliente_TFG.Pages
             txtBiografia.Foreground = AppTheme.Actual.TextoPrincipal;
 
             gridCnetral.Background = AppTheme.Actual.FondoPanel;
+
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+
+        {
+
+            await RecargarUsuarioDesdeServidor();
 
         }
 
