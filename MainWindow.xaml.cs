@@ -51,6 +51,7 @@ namespace Cliente_TFG
             Cabecera_top.AmigosPresionado += boton_amigos_presionado;
 
             Cabecera_top.VerPerfilPresionado += boton_verPerfil_presionado;
+            Cabecera_top.RecargarSaldoPresionado += boton_recargarSaldo_presionado;
 
 
             if (online)
@@ -129,6 +130,10 @@ namespace Cliente_TFG
             framePrincipal.Navigate(new paginaPerfil(this));
         }
 
+        private void boton_recargarSaldo_presionado(object sender, RoutedEventArgs e)
+        {
+            framePrincipal.Navigate(new paginaRecargaSaldo(this));
+        }
 
 
         public string IP => ip;

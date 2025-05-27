@@ -67,6 +67,7 @@ namespace Cliente_TFG.UserControls
 
 
         public event RoutedEventHandler VerPerfilPresionado;
+        public event RoutedEventHandler RecargarSaldoPresionado;
 
         public Cabezera()
         {
@@ -214,6 +215,11 @@ namespace Cliente_TFG.UserControls
             VerPerfilPresionado?.Invoke(this, e);
         }
 
+        private void RecargarSaldo_Click(object sender, RoutedEventArgs e)
+        {
+            RecargarSaldoPresionado?.Invoke(this, e);
+        }
+
 
         //PARA CAMBIAR EL ESTADO DE LA CUENTA
         private string _estadoActual;
@@ -248,6 +254,7 @@ namespace Cliente_TFG.UserControls
         }
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
 
     }
 

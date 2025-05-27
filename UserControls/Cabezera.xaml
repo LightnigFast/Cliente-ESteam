@@ -184,6 +184,15 @@
                         </MenuItem.Header>
                     </MenuItem>
 
+                    <MenuItem Click="RecargarSaldo_Click" Tag="Conectado" Style="{StaticResource EstiloMenuItem}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                <TextBlock Text="Recargar Saldo" FontSize="12" VerticalAlignment="Center"/>
+                                <Border Height="1" Background="White" Margin="-5" VerticalAlignment="Bottom" Width="100" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+
                     <MenuItem Click="StatusMenuItem_Click" Tag="Conectado" Style="{StaticResource EstiloMenuItem}">
                         <MenuItem.Header>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

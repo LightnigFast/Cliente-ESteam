@@ -77,6 +77,9 @@
     <Compile Include="Pages\paginaPerfil.xaml.cs">
       <DependentUpon>paginaPerfil.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\paginaRecargarSaldo.xaml.cs">
+      <DependentUpon>paginaRecargarSaldo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\paginaTienda.xaml.cs">
       <DependentUpon>paginaTienda.xaml</DependentUpon>
     </Compile>
@@ -114,6 +117,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\paginaPerfil.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\paginaRecargarSaldo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
