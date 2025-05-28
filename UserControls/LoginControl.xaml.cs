@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Cliente_TFG.Classes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace Cliente_TFG.UserControls
         public delegate void RegistroRequested();
         public event RegistroRequested AbrirRegistro;
         //public string ip = "26.84.183.227";
-        public string ip = "127.0.0.1";
+        public string ip = Config.IP;
 
 
         public LoginControl()

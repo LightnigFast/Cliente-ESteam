@@ -26,8 +26,7 @@ namespace Cliente_TFG
 
         public Usuario user;
         private bool online = true;
-        //public string ip = "26.84.183.227";
-        public string ip = "127.0.0.1";
+        public string ip = Config.IP;
         private int idUser = 5;
 
         public Usuario Usuario
