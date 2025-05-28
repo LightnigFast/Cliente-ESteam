@@ -30,6 +30,7 @@
 
 
     <Grid>
+        <Image Source="/res/login/fondoLogin.png" Stretch="Fill" Panel.ZIndex="0" Opacity="0.1"/>
         <!--BOTÓN CERRAR-->
         <Grid Height="40" VerticalAlignment="Top" MouseDown="Header_MouseDown">
             <Grid.ColumnDefinitions>

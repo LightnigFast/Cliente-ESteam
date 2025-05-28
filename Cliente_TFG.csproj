@@ -190,6 +190,7 @@
     <Content Include="res\library\Banner_no_games_library.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="res\login\fondoLogin.png" />
     <Resource Include="res\store\fondoTienda.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
