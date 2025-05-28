@@ -41,6 +41,7 @@ namespace Cliente_TFG.UserControls
 
         private async void BotonLogin_Click(object sender, RoutedEventArgs e)
         {
+            txtErrores.Text = "";
             string correo = txtCorreo.Text;
             string contrasena = txtPassword.Password;
 
@@ -79,7 +80,7 @@ namespace Cliente_TFG.UserControls
                         dynamic datosRespuesta = JsonConvert.DeserializeObject(respuestaJson);
                         int idUsuario = datosRespuesta.id_usuario;
 
-                        MessageBox.Show("Login correcto. ID: " + idUsuario);
+                        //MessageBox.Show("Login correcto. ID: " + idUsuario);
                         return idUsuario; // DEVUELVE EL ID DEL USUARIO
                     }
                     else

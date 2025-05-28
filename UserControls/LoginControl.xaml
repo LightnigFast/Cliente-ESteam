@@ -12,7 +12,7 @@
         <!--PANEL DEL LOGIN-->
         <Border Background="{Binding Source={StaticResource AppTheme}, Path=FondoPanel}"
         BorderBrush="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
-        BorderThickness="2" CornerRadius="15" Padding="40" Width="400" VerticalAlignment="Center" HorizontalAlignment="Center">
+        BorderThickness="2" CornerRadius="15" Padding="40" Width="430" Height="430" VerticalAlignment="Center" HorizontalAlignment="Center">
 
             <StackPanel>
                 <!--TITULO GRANDE DE ARRIBA DEL LOGIN-->
