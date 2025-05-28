@@ -162,7 +162,7 @@
 
                                                 <!-- Contenido seleccionado -->
                                                 <ContentPresenter Grid.Column="0"
-                                                        Margin="15,12"
+                                                        Margin="10,8"
                                                         VerticalAlignment="Center"
                                                         Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
                                                         IsHitTestVisible="False"/>
