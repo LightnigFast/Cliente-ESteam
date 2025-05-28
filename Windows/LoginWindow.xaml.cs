@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cliente_TFG.UserControls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
@@ -22,18 +24,37 @@ namespace Cliente_TFG.Windows
         public LoginWindow()
         {
             InitializeComponent();
+            MostrarLogin();
         }
 
-        //PARA LA VENTANA DE REGISTRO
-        private void AbrirRegistro_Click(object sender, MouseButtonEventArgs e)
+        private void MostrarRegistro()
         {
-            MessageBox.Show("Aquí abrirías la ventana de registro.");
+            var sbOut = (Storyboard)FindResource("FadeOutStoryboard");
+            sbOut.Completed += (s, e) =>
+            {
+                var registro = new RegistroControl();
+                registro.VolverAlLogin += MostrarLogin;
+                MainContent.Content = registro;
+
+                var sbIn = (Storyboard)FindResource("FadeInStoryboard");
+                sbIn.Begin();
+            };
+            sbOut.Begin();
         }
 
-        //METODO PARA PODER CERRAR LA VENTANA
-        private void Cerrar_Click(object sender, RoutedEventArgs e)
+        private void MostrarLogin()
         {
-            this.Close();
+            var sbOut = (Storyboard)FindResource("FadeOutStoryboard");
+            sbOut.Completed += (s, e) =>
+            {
+                var login = new LoginControl();
+                login.AbrirRegistro += MostrarRegistro;
+                MainContent.Content = login;
+
+                var sbIn = (Storyboard)FindResource("FadeInStoryboard");
+                sbIn.Begin();
+            };
+            sbOut.Begin();
         }
 
         //METODO PARA PODER MOVER LA VENTANA CON EL RATON
@@ -41,6 +62,11 @@ namespace Cliente_TFG.Windows
         {
             if (e.ChangedButton == MouseButton.Left)
                 this.DragMove();
+        }
+
+        private void Cerrar_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }
