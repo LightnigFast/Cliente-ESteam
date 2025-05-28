@@ -77,10 +77,12 @@ namespace Cliente_TFG.Classes
         {
             Actual.Fondo = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E1E1E"));
             Actual.TextoPrincipal = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
-            Actual.TextoPrecio = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#baee12"));
+            //Actual.TextoPrecio = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#baee12"));
+            Actual.TextoPrecio = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#d11f45"));
             Actual.TextoSecundario = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CCCCCC"));
             Actual.RatonEncima = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#997878"));
-            Actual.FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4c6b22"));
+            //Actual.FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4c6b22"));
+            Actual.FondoDescuento = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#550617"));
             //Actual.FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#533939"));
             Actual.FondoPanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252525"));
             Actual.BordePanel = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#d11f45"));

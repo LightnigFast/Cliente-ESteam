@@ -36,7 +36,7 @@
                                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                 <TextBlock x:Name="placeholder"
-                                         Text="Ingresa el monto..."
+                                         Text="Ingresa una cantidad..."
                                          Margin="{TemplateBinding Padding}"
                                          Foreground="#888888"
                                          FontStyle="Italic"
@@ -89,11 +89,11 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="{Binding RatonEncima, Source={x:Static classes:AppTheme.Actual}}"/>
-                                <Setter TargetName="border" Property="BorderBrush" Value="#4A90E2"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{Binding BordePanel, Source={x:Static classes:AppTheme.Actual}}"/>
                                 <Setter TargetName="border" Property="BorderThickness" Value="4"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#4A90E2"/>
+                                <Setter TargetName="border" Property="Background" Value="{Binding BordePanel, Source={x:Static classes:AppTheme.Actual}}"/>
                                 <Setter Property="Foreground" Value="White"/>
                                 <Setter TargetName="border" Property="BorderThickness" Value="4"/>
                             </Trigger>
@@ -105,14 +105,14 @@
 
         <!--ESTILO PARA BOTON PRINCIPAL-->
         <Style x:Key="BotonPrincipalStyle" TargetType="Button">
-            <Setter Property="Padding" Value="25,15"/>
+            <Setter Property="Padding" Value="25,15,25,15"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Background" Value="#4A90E2"/>
-            <Setter Property="BorderBrush" Value="#4A90E2"/>
+            <Setter Property="Background" Value="{Binding FondoPanel, Source={x:Static classes:AppTheme.Actual}}"/>
+            <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={x:Static classes:AppTheme.Actual}}"/>
             <Setter Property="BorderThickness" Value="3"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="{Binding TextoPrincipal, Source={x:Static classes:AppTheme.Actual}}"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -126,12 +126,12 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#357ABD"/>
-                                <Setter TargetName="border" Property="BorderBrush" Value="#357ABD"/>
+                                <Setter TargetName="border" Property="Background" Value="{Binding RatonEncima, Source={x:Static classes:AppTheme.Actual}}"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{Binding BordePanel, Source={x:Static classes:AppTheme.Actual}}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#2E6DA4"/>
-                                <Setter TargetName="border" Property="BorderBrush" Value="#2E6DA4"/>
+                                <Setter TargetName="border" Property="Background" Value="{Binding BordePanel, Source={x:Static classes:AppTheme.Actual}}"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{Binding BordePanel, Source={x:Static classes:AppTheme.Actual}}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -271,7 +271,7 @@
                                    Foreground="{Binding TextoPrincipal, Source={x:Static classes:AppTheme.Actual}}" 
                                    VerticalAlignment="Center"/>
                     </StackPanel>
-                    <TextBlock Text="Selecciona un monto rápido o ingresa la cantidad que desees" 
+                    <TextBlock Text="Selecciona una cantidad de recarga rápida o ingresa la cantidad que desees" 
                                FontSize="18" 
                                Foreground="{Binding TextoSecundario, Source={x:Static classes:AppTheme.Actual}}" 
                                HorizontalAlignment="Center" 
@@ -293,7 +293,7 @@
                                    HorizontalAlignment="Center" 
                                    Margin="0,0,0,30"/>
 
-                        <TextBlock Text="Selecciona uno de los montos más populares" 
+                        <TextBlock Text="Selecciona una de las siguientes cantidades" 
                                    FontSize="16" 
                                    Foreground="{Binding TextoSecundario, Source={x:Static classes:AppTheme.Actual}}" 
                                    HorizontalAlignment="Center" 
@@ -319,7 +319,7 @@
                         Padding="40" 
                         Margin="0,0,0,50" Cursor="">
                     <StackPanel MaxWidth="600">
-                        <TextBlock Text="💰 Monto Personalizado" 
+                        <TextBlock Text="💰 Cantidad Personalizada" 
                                    FontSize="32" 
                                    FontWeight="Bold" 
                                    Foreground="{Binding BordePanel, Source={x:Static classes:AppTheme.Actual}}" 
@@ -349,7 +349,7 @@
 
                         <!-- INFORMACION ADICIONAL -->
                         <StackPanel x:Name="panelInfoMonto" Visibility="Collapsed" Margin="0,0,0,30">
-                            <Border Background="{Binding RatonEncima, Source={x:Static classes:AppTheme.Actual}}" 
+                            <Border Background="{Binding FondoDescuento, Source={x:Static classes:AppTheme.Actual}}" 
                                     CornerRadius="10" 
                                     Padding="20">
                                 <StackPanel>
@@ -361,12 +361,12 @@
                                                Margin="0,0,0,10"/>
                                     <TextBlock Text="✓ Sin comisiones adicionales" 
                                                FontSize="14" 
-                                               Foreground="#4CAF50" 
+                                               Foreground="{Binding TextoPrecio, Source={x:Static classes:AppTheme.Actual}}"
                                                HorizontalAlignment="Center" 
                                                Margin="0,0,0,5"/>
                                     <TextBlock Text="✓ Procesamiento instantáneo" 
                                                FontSize="14" 
-                                               Foreground="#4CAF50" 
+                                               Foreground="{Binding TextoPrecio, Source={x:Static classes:AppTheme.Actual}}" 
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
@@ -403,7 +403,7 @@
                                HorizontalAlignment="Center" 
                                Margin="0,0,0,30"/>
 
-                    <Border Background="{Binding RatonEncima, Source={x:Static classes:AppTheme.Actual}}" 
+                    <Border Background="{Binding FondoDescuento, Source={x:Static classes:AppTheme.Actual}}" 
                             CornerRadius="10" 
                             Padding="20" 
                             Margin="0,0,0,30">
@@ -432,8 +432,6 @@
                               Margin="0,0,0,30"
                               Style="{StaticResource ComboBoxModernoStyle}"/>
 
-
-
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="✓ Confirmar" 
                                 Style="{StaticResource BotonPrincipalStyle}" 
@@ -444,9 +442,6 @@
                                 Style="{StaticResource BotonPrincipalStyle}" 
                                 Width="150" 
                                 Margin="15,0,0,0" 
-                                Background="{Binding RatonEncima, Source={x:Static classes:AppTheme.Actual}}"
-                                BorderBrush="{Binding RatonEncima, Source={x:Static classes:AppTheme.Actual}}"
-                                Foreground="{Binding TextoPrincipal, Source={x:Static classes:AppTheme.Actual}}"
                                 Click="btnCancelarRecarga_Click"/>
                     </StackPanel>
                 </StackPanel>

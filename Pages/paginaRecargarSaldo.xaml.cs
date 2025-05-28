@@ -50,7 +50,7 @@ namespace Cliente_TFG.Pages
                 "🏦 Transferencia Bancaria",
                 "📱 PayPal",
                 "💰 Paysafecard",
-                "🪙 Criptomonedas"
+                "✪ Criptomonedas"
             };
 
             foreach (var metodo in metodos)
@@ -107,7 +107,7 @@ namespace Cliente_TFG.Pages
             {
                 if (monto >= 1 && monto <= 10000)
                 {
-                    txtMontoInfo.Text = $"Monto a recargar: {monto:F2}€";
+                    txtMontoInfo.Text = $"Cantidad a recargar: {monto:F2}€";
                     txtMontoInfo.Foreground = AppTheme.Actual.TextoPrincipal;
                     panelInfoMonto.Visibility = Visibility.Visible;
                     btnContinuarPersonalizado.IsEnabled = true;
@@ -117,7 +117,7 @@ namespace Cliente_TFG.Pages
                 }
                 else if (monto > 10000)
                 {
-                    txtMontoInfo.Text = "⚠️ Monto máximo: 10,000€";
+                    txtMontoInfo.Text = "⚠️ Cantidad máxima: 10,000€";
                     txtMontoInfo.Foreground = Brushes.Orange;
                     panelInfoMonto.Visibility = Visibility.Visible;
                     btnContinuarPersonalizado.IsEnabled = false;
