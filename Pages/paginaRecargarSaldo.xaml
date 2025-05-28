@@ -49,13 +49,7 @@
                             <Trigger Property="Text" Value="">
                                 <Setter TargetName="placeholder" Property="Visibility" Value="Visible"/>
                             </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="#4A90E2"/>
-                                <Setter TargetName="border" Property="Background" Value="{Binding RatonEncima, Source={x:Static classes:AppTheme.Actual}}"/>
-                            </Trigger>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="#4A90E2"/>
-                                <Setter TargetName="border" Property="Background" Value="{Binding RatonEncima, Source={x:Static classes:AppTheme.Actual}}"/>
                                 <Setter TargetName="placeholder" Property="Visibility" Value="Collapsed"/>
                             </Trigger>
                         </ControlTemplate.Triggers>

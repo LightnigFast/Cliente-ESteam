@@ -1,7 +1,10 @@
 ﻿using Cliente_TFG.Classes;
+using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,7 +17,7 @@ namespace Cliente_TFG.Pages
     {
         private MainWindow ventanaPrincipal;
         private decimal montoSeleccionado = 0;
-
+        private static readonly HttpClient client = new HttpClient();
         public paginaRecargaSaldo(MainWindow mainWindow)
         {
             InitializeComponent();
@@ -50,7 +53,6 @@ namespace Cliente_TFG.Pages
                 "🏦 Transferencia Bancaria",
                 "📱 PayPal",
                 "💰 Paysafecard",
-                "✪ Criptomonedas"
             };
 
             foreach (var metodo in metodos)
@@ -159,19 +161,81 @@ namespace Cliente_TFG.Pages
         {
             var metodoSeleccionado = cmbMetodosPago.SelectedItem?.ToString() ?? "Método no seleccionado";
 
-            MessageBox.Show(
-                $"✅ Recarga procesada exitosamente!\n\n" +
-                $"💰 Monto: {montoSeleccionado:F2}€\n" +
-                $"💳 Método: {metodoSeleccionado}\n\n" +
-                $"El saldo se agregará a tu cuenta en unos momentos.",
-                "Recarga Exitosa",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information
-            );
+            int userId = ventanaPrincipal.Usuario.IdUsuario;
+            RecargarSaldoAsync(userId,metodoSeleccionado);
 
             CerrarConfirmacion();
             LimpiarFormulario();
         }
+
+        private async void RecargarSaldoAsync(int userId,string metodoSeleccionado)
+        {
+            try
+            {
+                //Hago una copia del monto por que luego se resetea
+                decimal monto= new decimal();
+                monto = montoSeleccionado;
+
+                string url = $"http://{ventanaPrincipal.IP}:50000/users/{userId}/recargar?cantidad={montoSeleccionado}";
+
+
+                //HACER PUT
+                HttpResponseMessage response = await client.PutAsync(url, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                    //PARSING DEL DINERO NUEVO 
+                    var resultado = Newtonsoft.Json.JsonConvert.DeserializeObject<RespuestaRecargaSaldo>(jsonResponse);
+
+                    if (resultado != null)
+                    {
+                        double nuevoDinero = resultado.DineroRestante;
+                        ventanaPrincipal.Cabecera_top.Dinero = nuevoDinero;
+                        //MessageBox.Show("Mensaje del servidor: "+ resultado.Mensaje);
+
+                    }
+
+                    MessageBox.Show(
+                        $"✅ Recarga procesada exitosamente!\n\n" +
+                        $"💰 Monto: {monto:F2}€\n" +
+                        $"💳 Método: {metodoSeleccionado}\n\n" +
+                        "El saldo se ha agregado a tu cuenta correctamente.\n"+
+                        $"Saldo actual: {resultado.DineroRestante}$",
+                        "Recarga Exitosa",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                    ventanaPrincipal.Usuario.CargarDatos(userId);
+                }
+
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"Error al comprar el juego: {errorResponse}");
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Excepción al comprar: {ex.Message}");
+            }
+        }
+
+        public class RespuestaRecargaSaldo
+        {
+            [JsonProperty("dinero_restante")]
+            public double DineroRestante { get; set; }
+
+            [JsonProperty("message")]
+            public string Mensaje { get; set; }
+
+            [JsonProperty("success")]
+            public bool Success { get; set; }
+        }
+        
 
         // CANCELAR RECARGA
         private void btnCancelarRecarga_Click(object sender, RoutedEventArgs e)
