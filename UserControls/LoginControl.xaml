@@ -22,7 +22,7 @@
                 <!--PARTE PARA ESCRIBIR EL USUARIO-->
                 <TextBlock Text="Usuario"
                    Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoSecundario}" FontSize="14"/>
-                <TextBox Margin="0 5 0 20" Height="35" FontSize="14" Padding="6"
+                <TextBox x:Name="txtCorreo" Margin="0 5 0 20" Height="35" FontSize="14" Padding="6"
                  Background="{Binding Source={StaticResource AppTheme}, Path=Fondo}"
                  Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"
                  BorderBrush="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
@@ -32,7 +32,7 @@
                 <TextBlock Text="Contraseña"
                    Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoSecundario}"
                    FontSize="14"/>
-                <PasswordBox Margin="0 5 0 30" Height="35" FontSize="14" Padding="6"
+                <PasswordBox x:Name="txtPassword" Margin="0 5 0 30" Height="35" FontSize="14" Padding="6"
                      Background="{Binding Source={StaticResource AppTheme}, Path=Fondo}"
                      Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"
                      BorderBrush="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
@@ -42,7 +42,7 @@
                 <Button Content="Iniciar sesión" Height="40"  FontSize="16" FontWeight="Bold"
                         Background="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
                         Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"
-                        BorderThickness="0" Cursor="Hand">  
+                        BorderThickness="0" Cursor="Hand" Click="BotonLogin_Click">  
                     <Button.Style>
                         <Style TargetType="Button">
                             <Setter Property="Background" Value="{Binding Source={StaticResource AppTheme}, Path=BordePanel}" />
