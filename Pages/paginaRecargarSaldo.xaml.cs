@@ -207,7 +207,6 @@ namespace Cliente_TFG.Pages
                         MessageBoxButton.OK,
                         MessageBoxImage.Information
                     );
-                    ventanaPrincipal.Usuario.CargarDatos(userId);
                 }
 
                 else
