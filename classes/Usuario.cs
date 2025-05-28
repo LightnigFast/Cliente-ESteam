@@ -45,13 +45,13 @@ namespace Cliente_TFG.Classes
                 contraseña = (string)usuarioJson["contrasena"];
                 correo = (string)usuarioJson["correo"];
                 descripcion = (string)usuarioJson["descripcion"];
-                dinero = (double)usuarioJson["dinero"];
+                dinero = usuarioJson["dinero"]?.Type == JTokenType.Null ? 0 : (double)usuarioJson["dinero"]; //COMPROBAMOS SI ES NULL
                 estado = (string)usuarioJson["estado"];
                 foto_perfil = (string)usuarioJson["foto_perfil"];
                 id_usuario = (int)usuarioJson["id_usuario"];
                 nombre_cuenta = (string)usuarioJson["nombre_cuenta"];
                 nombre_usuario = (string)usuarioJson["nombre_usuario"];
-                token = ((string)usuarioJson["token"]).Trim();
+                token = ((string)usuarioJson["token"])?.Trim() ?? "";
             }
             CargarBiblioteca(idUser);
         }

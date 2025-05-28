@@ -43,14 +43,16 @@ namespace Cliente_TFG.UserControls
             string correo = txtCorreo.Text;
             string contrasena = txtPassword.Password;
 
-            bool exito = await LoginUsuarioAsync(correo, contrasena);
-            if (exito)
+            int? idUsuario = await LoginUsuarioAsync(correo, contrasena);
+            if (idUsuario.HasValue)
             {
-                //NAVEGAR A LA APP O MOSTRAR LA VENTANA PRINCIPAL
+                MainWindow mainWindow = new MainWindow(idUsuario.Value);
+                mainWindow.Show();
+                Window.GetWindow(this)?.Close();
             }
         }
 
-        public async Task<bool> LoginUsuarioAsync(string correo, string contrasena)
+        public async Task<int?> LoginUsuarioAsync(string correo, string contrasena)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -74,25 +76,30 @@ namespace Cliente_TFG.UserControls
                     {
                         string respuestaJson = await response.Content.ReadAsStringAsync();
                         dynamic datosRespuesta = JsonConvert.DeserializeObject(respuestaJson);
-                        string idUsuario = datosRespuesta.id_usuario;
+                        int idUsuario = datosRespuesta.id_usuario;
 
                         MessageBox.Show("Login correcto. ID: " + idUsuario);
-                        return true;
+                        return idUsuario; // DEVUELVE EL ID DEL USUARIO
                     }
                     else
                     {
-                        string error = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("Error en login: " + error);
-                        return false;
+                        string errorJson = await response.Content.ReadAsStringAsync();
+                        dynamic errorObj = JsonConvert.DeserializeObject(errorJson);
+                        string mensajeError = errorObj.error;
+                        txtErrores.Text = "Error en login: " + mensajeError;
+                        //MessageBox.Show("Error en login: " + error);
+                        return null;
                     }
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("ERROR DE CONEXIÓN: " + ex.Message);
-                    return false;
+                    return null;
                 }
             }
         }
+
+
 
 
 

@@ -28,6 +28,8 @@ namespace Cliente_TFG
         private bool online = true;
         //public string ip = "26.84.183.227";
         public string ip = "127.0.0.1";
+        private int idUser = 5;
+
         public Usuario Usuario
         {
             get => user;
@@ -37,6 +39,20 @@ namespace Cliente_TFG
         public MainWindow()
         {
             InitializeComponent();
+            cargarTODO();
+
+        }
+
+        public MainWindow(int idUser)
+        {
+            InitializeComponent();
+            this.idUser = idUser;
+            cargarTODO();
+        }
+
+
+        private void cargarTODO()
+        {
             this.DataContext = AppTheme.Actual;
             AppTheme.SetDark();
             cargarTema();
@@ -53,19 +69,18 @@ namespace Cliente_TFG
             Cabecera_top.VerPerfilPresionado += boton_verPerfil_presionado;
             Cabecera_top.RecargarSaldoPresionado += boton_recargarSaldo_presionado;
 
-
             if (online)
             {
-                CargarDatosUsuario(5);
+                CargarDatosUsuario(idUser);
                 Cabecera_top.NombreUsuario = user.NombreUsuario;
                 Cabecera_top.Dinero = user.Dinero;
             }
-            
+
 
             CargarPrimeraVentana();
-
-
         }
+
+        
 
         private void cargarTema()
         {
