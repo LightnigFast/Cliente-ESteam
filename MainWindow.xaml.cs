@@ -137,7 +137,7 @@ namespace Cliente_TFG
 
         private void boton_amigos_presionado(object sender, RoutedEventArgs e)
         {
-            framePrincipal.Navigate(new paginaAmigos());
+            framePrincipal.Navigate(new paginaAmigos(this));
         }
 
         private void boton_verPerfil_presionado(object sender, RoutedEventArgs e)

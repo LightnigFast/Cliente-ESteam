@@ -4,11 +4,581 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Cliente_TFG.Pages"
+      xmlns:classes="clr-namespace:Cliente_TFG.Classes"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="720" d:DesignWidth="1280"
       Title="paginaAmigos">
 
-    <Grid Background="DarkViolet">
-        
+    <Page.Resources>
+        <!-- Estilo para la barra de búsqueda -->
+        <Style x:Key="DarkMinimalistSearchBox" TargetType="TextBox">
+            <Setter Property="Background" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+            <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+            <Setter Property="BorderThickness" Value="0 0 0 2"/>
+            <Setter Property="Padding" Value="8,0,8,2"/>
+            <Setter Property="Foreground" Value="{Binding TextoPrincipal, Source={StaticResource AppTheme}}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Width" Value="300"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Margin="34,0,8,0"
+                                              VerticalAlignment="Center"/>
+                                <TextBlock x:Name="placeholder"
+                                           Text="Buscar..."
+                                           Margin="34,0,0,0"
+                                           Foreground="#777777"
+                                           FontStyle="Italic"
+                                           Visibility="Collapsed"
+                                           VerticalAlignment="Center"/>
+                                <Path Data="M15.5,14h-0.79l-0.28,-0.27C15.41,12.59 16,11.11 16,9.5 16,5.91 13.09,3 9.5,3S3,5.91 3,9.5 5.91,16 9.5,16c1.61,0 3.09,-0.59 4.23,-1.57l0.27,0.28v0.79l5,5 1.5,-1.5 -5,-5Zm-6,0C7.01,14 5,11.99 5,9.5S7.01,5 9.5,5 14,7.01 14,9.5 11.99,14 9.5,14Z"
+                                      Stretch="Uniform"
+                                      Fill="#777777"
+                                      Width="20"
+                                      Height="20"
+                                      Margin="8,0,0,0"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="placeholder" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="#5E5E5E"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+                                <Setter TargetName="placeholder" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilo para el ScrollView -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="3"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track Name="PART_Track" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineUpCommand" Visibility="Collapsed"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="#555" CornerRadius="3"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineDownCommand" Visibility="Collapsed"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilo para los botones de aceptar/rechazar solicitud -->
+        <Style x:Key="BotonSolicitudStyle" TargetType="Button">
+            <Setter Property="Width" Value="25"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+            <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{Binding TextoPrincipal, Source={StaticResource AppTheme}}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+                                <Setter Property="Foreground" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{Binding TextoPrincipal, Source={StaticResource AppTheme}}"/>
+                                <Setter Property="Foreground" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="Gray"/>
+                                <Setter Property="Foreground" Value="LightGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilo para el botón de buscar amigos -->
+        <Style x:Key="BotonBuscarAmigosStyle" TargetType="Button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+            <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{Binding TextoPrincipal, Source={StaticResource AppTheme}}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <Grid>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Path x:Name="searchIcon" 
+                                      Data="M15.5,14h-0.79l-0.28,-0.27C15.41,12.59 16,11.11 16,9.5 16,5.91 13.09,3 9.5,3S3,5.91 3,9.5 5.91,16 9.5,16c1.61,0 3.09,-0.59 4.23,-1.57l0.27,0.28v0.79l5,5 1.5,-1.5 -5,-5Zm-6,0C7.01,14 5,11.99 5,9.5S7.01,5 9.5,5 14,7.01 14,9.5 11.99,14 9.5,14Z"
+                                      Stretch="Uniform"
+                                      Fill="{Binding TextoPrincipal, Source={StaticResource AppTheme}}"
+                                      Width="16"
+                                      Height="16"
+                                      Margin="0,0,5,0"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"/>
+                                <TextBlock Text="Buscar amigos" 
+                                           Margin="25,0,0,0" 
+                                           VerticalAlignment="Center"
+                                           Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+                                <Setter TargetName="searchIcon" Property="Fill" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+                                <Setter Property="Foreground" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{Binding TextoPrincipal, Source={StaticResource AppTheme}}"/>
+                                <Setter TargetName="searchIcon" Property="Fill" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+                                <Setter Property="Foreground" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid x:Name="gridPrincipal" Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Panel izquierdo: Solicitudes de amistad y lista de amigos -->
+        <Border Grid.Column="0" 
+                Background="{Binding FondoPanel, Source={StaticResource AppTheme}}" 
+                BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                BorderThickness="2" 
+                CornerRadius="10" 
+                Margin="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Sección de solicitudes de amistad -->
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="Solicitudes de amigo (1)" 
+                               Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Margin="10,10,0,5"/>
+
+                    <Border Background="#252525" 
+                            BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                            BorderThickness="1" 
+                            CornerRadius="5" 
+                            Margin="5">
+                        <Grid Height="40">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Icono de usuario -->
+                            <Border Grid.Column="0" 
+                                    Width="30" 
+                                    Height="30" 
+                                    Background="Transparent" 
+                                    BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                                    BorderThickness="1" 
+                                    CornerRadius="15" 
+                                    Margin="5,0">
+                                <TextBlock Text="👤" 
+                                           FontSize="16" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center"/>
+                            </Border>
+
+                            <!-- Nombre de usuario -->
+                            <TextBlock Grid.Column="1" 
+                                       Text="Juan" 
+                                       Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                                       VerticalAlignment="Center" 
+                                       Margin="5,0"/>
+
+                            <!-- Botones de aceptar/rechazar -->
+                            <StackPanel Grid.Column="2" 
+                                        Orientation="Horizontal" 
+                                        HorizontalAlignment="Right" 
+                                        Margin="0,0,5,0">
+                                <Button x:Name="btnAceptar" 
+                                        Content="✓" 
+                                        Style="{StaticResource BotonSolicitudStyle}" 
+                                        Click="btnAceptar_Click"/>
+                                <Button x:Name="btnRechazar" 
+                                        Content="✕" 
+                                        Style="{StaticResource BotonSolicitudStyle}" 
+                                        Click="btnRechazar_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Lista de amigos -->
+                <ScrollViewer Grid.Row="1" 
+                              VerticalScrollBarVisibility="Auto" 
+                              HorizontalScrollBarVisibility="Disabled" 
+                              Margin="0,10,0,0">
+                    <StackPanel x:Name="listaAmigos">
+                        <!-- Amigo 1 -->
+                        <Border x:Name="amigoPepe" 
+                                Background="#252525" 
+                                BorderBrush="Transparent" 
+                                BorderThickness="1" 
+                                CornerRadius="5" 
+                                Margin="5,2" 
+                                MouseEnter="amigo_MouseEnter" 
+                                MouseLeave="amigo_MouseLeave" 
+                                MouseLeftButtonDown="amigo_MouseLeftButtonDown">
+                            <Grid Height="40">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Indicador de estado (online) -->
+                                <Border Grid.Column="0" 
+                                        Width="10" 
+                                        Height="10" 
+                                        Background="#4CAF50" 
+                                        CornerRadius="5" 
+                                        Margin="5,0,0,0" 
+                                        VerticalAlignment="Center"/>
+
+                                <!-- Nombre de amigo -->
+                                <TextBlock Grid.Column="1" 
+                                           Text="Pepe" 
+                                           Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="10,0"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Amigo 2 -->
+                        <Border x:Name="amigoManolo" 
+                                Background="#252525" 
+                                BorderBrush="Transparent" 
+                                BorderThickness="1" 
+                                CornerRadius="5" 
+                                Margin="5,2" 
+                                MouseEnter="amigo_MouseEnter" 
+                                MouseLeave="amigo_MouseLeave" 
+                                MouseLeftButtonDown="amigo_MouseLeftButtonDown">
+                            <Grid Height="40">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Indicador de estado (online) -->
+                                <Border Grid.Column="0" 
+                                        Width="10" 
+                                        Height="10" 
+                                        Background="#4CAF50" 
+                                        CornerRadius="5" 
+                                        Margin="5,0,0,0" 
+                                        VerticalAlignment="Center"/>
+
+                                <!-- Nombre de amigo -->
+                                <TextBlock Grid.Column="1" 
+                                           Text="Manolo" 
+                                           Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="10,0"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Amigo 3 -->
+                        <Border x:Name="amigoJavi" 
+                                Background="#252525" 
+                                BorderBrush="Transparent" 
+                                BorderThickness="1" 
+                                CornerRadius="5" 
+                                Margin="5,2" 
+                                MouseEnter="amigo_MouseEnter" 
+                                MouseLeave="amigo_MouseLeave" 
+                                MouseLeftButtonDown="amigo_MouseLeftButtonDown">
+                            <Grid Height="40">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Indicador de estado (online) -->
+                                <Border Grid.Column="0" 
+                                        Width="10" 
+                                        Height="10" 
+                                        Background="#4CAF50" 
+                                        CornerRadius="5" 
+                                        Margin="5,0,0,0" 
+                                        VerticalAlignment="Center"/>
+
+                                <!-- Nombre de amigo -->
+                                <TextBlock Grid.Column="1" 
+                                           Text="Javi" 
+                                           Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="10,0"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ID de amigo y botón de búsqueda -->
+                <StackPanel Grid.Row="2" Margin="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Tu ID de amigo: " 
+                                   Grid.Column="0"
+                                   Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
+                                   FontSize="12" 
+                                   Margin="0,0,0,5"/>
+                        <TextBlock x:Name="txtIdAmigoUsuarioActual"
+                                   Text="001" 
+                                   Grid.Column="1"
+                                   Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
+                                   FontSize="12" 
+                                   Margin="0,0,0,5"/>
+                    </Grid>
+                    <Grid>
+                        <TextBox x:Name="txtBuscarAmigos" 
+                                 Height="40" 
+                                 Width="Auto" 
+                                 KeyDown="txtMensaje_KeyDown" 
+                                 Style="{StaticResource DarkMinimalistSearchBox}"
+                                 Text="" 
+                                 Padding="10,0" 
+                                 VerticalContentAlignment="Center" 
+                                 BorderThickness="1" 
+                                 BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                                 Background="#252525" 
+                                 Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type TextBox}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type TextBox}">
+                                                <Border x:Name="border" 
+                                                        BorderBrush="{TemplateBinding BorderBrush}" 
+                                                        BorderThickness="{TemplateBinding BorderThickness}" 
+                                                        Background="{TemplateBinding Background}" 
+                                                        CornerRadius="5" 
+                                                        SnapsToDevicePixels="True">
+                                                    <ScrollViewer x:Name="PART_ContentHost" 
+                                                                  Focusable="False" 
+                                                                  HorizontalScrollBarVisibility="Hidden" 
+                                                                  VerticalScrollBarVisibility="Hidden" 
+                                                                  VerticalAlignment="Center" 
+                                                                  Margin="10,0"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsFocused" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <Button x:Name="btnEnviar" 
+                            Content="▶" 
+                            Width="40" 
+                            Height="30" 
+                            HorizontalAlignment="Right" 
+                            VerticalAlignment="Center" 
+                            Margin="0,0,5,0" 
+                            Background="Transparent" 
+                            BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                            Foreground="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                            Click="btnEnviar_Click" 
+                            Cursor="Hand"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Panel derecho: Área de chat -->
+        <Border Grid.Column="1" 
+                Background="{Binding FondoPanel, Source={StaticResource AppTheme}}" 
+                BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                BorderThickness="2" 
+                CornerRadius="10" 
+                Margin="0,10,10,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Encabezado del chat -->
+                <TextBlock Grid.Row="0" 
+                           Text="CHAT" 
+                           Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                           FontSize="36" 
+                           FontWeight="Bold" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,20,0,0"/>
+
+                <!-- Área de mensajes -->
+                <ScrollViewer Grid.Row="1" 
+                              x:Name="scrollMensajes" 
+                              VerticalScrollBarVisibility="Auto" 
+                              HorizontalScrollBarVisibility="Disabled" 
+                              Margin="20">
+                    <StackPanel x:Name="areaMensajes">
+                        <!-- Los mensajes se agregarán dinámicamente -->
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Área de entrada de mensajes -->
+                <Grid Grid.Row="2" Margin="20,0,20,20">
+                    <TextBox x:Name="txtMensaje" 
+                             Height="40" 
+                             Width="Auto" 
+                             KeyDown="txtMensaje_KeyDown" 
+                             Text="" 
+                             Padding="10,0" 
+                             VerticalContentAlignment="Center" 
+                             BorderThickness="1" 
+                             BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                             Background="#252525" 
+                             Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type TextBox}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type TextBox}">
+                                            <Border x:Name="border" 
+                                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                                    Background="{TemplateBinding Background}" 
+                                                    CornerRadius="5" 
+                                                    SnapsToDevicePixels="True">
+                                                <ScrollViewer x:Name="PART_ContentHost" 
+                                                              Focusable="False" 
+                                                              HorizontalScrollBarVisibility="Hidden" 
+                                                              VerticalScrollBarVisibility="Hidden" 
+                                                              VerticalAlignment="Center" 
+                                                              Margin="10,0"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsFocused" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{Binding BordePanel, Source={StaticResource AppTheme}}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+                    <TextBlock Text="Escribe un mensaje..." 
+                               Margin="20,0,0,0" 
+                               VerticalAlignment="Center" 
+                               Foreground="#777777" 
+                               IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=txtMensaje}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Button x:Name="btnBuscarAmigo" 
+                            Content="▶" 
+                            Width="40" 
+                            Height="30" 
+                            HorizontalAlignment="Right" 
+                            VerticalAlignment="Center" 
+                            Margin="0,0,5,0" 
+                            Background="Transparent" 
+                            BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                            Foreground="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                            Click="btnEnviar_Click" 
+                            Cursor="Hand"/>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </Page>
