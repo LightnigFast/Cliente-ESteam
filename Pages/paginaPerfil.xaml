@@ -4,9 +4,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Cliente_TFG.Pages"
-      mc:Ignorable="d" 
-      d:DesignHeight="720" d:DesignWidth="1280"
-      Title="paginaPerfil">
+      mc:Ignorable="d" d:DesignWidth="1280"
+      Title="paginaPerfil" Height="906">
 
     <Page.Resources>
         <!--ESTILO PARA EL CONTENEDOR PRINCIPAL CON BORDE ROJO SIEMPRE VISIBLE Y ANIMACION-->
@@ -485,8 +484,8 @@
 
                                         <!--OVERLAY PARA INFO DEL JUEGO-->
                                         <Border Background="#AA000000" 
-                                                VerticalAlignment="Bottom"
-                                                Padding="12,8">
+                                                VerticalAlignment="Top"
+                                                Padding="12,8" Margin="0,273,0,0">
                                             <StackPanel>
                                                 <TextBlock Name="nombreJuego1" 
                                                            Text="Assassin's Creed" 
@@ -511,8 +510,8 @@
                                                Stretch="Uniform"/>
 
                                         <Border Background="#AA000000" 
-                                                VerticalAlignment="Bottom"
-                                                Padding="12,8">
+                                                VerticalAlignment="Top"
+                                                Padding="12,8" Margin="0,273,0,0">
                                             <StackPanel>
                                                 <TextBlock Name="nombreJuego2" 
                                                            Text="Cyberpunk 2077" 
@@ -537,8 +536,8 @@
                                                Stretch="Uniform"/>
 
                                         <Border Background="#AA000000" 
-                                                VerticalAlignment="Bottom"
-                                                Padding="12,8">
+                                                VerticalAlignment="Top"
+                                                Padding="12,8" Margin="0,273,0,0">
                                             <StackPanel>
                                                 <TextBlock Name="nombreJuego3" 
                                                            Text="The Witcher 3" 
