@@ -83,7 +83,7 @@ namespace Cliente_TFG.Pages
             {
                 string rutaImagenLocal = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "imagenes", "default.png");
                 imagenUser.Source = new BitmapImage(new Uri(rutaImagenLocal, UriKind.Absolute));
-                MessageBox.Show("URL de la foto inválida o vacía: " + urlImagen);
+                //MessageBox.Show("URL de la foto inválida o vacía: " + urlImagen);
             }
         }
 
@@ -163,8 +163,11 @@ namespace Cliente_TFG.Pages
                 ventanaPrincipal.Cabecera_top.NombreUsuario = usuarioActualizado.NombreUsuario;
                 ventanaPrincipal.Cabecera_top.Dinero = usuarioActualizado.Dinero;
                 //PARA LA FOTO
-                var uri = new Uri(usuarioActualizado.FotoPerfil, UriKind.Absolute);
-                ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(uri);
+                if (usuarioActualizado.FotoPerfil != null)
+                {
+                    var uri = new Uri(usuarioActualizado.FotoPerfil, UriKind.Absolute);
+                    ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(uri);
+                }
 
                 // Refresca el UI en esta página
                 cargarDatosUser();

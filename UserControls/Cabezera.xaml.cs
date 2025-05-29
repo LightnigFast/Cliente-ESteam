@@ -282,7 +282,7 @@ namespace Cliente_TFG.UserControls
             catch
             {
                 //SI LA URL NO ES VÁLIDA O DA ERROR, USAR UNA IMAGEN POR DEFECTO
-                FotoPerfil = new BitmapImage(new Uri("pack://application:,,,/res/imagenes/default_user.png"));
+                FotoPerfil = new BitmapImage(new Uri("pack://application:,,,/res/imagenes/default.png"));
             }
         }
 
