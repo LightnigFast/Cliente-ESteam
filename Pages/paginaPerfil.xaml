@@ -351,7 +351,7 @@
             <Grid HorizontalAlignment="Center" MaxWidth="1600" MinWidth="1000" Margin="40,25,40,50">
 
                 <!--CONTENEDOR PRINCIPAL CON FONDO OSCURO Y BORDE ROJO ANIMADO-->
-                <Border Style="{StaticResource MainContainerStyle}" Padding="50">
+                <Border Style="{StaticResource MainContainerStyle}" Padding="50" Margin="0,-10,0,10">
 
                     <!--GRID PRINCIPAL CON FILAS DEFINIDAS-->
                     <Grid Name="gridCentral">
@@ -387,6 +387,8 @@
                             <!--COLUMNA DERECHA - INFO DEL USUARIO-->
                             <StackPanel Name="gridInfoUser" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top">
 
+                                
+
                                 <!--HEADER CON NOMBRE Y BOTON EDITAR-->
                                 <Grid Margin="0,0,0,25">
                                     <Grid.ColumnDefinitions>
@@ -402,6 +404,16 @@
                                                    FontWeight="Bold" 
                                                    FontSize="36" 
                                                    Margin="0,0,0,8"/>
+                                        <!-- Editar nombre (oculto por defecto) -->
+                                        <TextBox Name="nombreUserEdit"
+                                             Text=""
+                                             FontSize="36"
+                                             Margin="0,0,0,8"
+                                             Visibility="Collapsed"
+                                             Foreground="White"
+                                             Background="#FF2B2B2B"
+                                             BorderBrush="#FF4A4A4A"
+                                             BorderThickness="1"/>
                                         <TextBlock Name="nombreCuenta" 
                                                    Text="ruben7" 
                                                    Foreground="#FFAAAAAA" 
@@ -410,7 +422,10 @@
                                     </StackPanel>
 
                                     <!--BOTON EDITAR PERFIL-->
-                                    <Button Grid.Column="1" 
+                                    <!-- <Button Name="btnEditar" Content="Editar" Click="btnEditar_Click" Margin="0,0,10,0"/> -->
+                                    <Button Name="btnEditar"
+                                            Click="btnEditar_Click"
+                                            Grid.Column="1" 
                                             Style="{StaticResource EditButtonStyle}"
                                             Padding="12,8"
                                             VerticalAlignment="Top">
@@ -419,7 +434,21 @@
                                             <TextBlock Text="Editar perfil" Foreground="White" FontSize="14"/>
                                         </StackPanel>
                                     </Button>
+                                    <Button Name="btnGuardar"
+                                        Click="btnGuardar_Click"
+                                        Grid.Column="1" 
+                                        Style="{StaticResource EditButtonStyle}"
+                                        Padding="12,8"
+                                        VerticalAlignment="Top" Margin="0,43,0,0" Background="Crimson"
+                                        Visibility="Collapsed">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="✏" Foreground="White" FontSize="14" Margin="0,0,6,0"/>
+                                            <TextBlock Text="Guardar Perfil" Foreground="White" FontSize="14"/>
+                                        </StackPanel>
+                                    </Button>
                                 </Grid>
+                                
+
 
                                 <!--BOTON DE AMIGOS-->
                                 <Button Margin="0,0,0,25" 
@@ -443,22 +472,36 @@
                                                FontSize="16" 
                                                Margin="0,0,0,10"/>
 
+
                                     <Border Background="#FF1E1E1E" 
                                             BorderBrush="#FF4A4A4A" 
                                             BorderThickness="1" 
                                             CornerRadius="4" 
                                             MinHeight="80"
                                             Padding="18">
-                                        <TextBlock Name="descripccionCuenta" 
+                                        <Grid>
+                                            <TextBlock Name="descripccionCuenta" 
                                                    Text="probando" 
                                                    Foreground="White" 
                                                    FontWeight="Light" 
                                                    FontSize="16" 
                                                    TextWrapping="Wrap"
                                                    VerticalAlignment="Top"/>
+                                            <TextBox Name="descripcionCuentaEdit"
+                                                     Text="probando"
+                                                     Foreground="White"
+                                                     FontWeight="Light"
+                                                     FontSize="16"
+                                                     TextWrapping="Wrap"
+                                                     VerticalAlignment="Top"
+                                                     Visibility="Collapsed"
+                                                     Background="#FF1E1E1E"
+                                                     BorderThickness="0"
+                                                     AcceptsReturn="True"/>
+
+                                        </Grid>
                                     </Border>
                                 </StackPanel>
-
                             </StackPanel>
                         </Grid>
 
@@ -570,9 +613,13 @@
                                 </Border>
 
                             </WrapPanel>
+                            
+                            
                         </StackPanel>
 
                     </Grid>
+                    
+                    
                 </Border>
             </Grid>
         </ScrollViewer>

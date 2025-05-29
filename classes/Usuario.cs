@@ -21,7 +21,7 @@ namespace Cliente_TFG.Classes
         public string foto_perfil;
         public int id_usuario;
         public string nombre_cuenta;
-        public string nombre_usuario;
+        public string nombre_usuario { get; set; }
         public string token;
         public List<int> bibliotecaJuegos = new List<int>();
         private MainWindow ventanaPrincipal;
@@ -83,13 +83,21 @@ namespace Cliente_TFG.Classes
         public string CodigoAmigo => codigo_amigo;
         public string Contraseña => contraseña;
         public string Correo => correo;
-        public string Descripcion => descripcion;
+        public string Descripcion
+        {
+            get => descripcion;
+            set => descripcion = value;
+        }
         public double Dinero => dinero;
         public string Estado => estado;
         public string FotoPerfil => foto_perfil;
         public int IdUsuario => id_usuario;
         public string NombreCuenta => nombre_cuenta;
-        public string NombreUsuario => nombre_usuario;
+        public string NombreUsuario
+        {
+            get => nombre_usuario;
+            set => nombre_usuario = value;
+        }
         public string Token => token;
         public List<int> BibliotecaJuegos => bibliotecaJuegos;
 

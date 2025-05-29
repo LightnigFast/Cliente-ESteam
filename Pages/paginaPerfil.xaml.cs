@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using System.IO;
 using Newtonsoft.Json.Linq;
 
+
 namespace Cliente_TFG.Pages
 {
     /// <summary>
@@ -337,6 +338,90 @@ namespace Cliente_TFG.Pages
 
             public string UrlCaratula => $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{AppId}/library_600x900.jpg";
         }
+
+        private void btnEditar_Click(object sender, RoutedEventArgs e)
+        {
+            // Nombre User
+            nombreUserEdit.Text = nombreUser.Text;
+            nombreUser.Visibility = Visibility.Collapsed;
+            nombreUserEdit.Visibility = Visibility.Visible;
+
+            // Descripción
+            descripcionCuentaEdit.Text = descripccionCuenta.Text;
+            descripccionCuenta.Visibility = Visibility.Collapsed;
+            descripcionCuentaEdit.Visibility = Visibility.Visible;
+
+            btnEditar.Visibility = Visibility.Collapsed;
+            btnGuardar.Visibility = Visibility.Visible;
+        }
+
+        private async void btnGuardar_Click(object sender, RoutedEventArgs e)
+        {
+            string nuevoNombre = nombreUserEdit.Text.Trim();
+            string nuevaDescripcion = descripcionCuentaEdit.Text.Trim();
+
+            if (string.IsNullOrEmpty(nuevoNombre))
+            {
+                MessageBox.Show("El nombre no puede estar vacío.", "Validación", MessageBoxButton.OK, MessageBoxImage.Warning);
+                nombreUserEdit.Focus();
+                return;
+            }
+
+            int idUsuario = ventanaPrincipal.user.IdUsuario;
+
+            // Crear un diccionario con campos que quieres actualizar
+            var datos = new Dictionary<string, string>
+    {
+        { "nombre_usuario", nuevoNombre },
+        { "descripcion", nuevaDescripcion }
+    };
+
+            string json = JsonConvert.SerializeObject(datos);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            try
+            {
+                string url = $"http://{ventanaPrincipal.IP}:50000/user_profile/{idUsuario}";
+                var client = new HttpClient();
+                var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
+                {
+                    Content = content
+                };
+
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Actualiza localmente
+                    nombreUser.Text = nuevoNombre;
+                    descripccionCuenta.Text = nuevaDescripcion;
+
+                    ventanaPrincipal.user.NombreUsuario = nuevoNombre;
+                    ventanaPrincipal.user.Descripcion = nuevaDescripcion;
+
+                    // Cambiar visibilidad
+                    nombreUser.Visibility = Visibility.Visible;
+                    nombreUserEdit.Visibility = Visibility.Collapsed;
+
+                    descripccionCuenta.Visibility = Visibility.Visible;
+                    descripcionCuentaEdit.Visibility = Visibility.Collapsed;
+
+                    btnEditar.Visibility = Visibility.Visible;
+                    btnGuardar.Visibility = Visibility.Collapsed;
+
+                    MessageBox.Show("Perfil actualizado correctamente.");
+                }
+                else
+                {
+                    MessageBox.Show("Error al actualizar el perfil. Inténtalo de nuevo.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error de conexión: " + ex.Message);
+            }
+        }
+
     }
 }
 
