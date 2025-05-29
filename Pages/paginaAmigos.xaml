@@ -508,19 +508,18 @@
                                 </Style>
                             </TextBox.Resources>
                         </TextBox>
-                        <Button x:Name="btnEnviar" 
+                        <Button x:Name="btnEnviarSolicitud" 
                             Content="▶"
                             Style="{StaticResource BotonCopiarStyle}"
                             Width="40" 
                             Height="30" 
-                            HorizontalAlignment="Right" 
-                            VerticalAlignment="Center" 
-                            Margin="0,0,5,0" 
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Bottom" 
+                            Margin="211,0,0,5" 
                             Background="Transparent" 
                             BorderThickness="0"
                             Foreground="{Binding BordePanel, Source={StaticResource AppTheme}}" 
-                            Click="btnEnviar_Click" 
-                            Cursor="Hand" FontSize="18"/>
+                            Cursor="Hand" FontSize="18" Click="btnEnviarSolicitud_Click"/>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -621,7 +620,7 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <Button x:Name="btnBuscarAmigo" 
+                    <Button x:Name="btnEnviar" 
                             Content="▶" 
                             Style="{StaticResource BotonCopiarStyle}"
                             Width="40" 

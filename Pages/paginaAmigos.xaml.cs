@@ -1,13 +1,21 @@
 ﻿using Cliente_TFG.Classes;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using static Cliente_TFG.Pages.paginaRecargaSaldo;
 
 namespace Cliente_TFG.Pages
 {
@@ -21,6 +29,7 @@ namespace Cliente_TFG.Pages
         private Dictionary<string, List<MensajeChat>> historialChat = new Dictionary<string, List<MensajeChat>>();
         private List<SolicitudAmistad> solicitudesPendientes = new List<SolicitudAmistad>();
         private List<Amigo> listaDeAmigos = new List<Amigo>();
+        private static readonly HttpClient client = new HttpClient();
 
         public paginaAmigos(MainWindow mainWindow)
         {
@@ -38,10 +47,17 @@ namespace Cliente_TFG.Pages
 
         private void InicializarDatosReales()
         {
+            InicializarCodigoDeAmigoDeUsuarioActual();
+
+        }
+
+        private void InicializarCodigoDeAmigoDeUsuarioActual()
+        {
             if (ventanaPrincipal.Usuario.codigo_amigo != null)
             {
                 txtIdAmigoUsuarioActual.Text = ventanaPrincipal.Usuario.codigo_amigo;
-            } else
+            }
+            else
             {
                 txtIdAmigoUsuarioActual.Text = "No tienes codigo de amigo";
             }
@@ -59,18 +75,13 @@ namespace Cliente_TFG.Pages
             btnRechazar.Foreground = AppTheme.Actual.TextoPrincipal;
 
             btnEnviar.Background = AppTheme.Actual.FondoPanel;
-            btnEnviar.BorderBrush = AppTheme.Actual.BordePanel;
             btnEnviar.Foreground = AppTheme.Actual.BordePanel;
         }
 
         private void InicializarDatosEjemplo()
         {
             // Inicializar solicitudes de amistad
-            solicitudesPendientes.Add(new SolicitudAmistad
-            {
-                NombreUsuario = "Juan",
-                IdUsuario = "123456"
-            });
+            solicitudesPendientes.Add(new SolicitudAmistad(123456, "Juan"));
 
             // Inicializar amigos
             listaDeAmigos.Add(new Amigo
@@ -445,6 +456,12 @@ namespace Cliente_TFG.Pages
 
         public class SolicitudAmistad
         {
+            public SolicitudAmistad(int id_usuario, string nombre_usuario)
+            {
+                IdUsuario = id_usuario.ToString();
+                NombreUsuario = nombre_usuario;
+            }
+
             public string NombreUsuario { get; set; }
             public string IdUsuario { get; set; }
         }
@@ -468,6 +485,81 @@ namespace Cliente_TFG.Pages
         {
             String output = txtIdAmigoUsuarioActual.Text;
             System.Windows.Clipboard.SetText(output);
+        }
+
+        private void btnEnviarSolicitud_Click(object sender, RoutedEventArgs e)
+        {
+            String friendCodeABuscar = txtBuscarAmigos.Text;
+            SolicitudAmistad user = GetUsuarioPorCodigoDeAmigo(friendCodeABuscar);
+            if (user == null)
+            {
+                MessageBox.Show($"No existe un usuario con codigo de amigo: {friendCodeABuscar}");
+                return;
+            }
+            MandarSolicitudDeAmistadAsync(user);
+        }
+
+        private async void MandarSolicitudDeAmistadAsync(SolicitudAmistad user)
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad";
+            try
+            {
+                // Validar inputs
+                if (ventanaPrincipal.user == null || ventanaPrincipal.user.id_usuario <= 0)
+                {
+                    MessageBox.Show("Error: El usuario actual no está definido o tiene un ID inválido.");
+                    return;
+                }
+                if (user == null)
+                {
+                    MessageBox.Show("Error: El usuario destino no está definido o tiene un ID inválido.");
+                    return;
+                }
+
+                // Construir la cadena del body
+                string jsonBody = $"{{\n  \"de_usuario_id\": {ventanaPrincipal.user.id_usuario},\n  \"para_usuario_id\": {user.IdUsuario}\n}}";
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+                // Hacer la solicitud
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show("Solicitud de amistad enviada correctamente.");
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"Error del servidor: {errorResponse} (Código: {response.StatusCode})");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"Error de red: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error inesperado: {ex.Message}");
+            }
+
+        }
+
+        // TODO - Comprobar errores
+        private SolicitudAmistad GetUsuarioPorCodigoDeAmigo(String friendCode)
+        {
+            var url = $"http://" + ventanaPrincipal.IP + $":50000/users/friend_code/{friendCode}";
+            using (var webClient = new WebClient())
+            {
+                string jsonString = webClient.DownloadString(url);
+
+                var jsonObj = JObject.Parse(jsonString);
+                var usuarioJson = jsonObj["usuario"];
+
+                int id_usuario = (int)usuarioJson["id_usuario"];
+                string nombre_usuario = (string)usuarioJson["nombre_usuario"];
+                return new SolicitudAmistad(id_usuario, nombre_usuario);
+            }
         }
     }
 }
