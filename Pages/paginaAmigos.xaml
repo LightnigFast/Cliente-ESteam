@@ -47,6 +47,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
         <!-- Estilo para la barra de búsqueda -->
         <Style x:Key="DarkMinimalistSearchBox" TargetType="TextBox">
             <Setter Property="Background" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
@@ -242,6 +243,14 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
+        <!-- Panel de notificaciones (superpuesto) -->
+        <StackPanel x:Name="panelNotificaciones" 
+                    Grid.ColumnSpan="2" 
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Top" 
+                    Margin="20" 
+                    ZIndex="1000"/>
+
         <!-- Panel izquierdo: Solicitudes de amistad y lista de amigos -->
         <Border Grid.Column="0" 
                 Background="{Binding FondoPanel, Source={StaticResource AppTheme}}" 
@@ -258,62 +267,28 @@
 
                 <!-- Sección de solicitudes de amistad -->
                 <StackPanel Grid.Row="0">
-                    <TextBlock Text="Solicitudes de amigo (1)" 
+                    <!-- Título dinámico con contador -->
+                    <TextBlock x:Name="textoSolicitudesTitulo"
+                               Text="Solicitudes de amigo (0)" 
                                Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
                                FontSize="16" 
                                FontWeight="Bold" 
                                Margin="10,10,0,5"/>
 
-                    <Border Background="#252525" 
-                            BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
-                            BorderThickness="1" 
-                            CornerRadius="5" 
-                            Margin="5">
-                        <Grid Height="40">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                    <!-- Contenedor dinámico para solicitudes -->
+                    <ScrollViewer MaxHeight="200" 
+                                  VerticalScrollBarVisibility="Auto" 
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="contenedorSolicitudes" 
+                                    Margin="5">
+                        </StackPanel>
+                        
+                    </ScrollViewer>
 
-                            <!-- Icono de usuario -->
-                            <Border Grid.Column="0" 
-                                    Width="30" 
-                                    Height="30" 
-                                    Background="Transparent" 
-                                    BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
-                                    BorderThickness="1" 
-                                    CornerRadius="15" 
-                                    Margin="5,0">
-                                <TextBlock Text="👤" 
-                                           FontSize="16" 
-                                           HorizontalAlignment="Center" 
-                                           VerticalAlignment="Center"/>
-                            </Border>
-
-                            <!-- Nombre de usuario -->
-                            <TextBlock Grid.Column="1" 
-                                       Text="Juan" 
-                                       Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
-                                       VerticalAlignment="Center" 
-                                       Margin="5,0"/>
-
-                            <!-- Botones de aceptar/rechazar -->
-                            <StackPanel Grid.Column="2" 
-                                        Orientation="Horizontal" 
-                                        HorizontalAlignment="Right" 
-                                        Margin="0,0,5,0">
-                                <Button x:Name="btnAceptar" 
-                                        Content="✓" 
-                                        Style="{StaticResource BotonSolicitudStyle}" 
-                                        Click="btnAceptar_Click"/>
-                                <Button x:Name="btnRechazar" 
-                                        Content="✕" 
-                                        Style="{StaticResource BotonSolicitudStyle}" 
-                                        Click="btnRechazar_Click"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                    <!-- Separador -->
+                    <Border Height="1" 
+                            Background="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                            Margin="10,5"/>
                 </StackPanel>
 
                 <!-- Lista de amigos -->
@@ -321,108 +296,118 @@
                               VerticalScrollBarVisibility="Auto" 
                               HorizontalScrollBarVisibility="Disabled" 
                               Margin="0,10,0,0">
-                    <StackPanel x:Name="listaAmigos">
-                        <!-- Amigo 1 -->
-                        <Border x:Name="amigoPepe" 
-                                Background="#252525" 
-                                BorderBrush="Transparent" 
-                                BorderThickness="1" 
-                                CornerRadius="5" 
-                                Margin="5,2" 
-                                MouseEnter="amigo_MouseEnter" 
-                                MouseLeave="amigo_MouseLeave" 
-                                MouseLeftButtonDown="amigo_MouseLeftButtonDown">
-                            <Grid Height="40">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <!-- Título de amigos -->
+                        <TextBlock Text="Lista de amigos" 
+                                   Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                                   FontSize="16" 
+                                   FontWeight="Bold" 
+                                   Margin="10,0,0,10"/>
 
-                                <!-- Indicador de estado (online) -->
-                                <Border Grid.Column="0" 
-                                        Width="10" 
-                                        Height="10" 
-                                        Background="#4CAF50" 
-                                        CornerRadius="5" 
-                                        Margin="5,0,0,0" 
-                                        VerticalAlignment="Center"/>
+                        <!-- Lista de amigos existente -->
+                        <StackPanel x:Name="listaAmigos">
+                            <!-- Amigo 1 -->
+                            <Border x:Name="amigoPepe" 
+                                    Background="#252525" 
+                                    BorderBrush="Transparent" 
+                                    BorderThickness="1" 
+                                    CornerRadius="5" 
+                                    Margin="5,2" 
+                                    MouseEnter="amigo_MouseEnter" 
+                                    MouseLeave="amigo_MouseLeave" 
+                                    MouseLeftButtonDown="amigo_MouseLeftButtonDown">
+                                <Grid Height="40">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- Nombre de amigo -->
-                                <TextBlock Grid.Column="1" 
-                                           Text="Pepe" 
-                                           Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
-                                           VerticalAlignment="Center" 
-                                           Margin="10,0"/>
-                            </Grid>
-                        </Border>
+                                    <!-- Indicador de estado (online) -->
+                                    <Border Grid.Column="0" 
+                                            Width="10" 
+                                            Height="10" 
+                                            Background="#4CAF50" 
+                                            CornerRadius="5" 
+                                            Margin="5,0,0,0" 
+                                            VerticalAlignment="Center"/>
 
-                        <!-- Amigo 2 -->
-                        <Border x:Name="amigoManolo" 
-                                Background="#252525" 
-                                BorderBrush="Transparent" 
-                                BorderThickness="1" 
-                                CornerRadius="5" 
-                                Margin="5,2" 
-                                MouseEnter="amigo_MouseEnter" 
-                                MouseLeave="amigo_MouseLeave" 
-                                MouseLeftButtonDown="amigo_MouseLeftButtonDown">
-                            <Grid Height="40">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                                    <!-- Nombre de amigo -->
+                                    <TextBlock Grid.Column="1" 
+                                               Text="Pepe" 
+                                               Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                                               VerticalAlignment="Center" 
+                                               Margin="10,0"/>
+                                </Grid>
+                            </Border>
 
-                                <!-- Indicador de estado (online) -->
-                                <Border Grid.Column="0" 
-                                        Width="10" 
-                                        Height="10" 
-                                        Background="#4CAF50" 
-                                        CornerRadius="5" 
-                                        Margin="5,0,0,0" 
-                                        VerticalAlignment="Center"/>
+                            <!-- Amigo 2 -->
+                            <Border x:Name="amigoManolo" 
+                                    Background="#252525" 
+                                    BorderBrush="Transparent" 
+                                    BorderThickness="1" 
+                                    CornerRadius="5" 
+                                    Margin="5,2" 
+                                    MouseEnter="amigo_MouseEnter" 
+                                    MouseLeave="amigo_MouseLeave" 
+                                    MouseLeftButtonDown="amigo_MouseLeftButtonDown">
+                                <Grid Height="40">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- Nombre de amigo -->
-                                <TextBlock Grid.Column="1" 
-                                           Text="Manolo" 
-                                           Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
-                                           VerticalAlignment="Center" 
-                                           Margin="10,0"/>
-                            </Grid>
-                        </Border>
+                                    <!-- Indicador de estado (online) -->
+                                    <Border Grid.Column="0" 
+                                            Width="10" 
+                                            Height="10" 
+                                            Background="#4CAF50" 
+                                            CornerRadius="5" 
+                                            Margin="5,0,0,0" 
+                                            VerticalAlignment="Center"/>
 
-                        <!-- Amigo 3 -->
-                        <Border x:Name="amigoJavi" 
-                                Background="#252525" 
-                                BorderBrush="Transparent" 
-                                BorderThickness="1" 
-                                CornerRadius="5" 
-                                Margin="5,2" 
-                                MouseEnter="amigo_MouseEnter" 
-                                MouseLeave="amigo_MouseLeave" 
-                                MouseLeftButtonDown="amigo_MouseLeftButtonDown">
-                            <Grid Height="40">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                                    <!-- Nombre de amigo -->
+                                    <TextBlock Grid.Column="1" 
+                                               Text="Manolo" 
+                                               Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                                               VerticalAlignment="Center" 
+                                               Margin="10,0"/>
+                                </Grid>
+                            </Border>
 
-                                <!-- Indicador de estado (online) -->
-                                <Border Grid.Column="0" 
-                                        Width="10" 
-                                        Height="10" 
-                                        Background="#4CAF50" 
-                                        CornerRadius="5" 
-                                        Margin="5,0,0,0" 
-                                        VerticalAlignment="Center"/>
+                            <!-- Amigo 3 -->
+                            <Border x:Name="amigoJavi" 
+                                    Background="#252525" 
+                                    BorderBrush="Transparent" 
+                                    BorderThickness="1" 
+                                    CornerRadius="5" 
+                                    Margin="5,2" 
+                                    MouseEnter="amigo_MouseEnter" 
+                                    MouseLeave="amigo_MouseLeave" 
+                                    MouseLeftButtonDown="amigo_MouseLeftButtonDown">
+                                <Grid Height="40">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- Nombre de amigo -->
-                                <TextBlock Grid.Column="1" 
-                                           Text="Javi" 
-                                           Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
-                                           VerticalAlignment="Center" 
-                                           Margin="10,0"/>
-                            </Grid>
-                        </Border>
+                                    <!-- Indicador de estado (online) -->
+                                    <Border Grid.Column="0" 
+                                            Width="10" 
+                                            Height="10" 
+                                            Background="#4CAF50" 
+                                            CornerRadius="5" 
+                                            Margin="5,0,0,0" 
+                                            VerticalAlignment="Center"/>
+
+                                    <!-- Nombre de amigo -->
+                                    <TextBlock Grid.Column="1" 
+                                               Text="Javi" 
+                                               Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
+                                               VerticalAlignment="Center" 
+                                               Margin="10,0"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
 
@@ -442,26 +427,33 @@
                                    Grid.Row="0"
                                    Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
                                    FontSize="12" 
-                                   Margin="20,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                                   Margin="20,0,0,5" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center" 
+                                   FontWeight="Bold"/>
                         <Button x:Name="btnCopiarIdAmigo" 
-                                    Width="30" 
-                                    Style="{StaticResource BotonCopiarStyle}"
-                                    Background="{Binding FondoPanel, Source={StaticResource AppTheme}}"
-                                    BorderThickness="1"
-                                    Grid.Column="1"
-                                    Cursor="Hand"
-                                    ToolTip="Copiar al portapapeles" BorderBrush="#00707070" Click="btnCopiarIdAmigo_Click" Grid.RowSpan="2">
+                                Width="30" 
+                                Style="{StaticResource BotonCopiarStyle}"
+                                Background="{Binding FondoPanel, Source={StaticResource AppTheme}}"
+                                BorderThickness="1"
+                                Grid.Column="1"
+                                Cursor="Hand"
+                                ToolTip="Copiar al portapapeles" 
+                                BorderBrush="#00707070" 
+                                Click="btnCopiarIdAmigo_Click" 
+                                Grid.RowSpan="2">
                             <Path Data="M16,1H4C2.9,1,2,1.9,2,3V17H4V3H16V1Z M19,5H8C6.9,5,6,5.9,6,7V21C6,22.1,6.9,23,8,23H19C20.1,23,21,22.1,21,21V7C21,5.9,20.1,5,19,5Z M19,21H8V7H19V21Z"
-                                      Fill="{Binding BordePanel, Source={StaticResource AppTheme}}"
-                                      Stretch="Uniform"/>
+                                  Fill="{Binding BordePanel, Source={StaticResource AppTheme}}"
+                                  Stretch="Uniform"/>
                         </Button>
 
                         <TextBlock x:Name="txtIdAmigoUsuarioActual"
-                                       Text="SG5698DSG6756SD4G67SDG" 
-                                        Grid.Row="1"
-                                       Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
-                                       FontSize="12" 
-                                       Margin="20,0,0,5" HorizontalAlignment="Center"/>
+                                   Text="SG5698DSG6756SD4G67SDG" 
+                                   Grid.Row="1"
+                                   Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
+                                   FontSize="12" 
+                                   Margin="20,0,0,5" 
+                                   HorizontalAlignment="Center"/>
                     </Grid>
                     <Grid>
                         <TextBox x:Name="txtBuscarAmigos" 
@@ -509,17 +501,19 @@
                             </TextBox.Resources>
                         </TextBox>
                         <Button x:Name="btnEnviarSolicitud" 
-                            Content="▶"
-                            Style="{StaticResource BotonCopiarStyle}"
-                            Width="40" 
-                            Height="30" 
-                            HorizontalAlignment="Left" 
-                            VerticalAlignment="Bottom" 
-                            Margin="211,0,0,5" 
-                            Background="Transparent" 
-                            BorderThickness="0"
-                            Foreground="{Binding BordePanel, Source={StaticResource AppTheme}}" 
-                            Cursor="Hand" FontSize="18" Click="btnEnviarSolicitud_Click"/>
+                                Content="▶"
+                                Style="{StaticResource BotonCopiarStyle}"
+                                Width="40" 
+                                Height="30" 
+                                HorizontalAlignment="Left" 
+                                VerticalAlignment="Bottom" 
+                                Margin="211,0,0,5" 
+                                Background="Transparent" 
+                                BorderThickness="0"
+                                Foreground="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                                Cursor="Hand" 
+                                FontSize="18" 
+                                Click="btnEnviarSolicitud_Click"/>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -631,9 +625,14 @@
                             Background="Transparent" 
                             Foreground="{Binding BordePanel, Source={StaticResource AppTheme}}" 
                             Click="btnEnviar_Click" 
-                            Cursor="Hand" FontSize="18"/>
+                            Cursor="Hand" 
+                            FontSize="18"/>
                 </Grid>
             </Grid>
         </Border>
+
+        <!-- Botones ocultos para compatibilidad con el código existente -->
+        <Button x:Name="btnAceptar" Visibility="Collapsed"/>
+        <Button x:Name="btnRechazar" Visibility="Collapsed"/>
     </Grid>
 </Page>

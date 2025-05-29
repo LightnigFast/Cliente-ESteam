@@ -31,24 +31,40 @@ namespace Cliente_TFG.Pages
         private List<Amigo> listaDeAmigos = new List<Amigo>();
         private static readonly HttpClient client = new HttpClient();
 
+        // Timer para actualizar solicitudes automáticamente
+        private DispatcherTimer timerActualizacionSolicitudes;
+
         public paginaAmigos(MainWindow mainWindow)
         {
             InitializeComponent();
             ventanaPrincipal = mainWindow;
 
             InicializarDatosReales();
-
-            // Inicializar datos de ejemplo
             InicializarDatosEjemplo();
-
-            // Aplicar colores del tema actual
+            InicializarTimerActualizacion();
             AplicarTemaActual();
+
+            // Actualizar la UI después de inicializar los datos
+            ActualizarSolicitudesPendientes();
+        }
+
+        private void InicializarTimerActualizacion()
+        {
+            // Timer para actualizar solicitudes cada 30 segundos
+            timerActualizacionSolicitudes = new DispatcherTimer();
+            timerActualizacionSolicitudes.Interval = TimeSpan.FromSeconds(30);
+            timerActualizacionSolicitudes.Tick += TimerActualizacionSolicitudes_Tick;
+            timerActualizacionSolicitudes.Start();
+        }
+
+        private async void TimerActualizacionSolicitudes_Tick(object sender, EventArgs e)
+        {
+            await ActualizarSolicitudesPendientesAsync();
         }
 
         private void InicializarDatosReales()
         {
             InicializarCodigoDeAmigoDeUsuarioActual();
-
         }
 
         private void InicializarCodigoDeAmigoDeUsuarioActual()
@@ -66,14 +82,6 @@ namespace Cliente_TFG.Pages
         private void AplicarTemaActual()
         {
             // Aplicar colores a los elementos principales
-            btnAceptar.Background = AppTheme.Actual.FondoPanel;
-            btnAceptar.BorderBrush = AppTheme.Actual.BordePanel;
-            btnAceptar.Foreground = AppTheme.Actual.TextoPrincipal;
-
-            btnRechazar.Background = AppTheme.Actual.FondoPanel;
-            btnRechazar.BorderBrush = AppTheme.Actual.BordePanel;
-            btnRechazar.Foreground = AppTheme.Actual.TextoPrincipal;
-
             btnEnviar.Background = AppTheme.Actual.FondoPanel;
             btnEnviar.Foreground = AppTheme.Actual.BordePanel;
         }
@@ -82,6 +90,7 @@ namespace Cliente_TFG.Pages
         {
             // Inicializar solicitudes de amistad
             solicitudesPendientes.Add(new SolicitudAmistad(123456, "Juan"));
+            solicitudesPendientes.Add(new SolicitudAmistad(123, "Antonia"));
 
             // Inicializar amigos
             listaDeAmigos.Add(new Amigo
@@ -122,13 +131,10 @@ namespace Cliente_TFG.Pages
             };
         }
 
-        private void btnAceptar_Click(object sender, RoutedEventArgs e)
+        private void AceptarSolicitudAmistad(SolicitudAmistad solicitud)
         {
-            // Lógica para aceptar solicitud de amistad
-            if (solicitudesPendientes.Count > 0)
+            try
             {
-                var solicitud = solicitudesPendientes[0];
-
                 // Agregar a la lista de amigos
                 listaDeAmigos.Add(new Amigo
                 {
@@ -141,29 +147,323 @@ namespace Cliente_TFG.Pages
                 AgregarAmigoALista(solicitud.NombreUsuario);
 
                 // Eliminar la solicitud
-                solicitudesPendientes.RemoveAt(0);
+                solicitudesPendientes.Remove(solicitud);
 
-                // Actualizar la UI para mostrar que no hay solicitudes pendientes
+                // Actualizar la UI
                 ActualizarSolicitudesPendientes();
+
+                // Mostrar notificación
+                MostrarNotificacion($"Has aceptado la solicitud de {solicitud.NombreUsuario}", NotificationType.Success);
+
+                // Aquí puedes agregar la llamada al servidor para aceptar la solicitud
+                // await AceptarSolicitudEnServidorAsync(solicitud);
+            }
+            catch (Exception ex)
+            {
+                MostrarNotificacion($"Error al aceptar solicitud: {ex.Message}", NotificationType.Error);
             }
         }
 
-        private void btnRechazar_Click(object sender, RoutedEventArgs e)
+        private void RechazarSolicitudAmistad(SolicitudAmistad solicitud)
         {
-            // Lógica para rechazar solicitud de amistad
-            if (solicitudesPendientes.Count > 0)
+            try
             {
-                solicitudesPendientes.RemoveAt(0);
+                // Eliminar la solicitud
+                solicitudesPendientes.Remove(solicitud);
+
+                // Actualizar la UI
                 ActualizarSolicitudesPendientes();
+
+                // Mostrar notificación
+                MostrarNotificacion($"Has rechazado la solicitud de {solicitud.NombreUsuario}", NotificationType.Warning);
+
+                // Aquí puedes agregar la llamada al servidor para rechazar la solicitud
+                // await RechazarSolicitudEnServidorAsync(solicitud);
+            }
+            catch (Exception ex)
+            {
+                MostrarNotificacion($"Error al rechazar solicitud: {ex.Message}", NotificationType.Error);
             }
         }
 
         private void ActualizarSolicitudesPendientes()
         {
-            // Actualizar la UI para mostrar el número correcto de solicitudes pendientes
-            // En una implementación real, esto se conectaría a una base de datos o servicio
+            // Limpiar el panel de solicitudes
+            contenedorSolicitudes.Children.Clear();
+
+            // Actualizar el contador en el título
+            textoSolicitudesTitulo.Text = $"Solicitudes de amigo ({solicitudesPendientes.Count})";
+
+            // Si no hay solicitudes, mostrar mensaje
+            if (solicitudesPendientes.Count == 0)
+            {
+                TextBlock mensajeVacio = new TextBlock
+                {
+                    Text = "No hay solicitudes pendientes",
+                    Foreground = AppTheme.Actual.TextoSecundario,
+                    FontStyle = FontStyles.Italic,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(10)
+                };
+                contenedorSolicitudes.Children.Add(mensajeVacio);
+                return;
+            }
+
+            // Crear elementos para cada solicitud
+            foreach (var solicitud in solicitudesPendientes)
+            {
+                CrearElementoSolicitud(solicitud);
+            }
         }
 
+        private void CrearElementoSolicitud(SolicitudAmistad solicitud)
+        {
+            // Crear el contenedor principal
+            Border bordeSolicitud = new Border
+            {
+                Background = new SolidColorBrush(Color.FromRgb(37, 37, 37)), // #252525
+                BorderBrush = AppTheme.Actual.BordePanel,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(5),
+                Margin = new Thickness(5),
+                Tag = solicitud // Guardar referencia a la solicitud
+            };
+
+            Grid gridSolicitud = new Grid { Height = 40 };
+            gridSolicitud.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            gridSolicitud.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            gridSolicitud.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            // Icono de usuario
+            Border iconoUsuario = new Border
+            {
+                Width = 30,
+                Height = 30,
+                Background = Brushes.Transparent,
+                BorderBrush = AppTheme.Actual.BordePanel,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(15),
+                Margin = new Thickness(5,0,5, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            TextBlock iconoTexto = new TextBlock
+            {
+                Text = "👤",
+                FontSize = 16,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            iconoUsuario.Child = iconoTexto;
+            Grid.SetColumn(iconoUsuario, 0);
+            gridSolicitud.Children.Add(iconoUsuario);
+
+            // Nombre de usuario
+            TextBlock nombreUsuario = new TextBlock
+            {
+                Text = solicitud.NombreUsuario,
+                Foreground = AppTheme.Actual.TextoPrincipal,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(5,0,5, 0)
+            };
+            Grid.SetColumn(nombreUsuario, 1);
+            gridSolicitud.Children.Add(nombreUsuario);
+
+            // Panel de botones
+            StackPanel panelBotones = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(0, 0, 5, 0)
+            };
+
+            // Botón aceptar
+            Button botonAceptar = new Button
+            {
+                Content = "✓",
+                Width = 25,
+                Height = 25,
+                Margin = new Thickness(5,0,5, 0),
+                Background = AppTheme.Actual.FondoPanel,
+                BorderBrush = AppTheme.Actual.BordePanel,
+                BorderThickness = new Thickness(1),
+                Foreground = AppTheme.Actual.TextoPrincipal,
+                Cursor = Cursors.Hand,
+                Tag = solicitud
+            };
+            botonAceptar.Click += (sender, e) =>
+            {
+                Button btn = sender as Button;
+                if (btn?.Tag is SolicitudAmistad sol)
+                {
+                    AceptarSolicitudAmistad(sol);
+                }
+            };
+            panelBotones.Children.Add(botonAceptar);
+
+            // Botón rechazar
+            Button botonRechazar = new Button
+            {
+                Content = "✕",
+                Width = 25,
+                Height = 25,
+                Margin = new Thickness(5,0,5, 0),
+                Background = AppTheme.Actual.FondoPanel,
+                BorderBrush = AppTheme.Actual.BordePanel,
+                BorderThickness = new Thickness(1),
+                Foreground = AppTheme.Actual.TextoPrincipal,
+                Cursor = Cursors.Hand,
+                Tag = solicitud
+            };
+            botonRechazar.Click += (sender, e) =>
+            {
+                Button btn = sender as Button;
+                if (btn?.Tag is SolicitudAmistad sol)
+                {
+                    RechazarSolicitudAmistad(sol);
+                }
+            };
+            panelBotones.Children.Add(botonRechazar);
+
+            Grid.SetColumn(panelBotones, 2);
+            gridSolicitud.Children.Add(panelBotones);
+
+            bordeSolicitud.Child = gridSolicitud;
+
+            // Agregar animación de entrada
+            AplicarAnimacionEntrada(bordeSolicitud);
+
+            // Agregar al panel
+            contenedorSolicitudes.Children.Add(bordeSolicitud);
+        }
+
+        private void AplicarAnimacionEntrada(UIElement elemento)
+        {
+            // Animación de fade in y slide
+            elemento.Opacity = 0;
+            elemento.RenderTransform = new TranslateTransform(0, -20);
+
+            var fadeIn = new DoubleAnimation
+            {
+                From = 0,
+                To = 1,
+                Duration = TimeSpan.FromMilliseconds(300),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            var slideIn = new DoubleAnimation
+            {
+                From = -20,
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(300),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            elemento.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+            ((TranslateTransform)elemento.RenderTransform).BeginAnimation(TranslateTransform.YProperty, slideIn);
+        }
+
+        // Método para actualizar solicitudes desde el servidor
+        private async Task ActualizarSolicitudesPendientesAsync()
+        {
+            try
+            {
+                // Aquí harías la llamada al servidor para obtener solicitudes actualizadas
+                // var nuevasSolicitudes = await ObtenerSolicitudesDelServidorAsync();
+
+                // Por ahora, simular nuevas solicitudes ocasionalmente
+                if (new Random().Next(1, 100) <= 50) // 50% de probabilidad
+                {
+                    AgregarSolicitudSimulada();
+                }
+            }
+            catch (Exception ex)
+            {
+                MostrarNotificacion($"Error al actualizar solicitudes: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private void AgregarSolicitudSimulada()
+        {
+            var nombresSimulados = new[] { "Carlos", "María", "Pedro", "Ana", "Luis", "Sofia" };
+            var random = new Random();
+            var nombre = nombresSimulados[random.Next(nombresSimulados.Length)];
+            var id = random.Next(100000, 999999);
+
+            var nuevaSolicitud = new SolicitudAmistad(id, nombre);
+
+            // Verificar que no exista ya
+            if (!solicitudesPendientes.Exists(s => s.IdUsuario == nuevaSolicitud.IdUsuario))
+            {
+                solicitudesPendientes.Add(nuevaSolicitud);
+                ActualizarSolicitudesPendientes();
+                MostrarNotificacion($"Nueva solicitud de amistad de {nombre}", NotificationType.Info);
+            }
+        }
+
+        // Enum para tipos de notificación
+        public enum NotificationType
+        {
+            Success,
+            Warning,
+            Error,
+            Info
+        }
+
+        private void MostrarNotificacion(string mensaje, NotificationType tipo)
+        {
+            // Crear una notificación temporal en la UI
+            var notificacion = new Border
+            {
+                Background = ObtenerColorNotificacion(tipo),
+                CornerRadius = new CornerRadius(5),
+                Padding = new Thickness(10),
+                Margin = new Thickness(10),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+
+            var textoNotificacion = new TextBlock
+            {
+                Text = mensaje,
+                Foreground = Brushes.White,
+                FontWeight = FontWeights.Bold
+            };
+
+            notificacion.Child = textoNotificacion;
+
+            // Agregar a un panel de notificaciones
+            panelNotificaciones.Children.Add(notificacion);
+
+            // Remover después de 3 segundos
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(3);
+            timer.Tick += (s, e) =>
+            {
+                timer.Stop();
+                panelNotificaciones.Children.Remove(notificacion);
+            };
+            timer.Start();
+        }
+
+        private Brush ObtenerColorNotificacion(NotificationType tipo)
+        {
+            switch (tipo)
+            {
+                case NotificationType.Success:
+                    return new SolidColorBrush(Color.FromRgb(76, 175, 80)); // Verde
+                case NotificationType.Warning:
+                    return new SolidColorBrush(Color.FromRgb(255, 193, 7)); // Amarillo
+                case NotificationType.Error:
+                    return new SolidColorBrush(Color.FromRgb(244, 67, 54)); // Rojo
+                case NotificationType.Info:
+                    return new SolidColorBrush(Color.FromRgb(33, 150, 243)); // Azul
+                default:
+                    return new SolidColorBrush(Color.FromRgb(158, 158, 158)); // Gris
+            }
+        }
+
+        // Resto de métodos existentes...
         private void AgregarAmigoALista(string nombreAmigo)
         {
             // Crear un nuevo elemento en la lista de amigos
@@ -217,8 +517,12 @@ namespace Cliente_TFG.Pages
             {
                 historialChat[nombreAmigo] = new List<MensajeChat>();
             }
+
+            // Aplicar animación de entrada
+            AplicarAnimacionEntrada(bordeAmigo);
         }
 
+        // Métodos existentes sin cambios...
         private void amigo_MouseEnter(object sender, MouseEventArgs e)
         {
             if (sender is Border border)
@@ -446,7 +750,121 @@ namespace Cliente_TFG.Pages
             MessageBox.Show("Funcionalidad de búsqueda de amigos en desarrollo", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        // Clases auxiliares para manejar los datos
+        private void btnCopiarIdAmigo_Click(object sender, RoutedEventArgs e)
+        {
+            String output = txtIdAmigoUsuarioActual.Text;
+            System.Windows.Clipboard.SetText(output);
+            MostrarNotificacion("Código de amigo copiado al portapapeles", NotificationType.Success);
+        }
+
+        private void btnEnviarSolicitud_Click(object sender, RoutedEventArgs e)
+        {
+            String friendCodeABuscar = txtBuscarAmigos.Text;
+            if (String.IsNullOrEmpty(friendCodeABuscar))
+            {
+                MostrarNotificacion("Tienes que rellenar el campo con el código de amigo", NotificationType.Warning);
+                return;
+            }
+            SolicitudAmistad user = GetUsuarioPorCodigoDeAmigo(friendCodeABuscar);
+            if (user == null)
+            {
+                MostrarNotificacion($"No existe un usuario con código de amigo: {friendCodeABuscar}", NotificationType.Error);
+                return;
+            }
+            MandarSolicitudDeAmistadAsync(user);
+        }
+
+        private async void MandarSolicitudDeAmistadAsync(SolicitudAmistad user)
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad";
+            try
+            {
+                // Validar inputs
+                if (ventanaPrincipal.user == null || ventanaPrincipal.user.id_usuario <= 0)
+                {
+                    MostrarNotificacion("Error: El usuario actual no está definido o tiene un ID inválido.", NotificationType.Error);
+                    return;
+                }
+                if (user == null)
+                {
+                    MostrarNotificacion("Error: El usuario destino no está definido o tiene un ID inválido.", NotificationType.Error);
+                    return;
+                }
+
+                // Construir la cadena del body
+                string jsonBody = $"{{\n  \"de_usuario_id\": {ventanaPrincipal.user.id_usuario},\n  \"para_usuario_id\": {user.IdUsuario}\n}}";
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+                // Hacer la solicitud
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    MostrarNotificacion("Solicitud de amistad enviada correctamente.", NotificationType.Success);
+                    txtBuscarAmigos.Text = ""; // Limpiar el campo
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                MostrarNotificacion($"Error de red: {ex.Message}", NotificationType.Error);
+            }
+            catch (Exception ex)
+            {
+                MostrarNotificacion($"Error inesperado: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        // TODO - Comprobar errores
+        private SolicitudAmistad GetUsuarioPorCodigoDeAmigo(String friendCode)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(friendCode))
+                {
+                    return null;
+                }
+                var url = $"http://" + ventanaPrincipal.IP + $":50000/users/friend_code/{friendCode}";
+                using (var webClient = new WebClient())
+                {
+                    string jsonString;
+                    try
+                    {
+                        jsonString = webClient.DownloadString(url);
+                    }
+                    catch (WebException)
+                    {
+                        // El mensaje de la excepcion ya salta en el siguiente metodo
+                        return null;
+                    }
+
+                    var jsonObj = JObject.Parse(jsonString);
+                    var usuarioJson = jsonObj["usuario"];
+
+                    int id_usuario = (int)usuarioJson["id_usuario"];
+                    string nombre_usuario = (string)usuarioJson["nombre_usuario"];
+                    return new SolicitudAmistad(id_usuario, nombre_usuario);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // Limpiar recursos al cerrar
+        public void LimpiarRecursos()
+        {
+            timerActualizacionSolicitudes?.Stop();
+            timerActualizacionSolicitudes = null;
+        }
+
+        // Clases auxiliares para manejar los datos (sin cambios)
         public class MensajeChat
         {
             public string Remitente { get; set; }
@@ -479,112 +897,6 @@ namespace Cliente_TFG.Pages
             Ausente,
             Ocupado,
             Desconectado
-        }
-
-        private void btnCopiarIdAmigo_Click(object sender, RoutedEventArgs e)
-        {
-            String output = txtIdAmigoUsuarioActual.Text;
-            System.Windows.Clipboard.SetText(output);
-        }
-
-        private void btnEnviarSolicitud_Click(object sender, RoutedEventArgs e)
-        {
-            String friendCodeABuscar = txtBuscarAmigos.Text;
-            if (String.IsNullOrEmpty(friendCodeABuscar)) 
-            {
-                MessageBox.Show("Tienes que rellenar el campo con el código de amigo del usuario al que quieres agregar");
-                return;
-            }
-            SolicitudAmistad user = GetUsuarioPorCodigoDeAmigo(friendCodeABuscar);
-            if (user == null)
-            {
-                MessageBox.Show($"No existe un usuario con codigo de amigo: {friendCodeABuscar}");
-                return;
-            }
-            MandarSolicitudDeAmistadAsync(user);
-        }
-
-        private async void MandarSolicitudDeAmistadAsync(SolicitudAmistad user)
-        {
-            string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad";
-            try
-            {
-                // Validar inputs
-                if (ventanaPrincipal.user == null || ventanaPrincipal.user.id_usuario <= 0)
-                {
-                    MessageBox.Show("Error: El usuario actual no está definido o tiene un ID inválido.");
-                    return;
-                }
-                if (user == null)
-                {
-                    MessageBox.Show("Error: El usuario destino no está definido o tiene un ID inválido.");
-                    return;
-                }
-
-                // Construir la cadena del body
-                string jsonBody = $"{{\n  \"de_usuario_id\": {ventanaPrincipal.user.id_usuario},\n  \"para_usuario_id\": {user.IdUsuario}\n}}";
-                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-
-                // Hacer la solicitud
-                HttpResponseMessage response = await client.PostAsync(url, content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonResponse = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show("Solicitud de amistad enviada correctamente.");
-                }
-                else
-                {
-                    string errorResponse = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show($"Error del servidor: {errorResponse} (Código: {response.StatusCode})");
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                MessageBox.Show($"Error de red: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error inesperado: {ex.Message}");
-            }
-
-        }
-
-        // TODO - Comprobar errores
-        private SolicitudAmistad GetUsuarioPorCodigoDeAmigo(String friendCode)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(friendCode))
-                {
-                    return null;
-                }
-                var url = $"http://" + ventanaPrincipal.IP + $":50000/users/friend_code/{friendCode}";
-                using (var webClient = new WebClient())
-                {
-                    string jsonString;
-                    try
-                    {
-                        jsonString = webClient.DownloadString(url);
-                    }
-                    catch (WebException ex)
-                    {
-                        // El mensaje de la excepcion ya salta en el siguiente metodo
-                        return null;
-                    }
-
-                    var jsonObj = JObject.Parse(jsonString);
-                    var usuarioJson = jsonObj["usuario"];
-
-                    int id_usuario = (int)usuarioJson["id_usuario"];
-                    string nombre_usuario = (string)usuarioJson["nombre_usuario"];
-                    return new SolicitudAmistad(id_usuario, nombre_usuario);
-                }
-            }
-            catch 
-            {
-                return null;
-            }
         }
     }
 }
