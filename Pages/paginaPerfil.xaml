@@ -11,9 +11,9 @@
     <Page.Resources>
         <!--ESTILO PARA EL BOTON DE AMIGOS-->
         <Style x:Key="MinimalButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="#4A5568"/>
-            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Background" Value="#FF4A4A4A"/>
+            <Setter Property="BorderBrush" Value="#FF5A5A5A"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Medium"/>
             <Setter Property="Template">
@@ -23,126 +23,367 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8">
+                            CornerRadius="6">
                             <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           Margin="{TemplateBinding Padding}"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="#00C7FE"/>
-                                <Setter TargetName="border" Property="Background" Value="#1A2835"/>
+                                <Setter TargetName="border" Property="Background" Value="#FF5A5A5A"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <!--ESTILO PARA EL BOTON DE EDITAR USER-->
         <Style x:Key="EditButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="#FF4A4A4A"/>
+            <Setter Property="BorderBrush" Value="#FF6A6A6A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="White"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="border" 
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="6"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <!--EFECTO HOVER-->
-                                <Setter TargetName="border" Property="Background" Value="#1A2835"/>
-                                <Setter Property="Foreground" Value="#00C7FE"/>
-
-                                <Setter TargetName="border" Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect BlurRadius="12" Opacity="0.2" ShadowDepth="3" Color="#00C7FE"/>
-                                    </Setter.Value>
-                                </Setter>
+                                <Setter TargetName="border" Property="Background" Value="#FF5A5A5A"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!--ESTILO PARA EL BOTON DE CAMBIAR FOTO-->
+        <Style x:Key="CambiarFotoButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FF4A4A4A"/>
+            <Setter Property="BorderBrush" Value="#FF6A6A6A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FF5A5A5A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--ESTILO PARA LAS CARATULAS DE JUEGOS CON ANIMACION ROJA-->
+        <Style x:Key="GameCoverStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF1E1E1E"/>
+            <Setter Property="BorderBrush" Value="#FF4A4A4A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" 
+                                               To="1.05" Duration="0:0:0.2">
+                                    <DoubleAnimation.EasingFunction>
+                                        <QuadraticEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" 
+                                               To="1.05" Duration="0:0:0.2">
+                                    <DoubleAnimation.EasingFunction>
+                                        <QuadraticEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <!--CAMBIO A COLOR ROJO COMO LOS BOTONES DE ARRIBA-->
+                                <ColorAnimation Storyboard.TargetProperty="BorderBrush.Color" 
+                                              To="#FFDC143C" Duration="0:0:0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" 
+                                               To="1" Duration="0:0:0.2">
+                                    <DoubleAnimation.EasingFunction>
+                                        <QuadraticEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" 
+                                               To="1" Duration="0:0:0.2">
+                                    <DoubleAnimation.EasingFunction>
+                                        <QuadraticEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <ColorAnimation Storyboard.TargetProperty="BorderBrush.Color" 
+                                              To="#FF4A4A4A" Duration="0:0:0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Page.Resources>
 
-    <Grid Background="Transparent">
-        
-        <!--GRID CENTRAR PARA LA INFO DEL USER-->
-        <Grid Name="gridCnetral" HorizontalAlignment="Center" Width="1150" Margin="50">
+    <Grid Background="#FF2D2D30">
 
-            
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            
-            <!--PARTE PARA LA IMAGEN DEL USER-->
-            <Image Name="imagenUser" Grid.Column="0" Grid.Row="0"/>
+        <!--SCROLL VIEWER PARA EVITAR CORTES-->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 
-            <!--PARTE PARA EL NOMBRE DEL USUARIO, NOMBRE DE PERFIL, AMIGOS Y BOTON DE EDITAR PERFIL-->
-            <StackPanel Name="gridInfoUser" Grid.Column="1" Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center">
-                <!--PARA EL NOMBRE DE USUARIO Y EL BOTON DE EDITAR USER-->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Name="nombreUser" Grid.Column="0" Text="Nombre_Usuario" FontWeight="Bold" FontSize="46"/>
+            <!--CONTENEDOR CENTRADO CON ANCHO MAXIMO MAS AMPLIO-->
+            <Grid HorizontalAlignment="Center" MaxWidth="1100" MinWidth="800" Margin="30,20">
 
-                    <Button Grid.Column="1" Margin="15,0,20,0" Padding="5" Style="{StaticResource MinimalButtonStyle}" Height="35">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="Editar perfil" Foreground="#A0AEC0" VerticalAlignment="Center" Margin="5,0,10,0"/>
-                                
-                                <Path Data="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                                      Fill="#A0AEC0"
-                                      Stretch="Uniform"
-                                      Width="24"
-                                      VerticalAlignment="Center"/>
-                                
+                <!--CONTENEDOR PRINCIPAL CON FONDO OSCURO-->
+                <Border Background="#FF3E3E42" CornerRadius="8" Padding="30">
+
+                    <!--GRID PRINCIPAL CON FILAS DEFINIDAS-->
+                    <Grid Name="gridCentral">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!--FILA SUPERIOR - PERFIL DEL USUARIO-->
+                        <Grid Grid.Row="0" Margin="0,0,0,30">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!--COLUMNA IZQUIERDA - IMAGEN Y BOTON CAMBIAR FOTO-->
+                            <StackPanel Grid.Column="0" Margin="0,0,30,0" VerticalAlignment="Top">
+                                <!--IMAGEN DEL USER-->
+                                <Border Background="#FF1E1E1E" CornerRadius="4" Margin="0,0,0,15"
+                                        Width="180" Height="180">
+                                    <Image Name="imagenUser" Stretch="UniformToFill"/>
+                                </Border>
+
+                                <!--BOTON CAMBIAR FOTO-->
+                                <Button Content="Cambiar foto" 
+                                        x:Name="btnSubirImagen" 
+                                        Style="{StaticResource CambiarFotoButtonStyle}"
+                                        Padding="12,6"
+                                        HorizontalAlignment="Center"
+                                        Click="btnSubirImagen_Click_1"/>
                             </StackPanel>
-                        </Button.Content>
-                    </Button>
-                </Grid>
-                
-                <!--PARA EL NOMBRE DE CUENTA-->
-                <TextBlock Name="nombreCuenta" Text="user_129" FontWeight="Light" FontSize="22"/>
-                
-                <!--PARA EL BOTON DE AMIGOS-->
-                <Button Margin="0,10,0,0" Padding="25,15" HorizontalAlignment="Left" Style="{StaticResource MinimalButtonStyle}" Cursor="Hand">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <!--ICONO DE LOS AMIGOS-->
-                        <Path Data="M12 4C13.0609 4 14.0783 4.42143 14.8284 5.17157C15.5786 5.92172 16 6.93913 16 8C16 9.06087 15.5786 10.0783 14.8284 10.8284C14.0783 11.5786 13.0609 12 12 12C10.9391 12 9.92172 11.5786 9.17157 10.8284C8.42143 10.0783 8 9.06087 8 8C8 6.93913 8.42143 5.92172 9.17157 5.17157C9.92172 4.42143 10.9391 4 12 4ZM12 14C16.42 14 20 15.79 20 18V20H4V18C4 15.79 7.58 14 12 14Z" 
-                              Fill="#CBD5E0" Stretch="Uniform" Width="28" Margin="0,0,12,0"/>
-                        
-                        <TextBlock Text="Amigos · " FontSize="18" Foreground="#CBD5E0" VerticalAlignment="Center"/>
-                        <TextBlock Name="txtNumeroAmigos" Text="127" FontSize="18" Foreground="#CBD5E0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
 
-                <!--PARA LA DESCRIPCCION DE LA CUENTA-->
-                <TextBlock Name="txtBiografia" Text="BIOGRAFIA:" FontSize="17" Margin="0,10,0,0"/>
-                <TextBlock Name="descripccionCuenta" FontWeight="Light" FontSize="14"  TextWrapping="Wrap"
-                           Text="Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...
-                           Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...
-                           Esto es una descripccion...Esto es una descripccion...Esto es una descripccion...Esto es una descripccion..."/>
+                            <!--COLUMNA DERECHA - INFO DEL USUARIO-->
+                            <StackPanel Name="gridInfoUser" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top">
 
-            </StackPanel>
-            <Button Content="Cambiar foto" x:Name="btnSubirImagen" HorizontalAlignment="Left" Margin="180,0,0,0" Grid.Row="1" VerticalAlignment="Top" Click="btnSubirImagen_Click_1"/>
+                                <!--HEADER CON NOMBRE Y BOTON EDITAR-->
+                                <Grid Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-        </Grid>
-        
+                                    <!--NOMBRES DE USUARIO-->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Name="nombreUser" 
+                                                   Text="ruben7" 
+                                                   Foreground="White" 
+                                                   FontWeight="Bold" 
+                                                   FontSize="32" 
+                                                   Margin="0,0,0,5"/>
+                                        <TextBlock Name="nombreCuenta" 
+                                                   Text="ruben7" 
+                                                   Foreground="#FFAAAAAA" 
+                                                   FontWeight="Light" 
+                                                   FontSize="16"/>
+                                    </StackPanel>
+
+                                    <!--BOTON EDITAR PERFIL-->
+                                    <Button Grid.Column="1" 
+                                            Style="{StaticResource EditButtonStyle}"
+                                            Padding="10,6"
+                                            VerticalAlignment="Top">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="✏" Foreground="White" FontSize="12" Margin="0,0,5,0"/>
+                                            <TextBlock Text="Editar perfil" Foreground="White" FontSize="12"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+
+                                <!--BOTON DE AMIGOS-->
+                                <Button Margin="0,0,0,20" 
+                                        Padding="15,8" 
+                                        HorizontalAlignment="Left" 
+                                        Style="{StaticResource MinimalButtonStyle}" 
+                                        Cursor="Hand">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="👤" FontSize="16" Foreground="White" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Amigos • " FontSize="14" Foreground="White" VerticalAlignment="Center"/>
+                                        <TextBlock Name="txtNumeroAmigos" Text="127" FontSize="14" Foreground="White" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <!--BIOGRAFIA-->
+                                <StackPanel>
+                                    <TextBlock Name="txtBiografia" 
+                                               Text="BIOGRAFÍA:" 
+                                               Foreground="White" 
+                                               FontWeight="Bold" 
+                                               FontSize="14" 
+                                               Margin="0,0,0,8"/>
+
+                                    <Border Background="#FF1E1E1E" 
+                                            BorderBrush="#FF4A4A4A" 
+                                            BorderThickness="1" 
+                                            CornerRadius="4" 
+                                            MinHeight="70"
+                                            Padding="15">
+                                        <TextBlock Name="descripccionCuenta" 
+                                                   Text="probando" 
+                                                   Foreground="White" 
+                                                   FontWeight="Light" 
+                                                   FontSize="14" 
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Top"/>
+                                    </Border>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </Grid>
+
+                        <!--FILA INFERIOR - SECCION DE JUEGOS-->
+                        <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                            <!--SEPARADOR-->
+                            <Border Height="1" Background="#FF4A4A4A" Margin="0,0,0,25"/>
+
+                            <!--TITULO DE LA SECCION-->
+                            <TextBlock Text="3 últimos juegos comprados" 
+                                       Foreground="White" 
+                                       FontSize="18" 
+                                       FontWeight="Bold" 
+                                       HorizontalAlignment="Center" 
+                                       Margin="0,0,0,25"/>
+
+                            <!--CONTENEDOR DE LAS CARATULAS CON WRAP PANEL PARA RESPONSIVIDAD-->
+                            <WrapPanel HorizontalAlignment="Center" Orientation="Horizontal">
+
+                                <!--JUEGO 1-->
+                                <Border Style="{StaticResource GameCoverStyle}" 
+                                        Width="150" Height="200" 
+                                        Margin="15">
+                                    <Grid>
+                                        <Image Name="caratulaJuego1" 
+                                               Stretch="UniformToFill"
+                                               />
+
+                                        <!--OVERLAY PARA INFO DEL JUEGO-->
+                                        <Border Background="#AA000000" 
+                                                VerticalAlignment="Bottom"
+                                                Padding="10,6">
+                                            <StackPanel>
+                                                <TextBlock Name="nombreJuego1" 
+                                                           Text="Assassin's Creed" 
+                                                           Foreground="White" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="11"
+                                                           TextWrapping="Wrap"/>
+                                                <TextBlock Name="fechaJuego1" 
+                                                           Text="Comprado: 15/01/2024" 
+                                                           Foreground="#FFCCCCCC" 
+                                                           FontSize="9"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!--JUEGO 2-->
+                                <Border Style="{StaticResource GameCoverStyle}" 
+                                        Width="150" Height="200" 
+                                        Margin="15">
+                                    <Grid>
+                                        <Image Name="caratulaJuego2" 
+                                               Stretch="UniformToFill"
+                                               />
+
+                                        <Border Background="#AA000000" 
+                                                VerticalAlignment="Bottom"
+                                                Padding="10,6">
+                                            <StackPanel>
+                                                <TextBlock Name="nombreJuego2" 
+                                                           Text="Cyberpunk 2077" 
+                                                           Foreground="White" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="11"
+                                                           TextWrapping="Wrap"/>
+                                                <TextBlock Name="fechaJuego2" 
+                                                           Text="Comprado: 10/01/2024" 
+                                                           Foreground="#FFCCCCCC" 
+                                                           FontSize="9"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!--JUEGO 3-->
+                                <Border Style="{StaticResource GameCoverStyle}" 
+                                        Width="150" Height="200" 
+                                        Margin="15">
+                                    <Grid>
+                                        <Image Name="caratulaJuego3" 
+                                               Stretch="UniformToFill"
+                                               />
+
+                                        <Border Background="#AA000000" 
+                                                VerticalAlignment="Bottom"
+                                                Padding="10,6">
+                                            <StackPanel>
+                                                <TextBlock Name="nombreJuego3" 
+                                                           Text="The Witcher 3" 
+                                                           Foreground="White" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="11"
+                                                           TextWrapping="Wrap"/>
+                                                <TextBlock Name="fechaJuego3" 
+                                                           Text="Comprado: 05/01/2024" 
+                                                           Foreground="#FFCCCCCC" 
+                                                           FontSize="9"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                            </WrapPanel>
+                        </StackPanel>
+
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+
     </Grid>
 </Page>
