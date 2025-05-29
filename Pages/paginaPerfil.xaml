@@ -342,7 +342,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid Background="#FF2D2D30">
+    <Grid Name="RootGrid" Background="#FF2D2D30">
 
         <!--SCROLL VIEWER PARA EVITAR CORTES-->
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
@@ -483,7 +483,9 @@
                                         Margin="35">
                                     <Grid ClipToBounds="True">
                                         <Image Name="caratulaJuego1" 
-                                               Stretch="Uniform"/>
+                                               Stretch="Uniform"
+                                               MouseEnter="CaratulaJuego_MouseEnter"
+                                               />
 
                                         <!--OVERLAY PARA INFO DEL JUEGO-->
                                         <Border Background="#AA000000" 
@@ -512,7 +514,9 @@
                                         Margin="35">
                                     <Grid ClipToBounds="True">
                                         <Image Name="caratulaJuego2" 
-                                               Stretch="Uniform"/>
+                                               Stretch="Uniform"
+                                               MouseEnter="CaratulaJuego_MouseEnter"
+                                               />
 
                                         <Border Background="#AA000000" 
                                                 VerticalAlignment="Bottom"
@@ -539,8 +543,10 @@
                                 <Border Style="{StaticResource GameCoverLargeStyle}" 
                                         Margin="35">
                                     <Grid ClipToBounds="True">
-                                        <Image Name="caratulaJuego3" 
-                                               Stretch="Uniform"/>
+                                        <Image x:Name="caratulaJuego3" 
+                                               Stretch="Uniform"
+                                               MouseEnter="CaratulaJuego_MouseEnter"
+                                               />
 
                                         <Border Background="#AA000000" 
                                                 VerticalAlignment="Bottom"
@@ -573,4 +579,3 @@
 
     </Grid>
 </Page>
-

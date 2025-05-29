@@ -236,17 +236,18 @@ namespace Cliente_TFG.Pages
         {
             try
             {
-                string url = "http://" + ventanaPrincipal.IP + ":50000/library/5/ultimos_juegos";
+                int idUsuario = ventanaPrincipal.user.IdUsuario;
+                string url = $"http://{ventanaPrincipal.IP}:50000/library/{idUsuario}/ultimos_juegos";
 
                 using (HttpClient client = new HttpClient())
                 {
                     var response = await client.GetStringAsync(url);
                     JObject json = JObject.Parse(response);
-                    var juegos = json["ultimas_compras"];
+                    var juegosJson = json["ultimas_compras"];
 
-                    if (juegos != null)
+                    if (juegosJson != null)
                     {
-                        // Agrupamos los controles en una lista
+                        // Controles en la interfaz gráfica
                         var juegosUI = new List<(Image caratula, TextBlock nombre, TextBlock fecha)>
                 {
                     (caratulaJuego1, nombreJuego1, fechaJuego1),
@@ -254,24 +255,38 @@ namespace Cliente_TFG.Pages
                     (caratulaJuego3, nombreJuego3, fechaJuego3)
                 };
 
-                        for (int i = 0; i < Math.Min(juegosUI.Count, juegos.Count()); i++)
+                        // Crear lista de objetos Juego
+                        List<Juego> juegos = new List<Juego>();
+                        foreach (var item in juegosJson)
                         {
-                            var juego = juegos[i];
-                            int appId = juego["app_id"].Value<int>();
-                            string nombre = juego["nombre"].Value<string>();
-                            string fechaCompra = juego["fecha_compra"].Value<string>();
+                            juegos.Add(new Juego
+                            {
+                                AppId = item["app_id"].Value<int>(),
+                                Nombre = item["nombre"].Value<string>(),
+                                FechaCompra = DateTime.Parse(item["fecha_compra"].Value<string>())
+                            });
+                        }
 
-                            string imagenUrl = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appId}/library_600x900.jpg";
+                        // Cargar datos en UI
+                        for (int i = 0; i < Math.Min(juegos.Count, juegosUI.Count); i++)
+                        {
+                            Juego juego = juegos[i];
 
                             BitmapImage bitmap = new BitmapImage();
                             bitmap.BeginInit();
-                            bitmap.UriSource = new Uri(imagenUrl, UriKind.Absolute);
+                            bitmap.UriSource = new Uri(juego.UrlCaratula, UriKind.Absolute);
                             bitmap.CacheOption = BitmapCacheOption.OnLoad;
                             bitmap.EndInit();
 
                             juegosUI[i].caratula.Source = bitmap;
-                            juegosUI[i].nombre.Text = nombre;
-                            juegosUI[i].fecha.Text = $"Comprado: {DateTime.Parse(fechaCompra).ToString("dd/MM/yyyy")}";
+                            juegosUI[i].caratula.Tag = juego;
+
+                            // ⚠️ Añadir los eventos aquí:
+                            juegosUI[i].caratula.MouseEnter += CaratulaJuego_MouseEnter;
+                            //juegosUI[i].caratula.MouseLeave += CaratulaJuego_MouseLeave;
+
+                            juegosUI[i].nombre.Text = juego.Nombre;
+                            juegosUI[i].fecha.Text = $"Comprado: {juego.FechaCompra:dd/MM/yyyy}";
                         }
                     }
                 }
@@ -282,8 +297,46 @@ namespace Cliente_TFG.Pages
             }
         }
 
+        private void CaratulaJuego_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Image imagen && imagen.Tag is Juego juego)
+            {
+                string ruta = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "ClienteTFG", "imagenes", $"{juego.AppId}_fondo.jpg");
 
+                CambiarFondo(ruta);
+            }
+        }
+
+        //private void CaratulaJuego_MouseLeave(object sender, MouseEventArgs e)
+        //{
+        //    // Fondo original
+        //    RootGrid.Background = new SolidColorBrush(Color.FromRgb(45, 45, 48));
+        //}
+
+        private void CambiarFondo(string ruta)
+        {
+            if (File.Exists(ruta))
+            {
+                ImageBrush brush = new ImageBrush
+                {
+                    ImageSource = new BitmapImage(new Uri(ruta, UriKind.Absolute)),
+                    Stretch = Stretch.UniformToFill,
+                    Opacity = 0.4 // Ajusta si quieres efecto sutil
+                };
+                RootGrid.Background = brush;
+            }
+        }
+
+        public class Juego
+        {
+            public string Nombre { get; set; }
+            public int AppId { get; set; }
+            public DateTime FechaCompra { get; set; }
+
+            public string UrlCaratula => $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{AppId}/library_600x900.jpg";
+        }
     }
 }
-
 
