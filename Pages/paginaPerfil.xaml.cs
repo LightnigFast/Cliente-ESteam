@@ -35,8 +35,11 @@ namespace Cliente_TFG.Pages
             InitializeComponent();
             this.ventanaPrincipal = ventanaPrincipal;
             this.Loaded += Page_Loaded;
-            cargarTemas();
 
+            // Config responsive
+            //SetupResponsiveHandlers();
+
+            cargarTemas();
             cargarDatosUser();
         }
 
@@ -226,5 +229,41 @@ namespace Cliente_TFG.Pages
                 }
             }
         }
+
+
+        // Metodos GRID
+
+        // Agregar este método a tu clase paginaPerfil
+        //private void AdjustGameCoverSizes()
+        //{
+        //    if (gridCentral.ActualWidth > 1000)
+        //    {
+        //        // Pantalla grande - carátulas grandes
+        //        gameCover1.Style = (Style)FindResource("GameCoverLargeStyle");
+        //        gameCover2.Style = (Style)FindResource("GameCoverLargeStyle");
+        //        gameCover3.Style = (Style)FindResource("GameCoverLargeStyle");
+        //    }
+        //    else if (gridCentral.ActualWidth > 700)
+        //    {
+        //        // Pantalla mediana - carátulas medianas
+        //        gameCover1.Style = (Style)FindResource("GameCoverMediumStyle");
+        //        gameCover2.Style = (Style)FindResource("GameCoverMediumStyle");
+        //        gameCover3.Style = (Style)FindResource("GameCoverMediumStyle");
+        //    }
+        //    else
+        //    {
+        //        // Pantalla pequeña - carátulas pequeñas
+        //        gameCover1.Style = (Style)FindResource("GameCoverSmallStyle");
+        //        gameCover2.Style = (Style)FindResource("GameCoverSmallStyle");
+        //        gameCover3.Style = (Style)FindResource("GameCoverSmallStyle");
+        //    }
+        //}
+
+        //// Agregar este evento al constructor después de InitializeComponent()
+        //private void SetupResponsiveHandlers()
+        //{
+        //    this.SizeChanged += (s, e) => AdjustGameCoverSizes();
+        //    gridCentral.SizeChanged += (s, e) => AdjustGameCoverSizes();
+        //}
     }
 }
