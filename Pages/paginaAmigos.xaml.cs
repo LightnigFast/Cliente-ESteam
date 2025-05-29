@@ -490,6 +490,11 @@ namespace Cliente_TFG.Pages
         private void btnEnviarSolicitud_Click(object sender, RoutedEventArgs e)
         {
             String friendCodeABuscar = txtBuscarAmigos.Text;
+            if (String.IsNullOrEmpty(friendCodeABuscar)) 
+            {
+                MessageBox.Show("Tienes que rellenar el campo con el código de amigo del usuario al que quieres agregar");
+                return;
+            }
             SolicitudAmistad user = GetUsuarioPorCodigoDeAmigo(friendCodeABuscar);
             if (user == null)
             {
@@ -548,17 +553,37 @@ namespace Cliente_TFG.Pages
         // TODO - Comprobar errores
         private SolicitudAmistad GetUsuarioPorCodigoDeAmigo(String friendCode)
         {
-            var url = $"http://" + ventanaPrincipal.IP + $":50000/users/friend_code/{friendCode}";
-            using (var webClient = new WebClient())
+            try
             {
-                string jsonString = webClient.DownloadString(url);
+                if (string.IsNullOrEmpty(friendCode))
+                {
+                    return null;
+                }
+                var url = $"http://" + ventanaPrincipal.IP + $":50000/users/friend_code/{friendCode}";
+                using (var webClient = new WebClient())
+                {
+                    string jsonString;
+                    try
+                    {
+                        jsonString = webClient.DownloadString(url);
+                    }
+                    catch (WebException ex)
+                    {
+                        // El mensaje de la excepcion ya salta en el siguiente metodo
+                        return null;
+                    }
 
-                var jsonObj = JObject.Parse(jsonString);
-                var usuarioJson = jsonObj["usuario"];
+                    var jsonObj = JObject.Parse(jsonString);
+                    var usuarioJson = jsonObj["usuario"];
 
-                int id_usuario = (int)usuarioJson["id_usuario"];
-                string nombre_usuario = (string)usuarioJson["nombre_usuario"];
-                return new SolicitudAmistad(id_usuario, nombre_usuario);
+                    int id_usuario = (int)usuarioJson["id_usuario"];
+                    string nombre_usuario = (string)usuarioJson["nombre_usuario"];
+                    return new SolicitudAmistad(id_usuario, nombre_usuario);
+                }
+            }
+            catch 
+            {
+                return null;
             }
         }
     }
