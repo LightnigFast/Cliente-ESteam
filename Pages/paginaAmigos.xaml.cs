@@ -27,11 +27,24 @@ namespace Cliente_TFG.Pages
             InitializeComponent();
             ventanaPrincipal = mainWindow;
 
+            InicializarDatosReales();
+
             // Inicializar datos de ejemplo
             InicializarDatosEjemplo();
 
             // Aplicar colores del tema actual
             AplicarTemaActual();
+        }
+
+        private void InicializarDatosReales()
+        {
+            if (ventanaPrincipal.Usuario.codigo_amigo != null)
+            {
+                txtIdAmigoUsuarioActual.Text = ventanaPrincipal.Usuario.codigo_amigo;
+            } else
+            {
+                txtIdAmigoUsuarioActual.Text = "No tienes codigo de amigo";
+            }
         }
 
         private void AplicarTemaActual()
@@ -449,6 +462,12 @@ namespace Cliente_TFG.Pages
             Ausente,
             Ocupado,
             Desconectado
+        }
+
+        private void btnCopiarIdAmigo_Click(object sender, RoutedEventArgs e)
+        {
+            String output = txtIdAmigoUsuarioActual.Text;
+            System.Windows.Clipboard.SetText(output);
         }
     }
 }

@@ -10,6 +10,43 @@
       Title="paginaAmigos">
 
     <Page.Resources>
+        <!-- Estilo del boton de copiar el codigo de amigo-->
+        <Style x:Key="BotonCopiarStyle" TargetType="Button">
+            <Setter Property="Background" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
+            <Setter Property="BorderBrush" Value="#00707070"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.1" ScaleY="1.1"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <!-- Estilo para la barra de búsqueda -->
         <Style x:Key="DarkMinimalistSearchBox" TargetType="TextBox">
             <Setter Property="Background" Value="{Binding FondoPanel, Source={StaticResource AppTheme}}"/>
@@ -393,20 +430,38 @@
                 <StackPanel Grid.Row="2" Margin="10">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Tu ID de amigo: " 
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Tu codigo de amigo" 
                                    Grid.Column="0"
+                                   Grid.Row="0"
                                    Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
                                    FontSize="12" 
-                                   Margin="0,0,0,5"/>
+                                   Margin="20,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                        <Button x:Name="btnCopiarIdAmigo" 
+                                    Width="30" 
+                                    Style="{StaticResource BotonCopiarStyle}"
+                                    Background="{Binding FondoPanel, Source={StaticResource AppTheme}}"
+                                    BorderThickness="1"
+                                    Grid.Column="1"
+                                    Cursor="Hand"
+                                    ToolTip="Copiar al portapapeles" BorderBrush="#00707070" Click="btnCopiarIdAmigo_Click" Grid.RowSpan="2">
+                            <Path Data="M16,1H4C2.9,1,2,1.9,2,3V17H4V3H16V1Z M19,5H8C6.9,5,6,5.9,6,7V21C6,22.1,6.9,23,8,23H19C20.1,23,21,22.1,21,21V7C21,5.9,20.1,5,19,5Z M19,21H8V7H19V21Z"
+                                      Fill="{Binding BordePanel, Source={StaticResource AppTheme}}"
+                                      Stretch="Uniform"/>
+                        </Button>
+
                         <TextBlock x:Name="txtIdAmigoUsuarioActual"
-                                   Text="001" 
-                                   Grid.Column="1"
-                                   Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
-                                   FontSize="12" 
-                                   Margin="0,0,0,5"/>
+                                       Text="SG5698DSG6756SD4G67SDG" 
+                                        Grid.Row="1"
+                                       Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
+                                       FontSize="12" 
+                                       Margin="20,0,0,5" HorizontalAlignment="Center"/>
                     </Grid>
                     <Grid>
                         <TextBox x:Name="txtBuscarAmigos" 
@@ -454,17 +509,18 @@
                             </TextBox.Resources>
                         </TextBox>
                         <Button x:Name="btnEnviar" 
-                            Content="▶" 
+                            Content="▶"
+                            Style="{StaticResource BotonCopiarStyle}"
                             Width="40" 
                             Height="30" 
                             HorizontalAlignment="Right" 
                             VerticalAlignment="Center" 
                             Margin="0,0,5,0" 
                             Background="Transparent" 
-                            BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
+                            BorderThickness="0"
                             Foreground="{Binding BordePanel, Source={StaticResource AppTheme}}" 
                             Click="btnEnviar_Click" 
-                            Cursor="Hand"/>
+                            Cursor="Hand" FontSize="18"/>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -567,16 +623,16 @@
                     </TextBlock>
                     <Button x:Name="btnBuscarAmigo" 
                             Content="▶" 
+                            Style="{StaticResource BotonCopiarStyle}"
                             Width="40" 
                             Height="30" 
                             HorizontalAlignment="Right" 
                             VerticalAlignment="Center" 
                             Margin="0,0,5,0" 
                             Background="Transparent" 
-                            BorderBrush="{Binding BordePanel, Source={StaticResource AppTheme}}" 
                             Foreground="{Binding BordePanel, Source={StaticResource AppTheme}}" 
                             Click="btnEnviar_Click" 
-                            Cursor="Hand"/>
+                            Cursor="Hand" FontSize="18"/>
                 </Grid>
             </Grid>
         </Border>
