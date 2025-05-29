@@ -16,6 +16,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cliente_TFG.Classes;
 using Newtonsoft.Json;
 using static System.Net.WebRequestMethods;
 namespace Cliente_TFG.Pages
@@ -32,31 +33,29 @@ namespace Cliente_TFG.Pages
         private string[] Nombres;
 
         //PARA EL FONDO
-        private List<string> imagenesFondo = new List<string>();
-        private List<string> imagenesLogos = new List<string>();
+        private List<BitmapImage> imagenesFondo = new List<BitmapImage>();
+        private List<BitmapImage> imagenesLogos = new List<BitmapImage>();
+        private List<BitmapImage> imagenVerticalJuegos = new List<BitmapImage>();
 
         //PARA LOS DEMAS JUEGOS DE LA BIBLIOTECA
-        private List<string> imagenVerticalJuegos = new List<string>();
 
         public paginaBiblioteca(MainWindow ventanaPrincipal)
         {
             InitializeComponent();
             this.ventanaPrincipal = ventanaPrincipal;
 
-            //CARGAR DATOS DE PRUEBA
-            //CargarDatosDePrueba();
-
-            //CARGAR DATOS DEL JSON
             this.Loaded += async (s, e) =>
             {
                 borrarDatos();
-                await CargarDatosJson();
 
-                //PARA EL FONDO
-                CargarImagenesFondo();
+
+                CargarDatosJson();
+
+
+                await CargarImagenesFondo();
             };
-
         }
+
 
         //METODO PARA BORRAR LOS DATOS CUANDO VUELVAS ATRAS (SI NO SE HACE, SE DUPLICAN LOS JUEGOS)
         private void borrarDatos()
@@ -69,41 +68,37 @@ namespace Cliente_TFG.Pages
             panelJuegosBiblioteca.Children.Clear();
         }
 
-        private async Task CargarDatosJson()
+        private void CargarDatosJson()
         {
-            using (HttpClient client = new HttpClient())
+            try
             {
-               
+                // Cargar la biblioteca local (lista de appids)
+                List<int> listaAppids = LocalStorage.CargarBiblioteca();
 
-                try
+                if (listaAppids == null || listaAppids.Count == 0)
                 {
-                    string json = await client.GetStringAsync("http://" + ventanaPrincipal.IP + ":50000/library/" + ventanaPrincipal.Usuario.IdUsuario);
-                    var response = JsonConvert.DeserializeObject<BibliotecaResponse>(json);
-                        
-                    List<string> listaAppids = new List<string>();
-                    List<string> listaNombres = new List<string>();
-
-                    foreach (var juego in response.juegos)
-                    {
-                        string id = juego.app_id.ToString();
-
-                        if (!listaAppids.Contains(id))
-                        {
-                            listaAppids.Add(id);
-                            listaNombres.Add(juego.nombre);
-                        }
-                    }
-
-                    appids = listaAppids.ToArray();
-                    Nombres = listaNombres.ToArray();
-
+                    Console.WriteLine("No hay juegos en la biblioteca local.");
+                    appids = new string[0];
+                    Nombres = new string[0]; // si quieres nombres tendrás que obtenerlos de otro sitio
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("ERROR AL CARGAR LA BIBLIOTECA: " + ex.Message);
-                }
+
+                // Convertir a string[]
+                appids = listaAppids.Select(id => id.ToString()).ToArray();
+
+                // Como no tienes nombres en el JSON, simplemente rellena Nombres con valores vacíos o iguales a appids
+                Nombres = appids.Select(id => $"Juego {id}").ToArray();
+
+                Console.WriteLine($"Se cargaron {appids.Length} appids desde biblioteca local.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR AL CARGAR LA BIBLIOTECA LOCAL: " + ex.Message);
+                appids = new string[0];
+                Nombres = new string[0];
             }
         }
+
 
 
         public class Juego
@@ -177,68 +172,96 @@ namespace Cliente_TFG.Pages
 
 
         //METODO PARA CARGAR LAS IMAGENES DE FONDO DE LA INTERFAZ
-        private void CargarImagenesFondo()
+        private async Task CargarImagenesFondo()
         {
+
+            imagenesFondo.Clear();
+            imagenesLogos.Clear();
+            imagenVerticalJuegos.Clear();
+
             foreach (var appidJuego in appids)
             {
-                //IMAGEN FONDO
-                string imagenFondo = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/library_hero.jpg";
-                imagenesFondo.Add(imagenFondo);
+                string nombreFondo = $"{appidJuego}_fondo.jpg";
+                string urlFondo = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/library_hero.jpg";
+                var imagenFondo = await ObtenerImagenAsync(urlFondo, nombreFondo);
+                if (imagenFondo != null)
+                    imagenesFondo.Add(imagenFondo);
 
-                //IMAGEN LOGO
-                string iamgenLogo = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/logo.png";
-                imagenesLogos.Add(iamgenLogo);
+                string nombreLogo = $"{appidJuego}_logo.png";
+                string urlLogo = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/logo.png";
+                var imagenLogo = await ObtenerImagenAsync(urlLogo, nombreLogo);
+                if (imagenLogo != null)
+                    imagenesLogos.Add(imagenLogo);
 
-                //IMAGEN VERTICAL PARA LA BIBLIOTECA
-                string iamgenVerticalJuego = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/library_600x900.jpg";
-                imagenVerticalJuegos.Add(iamgenVerticalJuego);
+                string nombreVertical = $"{appidJuego}_vertical.jpg";
+                string urlVertical = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/library_600x900.jpg";
+                var imagenVertical = await ObtenerImagenAsync(urlVertical, nombreVertical);
+                if (imagenVertical != null)
+                    imagenVerticalJuegos.Add(imagenVertical);
             }
 
             if (imagenesFondo.Count == 0)
             {
-                //CARGO UNA IMAGEN ESTATICA
-                string imagenFondov2 = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "library", "Banner_no_games_library.png");
-                imagenesFondo.Add(imagenFondov2);
-                CargarFondo();
-                //QUITO EL BOTON
-                BotonJugar.IsEnabled = false;
-                BotonJugar.Opacity = 0;
-                //PONGO EL MENSAJE DE ABAJO
-                cargarMensajeBiblioteca("Actualmente no dispones de juegos en tu biblioteca. Accede a la tienda para para comprar tu primer juego");
-                //MessageBox.Show("No se encontraron imágenes para el fondo.");
+                // Cargar imagen por defecto si no hay fondos
+                var fallbackPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "library", "Banner_no_games_library.png");
+                var fallbackImage = new BitmapImage(new Uri(fallbackPath));
+                imagenesFondo.Add(fallbackImage);
             }
-            else
+
+            CargarFondo();
+            CargarJuegosBibioteca();
+        }
+
+
+        private async Task<BitmapImage> ObtenerImagenAsync(string url, string nombreArchivo)
+        {
+            // PRIMERO INTENTA CARGAR LOCAL
+            if (LocalStorage.ExisteImagen(nombreArchivo))
             {
-                CargarFondo();
-                CargarJuegosBibioteca();
+                return LocalStorage.CargarImagenLocal(nombreArchivo);
+            }
+
+            // SI NO EXISTE LOCAL, INTENTA DESCARGAR Y GUARDAR
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    var bytes = await client.GetByteArrayAsync(url);
+                    LocalStorage.GuardarImagen(nombreArchivo, bytes);
+                    return LocalStorage.CargarImagenLocal(nombreArchivo);
+                }
+            }
+            catch
+            {
+                // SI FALLA DESCARGAR, DEVUELVE NULL
+                return null;
             }
         }
+
 
 
 
         //METODO PARA CARGAR EL FONDO
         private void CargarFondo()
         {
-            imgFondo.Source = new BitmapImage(new Uri(imagenesFondo.First(), UriKind.Absolute));
+            imgFondo.Source = imagenesFondo.First();
             imgFondo.ImageFailed += (s, e) =>
             {
                 Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appids[0]}/header.jpg");
-                imgFondo.Source = new BitmapImage((fallbackUri));
+                imgFondo.Source = new BitmapImage(fallbackUri);
             };
-
 
             if (imagenesLogos.Count != 0)
             {
-                ImagenLogo.Source = new BitmapImage(new Uri(imagenesLogos.First(), UriKind.Absolute));
-
+                ImagenLogo.Source = imagenesLogos.First();
                 ImagenLogo.ImageFailed += (s, e) =>
                 {
                     txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
                     txtFalloLogo.Text = Nombres[0];
                 };
-
             }
         }
+
 
         //METODO PARA CARGAR TODOS LOS DEMAS JUEGOS DE LA BIBLIOTECA
         private void CargarJuegosBibioteca()
@@ -255,7 +278,7 @@ namespace Cliente_TFG.Pages
 
                 Image img = new Image
                 {
-                    Source = new BitmapImage(new Uri(juegosBiblioteca)),
+                    Source = juegosBiblioteca,
                     Stretch = Stretch.Uniform,
                     Height = altura,
                     Margin = new Thickness(11),
@@ -373,8 +396,8 @@ namespace Cliente_TFG.Pages
                     imgFondo.Tag = index;
 
                     //CAMBIAMOS IMÁGENES
-                    imgFondo.Source = new BitmapImage(new Uri(imagenesFondo[index.Value], UriKind.Absolute));
-                    ImagenLogo.Source = new BitmapImage(new Uri(imagenesLogos[index.Value], UriKind.Absolute));
+                    imgFondo.Source = imagenesFondo[index.Value];
+                    ImagenLogo.Source = imagenesLogos[index.Value];
 
                     //ASIGNAMOS MANEJADORES DE NUEVO
                     imgFondo.ImageFailed += ImgFondo_ImageFailed;
@@ -428,12 +451,12 @@ namespace Cliente_TFG.Pages
                 {
                     hayCoincidencias = true;
 
-                    string juegosBiblioteca = imagenVerticalJuegos[i];
+                    BitmapImage juegosBiblioteca = imagenVerticalJuegos[i]; // ✅
                     var scale = new ScaleTransform(1.0, 1.0);
 
                     Image img = new Image
                     {
-                        Source = new BitmapImage(new Uri(juegosBiblioteca)),
+                        Source = juegosBiblioteca,
                         Stretch = Stretch.Uniform,
                         Height = 170,
                         Margin = new Thickness(11),

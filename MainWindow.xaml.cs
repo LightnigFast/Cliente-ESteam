@@ -70,17 +70,43 @@ namespace Cliente_TFG
 
             if (online)
             {
-                CargarDatosUsuario(idUser);
-                Cabecera_top.NombreUsuario = user.NombreUsuario;
-                Cabecera_top.Dinero = user.Dinero;
-                Cabecera_top.CargarDatosUsuario(user);
+                try
+                {
+                    user = new Usuario(this);
+                    user.CargarDatos(idUser); //SOLO CARGAMOS LOS DATOS SI ESTA EN MODO ONLINE
+
+                    //GUARDAMOS TODO EL LOCAL DESPUES DE LA CARGA CORRECTA
+                    LocalStorage.GuardarUsuario(user);
+                    LocalStorage.GuardarBiblioteca(user.BibliotecaJuegos);
+                }
+                catch
+                {
+                    //SI FALLA LA CARGA, PASAMOS A MODO OFFLINE AUTOMATICAMENTE Y CARGAMOS LOS DATOS GUARDADOS
+                    online = false;
+                    user = LocalStorage.CargarUsuario() ?? new Usuario(this);
+                    user.bibliotecaJuegos = LocalStorage.CargarBiblioteca();
+
+                    MessageBox.Show("No se pudo conectar al servidor. Modo offline activado.");
+                }
+            }
+            else
+            {
+                user = LocalStorage.CargarUsuario() ?? new Usuario(this);
+                user.bibliotecaJuegos = LocalStorage.CargarBiblioteca();
+
+                MessageBox.Show("Modo offline activado.");
             }
 
+            //CARGAMOS LA CABECERA Y LA PRIMERA PAGINA
+            Cabecera_top.NombreUsuario = user.NombreUsuario;
+            Cabecera_top.Dinero = user.Dinero;
+            Cabecera_top.CargarDatosUsuario(user);
 
             CargarPrimeraVentana();
+
         }
 
-        
+
 
         private void cargarTema()
         {

@@ -1,0 +1,87 @@
+﻿using System.IO;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System;
+using System.Windows.Media.Imaging;
+
+namespace Cliente_TFG.Classes
+{
+    public static class LocalStorage
+    {
+        private static string rutaUsuario = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "usuario.json");
+        private static string rutaBiblioteca = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "biblioteca.json");
+        private static string rutaImagenes = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "imagenes");
+
+
+        static LocalStorage()
+        {
+            var carpetaPrincipal = Path.GetDirectoryName(rutaUsuario);
+            Directory.CreateDirectory(carpetaPrincipal);
+            Directory.CreateDirectory(rutaImagenes); //CREAMOS LA CARPETA DE IMÁGENES
+        }
+
+
+        public static void GuardarUsuario(Usuario usuario)
+        {
+            var json = JsonConvert.SerializeObject(usuario);
+            File.WriteAllText(rutaUsuario, json);
+        }
+
+        public static Usuario CargarUsuario()
+        {
+            if (!File.Exists(rutaUsuario))
+                return null;
+
+            var json = File.ReadAllText(rutaUsuario);
+            return JsonConvert.DeserializeObject<Usuario>(json);
+        }
+
+        public static void GuardarBiblioteca(List<int> biblioteca)
+        {
+            var json = JsonConvert.SerializeObject(biblioteca);
+            File.WriteAllText(rutaBiblioteca, json);
+        }
+
+        public static List<int> CargarBiblioteca()
+        {
+            if (!File.Exists(rutaBiblioteca))
+                return new List<int>();
+
+            var json = File.ReadAllText(rutaBiblioteca);
+            return JsonConvert.DeserializeObject<List<int>>(json);
+        }
+
+
+
+        // Guardar una imagen descargada (byte[]) en disco
+        public static void GuardarImagen(string nombreArchivo, byte[] datosImagen)
+        {
+            string rutaImagen = Path.Combine(rutaImagenes, nombreArchivo);
+            File.WriteAllBytes(rutaImagen, datosImagen);
+        }
+
+        // Comprobar si la imagen existe localmente
+        public static bool ExisteImagen(string nombreArchivo)
+        {
+            string rutaImagen = Path.Combine(rutaImagenes, nombreArchivo);
+            return File.Exists(rutaImagen);
+        }
+
+        // Cargar imagen localmente y devolver como BitmapImage para WPF
+        public static BitmapImage CargarImagenLocal(string nombreArchivo)
+        {
+            string rutaImagen = Path.Combine(rutaImagenes, nombreArchivo);
+            if (!File.Exists(rutaImagen))
+                return null;
+
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.UriSource = new Uri($"file:///{rutaImagen.Replace('\\', '/')}");
+            bitmap.EndInit();
+            bitmap.Freeze(); // para usar en UI thread
+            return bitmap;
+        }
+
+    }
+}
