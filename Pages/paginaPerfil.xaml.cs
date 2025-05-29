@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace Cliente_TFG.Pages
 {
@@ -29,14 +30,16 @@ namespace Cliente_TFG.Pages
 
         //private const string URL_API = "http://26.84.183.227:50000/";
         private MainWindow ventanaPrincipal;
+        private List<string> imagenVerticalJuegos = new List<string>();
 
         public paginaPerfil(MainWindow ventanaPrincipal)
         {
             InitializeComponent();
             this.ventanaPrincipal = ventanaPrincipal;
             this.Loaded += Page_Loaded;
-          
+            CargarUltimosJuegos();
             cargarTemas();
+
             cargarDatosUser();
         }
 
@@ -83,11 +86,13 @@ namespace Cliente_TFG.Pages
             {
                 string rutaImagenLocal = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "imagenes", "default.png");
                 imagenUser.Source = new BitmapImage(new Uri(rutaImagenLocal, UriKind.Absolute));
-                //MessageBox.Show("URL de la foto inválida o vacía: " + urlImagen);
+                MessageBox.Show("URL de la foto inválida o vacía: " + urlImagen);
             }
         }
 
-       
+
+
+
 
         private async Task<string> SubirImagenAImgurAsync(string ruta)
         {
@@ -163,11 +168,8 @@ namespace Cliente_TFG.Pages
                 ventanaPrincipal.Cabecera_top.NombreUsuario = usuarioActualizado.NombreUsuario;
                 ventanaPrincipal.Cabecera_top.Dinero = usuarioActualizado.Dinero;
                 //PARA LA FOTO
-                if (usuarioActualizado.FotoPerfil != null)
-                {
-                    var uri = new Uri(usuarioActualizado.FotoPerfil, UriKind.Absolute);
-                    ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(uri);
-                }
+                var uri = new Uri(usuarioActualizado.FotoPerfil, UriKind.Absolute);
+                ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(uri);
 
                 // Refresca el UI en esta página
                 cargarDatosUser();
@@ -229,5 +231,59 @@ namespace Cliente_TFG.Pages
                 }
             }
         }
+
+        private async void CargarUltimosJuegos()
+        {
+            try
+            {
+                string url = "http://" + ventanaPrincipal.IP + ":50000/library/5/ultimos_juegos";
+
+                using (HttpClient client = new HttpClient())
+                {
+                    var response = await client.GetStringAsync(url);
+                    JObject json = JObject.Parse(response);
+                    var juegos = json["ultimas_compras"];
+
+                    if (juegos != null)
+                    {
+                        // Agrupamos los controles en una lista
+                        var juegosUI = new List<(Image caratula, TextBlock nombre, TextBlock fecha)>
+                {
+                    (caratulaJuego1, nombreJuego1, fechaJuego1),
+                    (caratulaJuego2, nombreJuego2, fechaJuego2),
+                    (caratulaJuego3, nombreJuego3, fechaJuego3)
+                };
+
+                        for (int i = 0; i < Math.Min(juegosUI.Count, juegos.Count()); i++)
+                        {
+                            var juego = juegos[i];
+                            int appId = juego["app_id"].Value<int>();
+                            string nombre = juego["nombre"].Value<string>();
+                            string fechaCompra = juego["fecha_compra"].Value<string>();
+
+                            string imagenUrl = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appId}/library_600x900.jpg";
+
+                            BitmapImage bitmap = new BitmapImage();
+                            bitmap.BeginInit();
+                            bitmap.UriSource = new Uri(imagenUrl, UriKind.Absolute);
+                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmap.EndInit();
+
+                            juegosUI[i].caratula.Source = bitmap;
+                            juegosUI[i].nombre.Text = nombre;
+                            juegosUI[i].fecha.Text = $"Comprado: {DateTime.Parse(fechaCompra).ToString("dd/MM/yyyy")}";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al cargar juegos: {ex.Message}");
+            }
+        }
+
+
     }
 }
+
+
