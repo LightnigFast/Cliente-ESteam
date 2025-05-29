@@ -376,7 +376,7 @@
                                 </Border>
 
                                 <!--BOTON CAMBIAR FOTO-->
-                                <Button Content="Cambiar foto" 
+                                <Button Content="📸Cambiar foto" 
                                         x:Name="btnSubirImagen" 
                                         Style="{StaticResource CambiarFotoButtonStyle}"
                                         Padding="15,8"
