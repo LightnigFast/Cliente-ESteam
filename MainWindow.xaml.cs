@@ -76,8 +76,7 @@ namespace Cliente_TFG
                     user.CargarDatos(idUser); //SOLO CARGAMOS LOS DATOS SI ESTA EN MODO ONLINE
 
                     //GUARDAMOS TODO EL LOCAL DESPUES DE LA CARGA CORRECTA
-                    LocalStorage.GuardarUsuario(user);
-                    LocalStorage.GuardarBiblioteca(user.BibliotecaJuegos);
+                    GuardarDatosLocal();
                 }
                 catch
                 {
@@ -106,6 +105,13 @@ namespace Cliente_TFG
 
         }
 
+
+        public void GuardarDatosLocal()
+        {
+            MessageBox.Show("hola " + user);
+            LocalStorage.GuardarUsuario(user);
+            LocalStorage.GuardarBiblioteca(user.BibliotecaJuegos);
+        }
 
 
         private void cargarTema()

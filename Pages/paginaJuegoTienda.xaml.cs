@@ -700,6 +700,7 @@ namespace Cliente_TFG.Pages
                         MessageBox.Show(resultado.Mensaje);
 
                         ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
+                        ventanaPrincipal.GuardarDatosLocal();
                         CargarBotonCompra();
 
                         return true;
@@ -708,6 +709,7 @@ namespace Cliente_TFG.Pages
                     MessageBox.Show("Compra realizada con éxito.");
 
                     ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
+                    ventanaPrincipal.GuardarDatosLocal();
                     CargarBotonCompra();
 
                     return true;
