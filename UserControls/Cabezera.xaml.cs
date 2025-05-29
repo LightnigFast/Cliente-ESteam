@@ -65,6 +65,19 @@ namespace Cliente_TFG.UserControls
             }
         }
 
+        private ImageSource _fotoPerfil;
+        public ImageSource FotoPerfil
+        {
+            get => _fotoPerfil;
+            set
+            {
+                if (_fotoPerfil != value)
+                {
+                    _fotoPerfil = value;
+                    OnPropertyChanged(nameof(FotoPerfil));
+                }
+            }
+        }
 
         public event RoutedEventHandler VerPerfilPresionado;
         public event RoutedEventHandler RecargarSaldoPresionado;
@@ -254,6 +267,24 @@ namespace Cliente_TFG.UserControls
         }
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+
+        public void CargarDatosUsuario(Usuario usuario)
+        {
+            NombreUsuario = usuario.NombreUsuario;
+            Dinero = usuario.Dinero;
+
+            try
+            {
+                var uri = new Uri(usuario.FotoPerfil, UriKind.Absolute);
+                FotoPerfil = new BitmapImage(uri);
+            }
+            catch
+            {
+                //SI LA URL NO ES VÁLIDA O DA ERROR, USAR UNA IMAGEN POR DEFECTO
+                FotoPerfil = new BitmapImage(new Uri("pack://application:,,,/res/imagenes/default_user.png"));
+            }
+        }
 
 
     }

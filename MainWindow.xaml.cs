@@ -73,6 +73,7 @@ namespace Cliente_TFG
                 CargarDatosUsuario(idUser);
                 Cabecera_top.NombreUsuario = user.NombreUsuario;
                 Cabecera_top.Dinero = user.Dinero;
+                Cabecera_top.CargarDatosUsuario(user);
             }
 
 

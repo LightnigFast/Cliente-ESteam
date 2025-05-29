@@ -245,11 +245,9 @@
                         <Border.Background>
                             <ImageBrush x:Name="marcoUser"/>
                         </Border.Background>
-                        <Ellipse Width="32" Height="32">
-                            <Ellipse.Fill>
-                                <ImageBrush x:Name="imagenUser" />
-                            </Ellipse.Fill>
-                        </Ellipse>
+                        <Border Width="32" Height="32" CornerRadius="6" ClipToBounds="True" BorderBrush="Gray" BorderThickness="1">
+                            <Image Source="{Binding FotoPerfil}" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
                     </Border>
 
                     <!--CONTENEDOR DE NOMBRE Y ESTADO-->

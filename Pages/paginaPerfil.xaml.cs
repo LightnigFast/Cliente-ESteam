@@ -162,6 +162,9 @@ namespace Cliente_TFG.Pages
                 // También actualiza la interfaz principal si tienes controles que muestran info del usuario
                 ventanaPrincipal.Cabecera_top.NombreUsuario = usuarioActualizado.NombreUsuario;
                 ventanaPrincipal.Cabecera_top.Dinero = usuarioActualizado.Dinero;
+                //PARA LA FOTO
+                var uri = new Uri(usuarioActualizado.FotoPerfil, UriKind.Absolute);
+                ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(uri);
 
                 // Refresca el UI en esta página
                 cargarDatosUser();
