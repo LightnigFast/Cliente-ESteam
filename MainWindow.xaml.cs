@@ -110,6 +110,7 @@ namespace Cliente_TFG
         {
             LocalStorage.GuardarUsuario(user);
             LocalStorage.GuardarBiblioteca(user.BibliotecaJuegos);
+            LocalStorage.GuardarBibliotecaNombreJuegos(user.bibliotecaJuegosNombres);
         }
 
 

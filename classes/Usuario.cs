@@ -24,6 +24,7 @@ namespace Cliente_TFG.Classes
         public string nombre_usuario { get; set; }
         public string token;
         public List<int> bibliotecaJuegos = new List<int>();
+        public List<string> bibliotecaJuegosNombres = new List<string>();
         private MainWindow ventanaPrincipal;
 
         public Usuario(MainWindow mainWindow)
@@ -72,6 +73,9 @@ namespace Cliente_TFG.Classes
                 {
                     int appId = (int)juego["app_id"];
                     bibliotecaJuegos.Add(appId);
+
+                    string nombreJuego = (string)juego["nombre"];
+                    bibliotecaJuegosNombres.Add(nombreJuego);
                 }
             }
         }

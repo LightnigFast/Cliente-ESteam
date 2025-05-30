@@ -41,6 +41,7 @@ namespace Cliente_TFG.Pages
 
         //PARA LOS DEMAS JUEGOS DE LA BIBLIOTECA
         private List<int> listaAppids;
+        private List<string> nombresJuegos;
         private BibliotecaResponse bibliotecaTotal = new BibliotecaResponse
         {
             juegos = new List<Juego>()
@@ -83,6 +84,7 @@ namespace Cliente_TFG.Pages
             {
                 //Cargar la biblioteca local (lista de appids)
                 listaAppids = LocalStorage.CargarBiblioteca();
+                nombresJuegos = LocalStorage.CargarBibliotecaNombreJuegos();
 
                 if (listaAppids == null || listaAppids.Count == 0)
                 {
@@ -233,7 +235,14 @@ namespace Cliente_TFG.Pages
                 string urlFondo = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/library_hero.jpg";
                 var imagenFondo = await ObtenerImagenAsync(urlFondo, nombreFondo);
                 if (imagenFondo != null)
+                {
                     imagenesFondo.Add(imagenFondo);
+                }
+                else
+                {
+                    //IMAGEN INVÁLIDA PARA FORZAR IMAGEFAILED
+                    imagenesFondo.Add(null);
+                }
 
                 string nombreLogo = $"{appidJuego}_logo.png";
                 string urlLogo = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/logo.png";
@@ -245,7 +254,6 @@ namespace Cliente_TFG.Pages
                 else
                 {
                     //IMAGEN INVÁLIDA PARA FORZAR IMAGEFAILED
-
                     imagenesLogos.Add(null);
                 }
 
@@ -318,12 +326,12 @@ namespace Cliente_TFG.Pages
 
             if (imagenesLogos.Count != 0)
             {
-                ImagenLogo.Source = imagenesLogos.First();
-                ImagenLogo.ImageFailed += (s, e) =>
+                if(imagenesLogos.First() == null)
                 {
                     txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
-                    txtFalloLogo.Text = Nombres[0];
-                };
+                    txtFalloLogo.Text = nombresJuegos[0];
+                }
+                
             }
         }
 
@@ -375,6 +383,13 @@ namespace Cliente_TFG.Pages
 
         }
 
+
+        private async Task<BitmapImage> CargarImagenFallbackFondo(string appid)
+        {
+            string nombreHeader = $"{appid}_header.jpg";
+            string urlHeader = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg";
+            return await ObtenerImagenAsync(urlHeader, nombreHeader);
+        }
 
         //METODO PARA GENERAR LA IMAGEN SI NO SE CARGA CORRECTAMENTE POR QUE NO EXISTE
         private BitmapImage GenerarImagenFallback(string appid, string nombreVertical)
@@ -608,19 +623,11 @@ namespace Cliente_TFG.Pages
         {
             if (sender is Image img && img.Tag is int idx)
             {
-                //OBTENEMOS EL ID
-                int appid = appids != null && idx < appids.Length ? int.Parse(appids[idx]) : -1;
-
-                //BUSCAMOS EL JUEGO EN LA BIBLIOTECA
-                var juego = bibliotecaTotal?.juegos?.FirstOrDefault(j => j.app_id == appid);
-
-                //MOSTRAMOS EL NOMBRE SI EXISTE
-                if (juego != null)
-                {
-                    txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
-                    txtFalloLogo.Text = juego.nombre;
-                    txtFalloLogo.Visibility = Visibility.Visible;
-                }
+                
+                txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
+                txtFalloLogo.Text = nombresJuegos[idx];
+                txtFalloLogo.Visibility = Visibility.Visible;
+                
             }
         }
 

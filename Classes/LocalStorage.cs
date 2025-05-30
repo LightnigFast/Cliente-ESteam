@@ -11,6 +11,7 @@ namespace Cliente_TFG.Classes
     {
         private static string rutaUsuario = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "usuario.json");
         private static string rutaBiblioteca = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "biblioteca.json");
+        private static string rutaBibliotecaNombres = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "bibliotecaNombres.json");
         private static string rutaImagenes = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "imagenes");
 
 
@@ -52,6 +53,20 @@ namespace Cliente_TFG.Classes
             return JsonConvert.DeserializeObject<List<int>>(json);
         }
 
+        public static void GuardarBibliotecaNombreJuegos(List<string> nombreJuego)
+        {
+            var json = JsonConvert.SerializeObject(nombreJuego);
+            File.WriteAllText(rutaBibliotecaNombres, json);
+        }
+
+        public static List<string> CargarBibliotecaNombreJuegos()
+        {
+            if (!File.Exists(rutaBibliotecaNombres))
+                return new List<string>();
+
+            var json = File.ReadAllText(rutaBibliotecaNombres);
+            return JsonConvert.DeserializeObject<List<string>>(json);
+        }
 
 
         //GUARDAR LA IMAGEN EN BYTES[]
