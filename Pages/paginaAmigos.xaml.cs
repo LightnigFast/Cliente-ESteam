@@ -46,13 +46,14 @@ namespace Cliente_TFG.Pages
 
             // Actualizar la UI después de inicializar los datos
             ActualizarSolicitudesPendientes();
+            Dispatcher.Invoke(() => ActualizarSolicitudesPendientesAsync());
         }
 
         private void InicializarTimerActualizacion()
         {
-            // Timer para actualizar solicitudes cada 30 segundos
+            // Timer para actualizar solicitudes cada 5 segundos
             timerActualizacionSolicitudes = new DispatcherTimer();
-            timerActualizacionSolicitudes.Interval = TimeSpan.FromSeconds(30);
+            timerActualizacionSolicitudes.Interval = TimeSpan.FromSeconds(5);
             timerActualizacionSolicitudes.Tick += TimerActualizacionSolicitudes_Tick;
             timerActualizacionSolicitudes.Start();
         }
@@ -89,8 +90,8 @@ namespace Cliente_TFG.Pages
         private void InicializarDatosEjemplo()
         {
             // Inicializar solicitudes de amistad
-            solicitudesPendientes.Add(new SolicitudAmistad(123456, "Juan"));
-            solicitudesPendientes.Add(new SolicitudAmistad(123, "Antonia"));
+            //solicitudesPendientes.Add(new SolicitudAmistad(123456, "Juan"));
+            //solicitudesPendientes.Add(new SolicitudAmistad(123, "Antonia"));
 
             // Inicializar amigos
             listaDeAmigos.Add(new Amigo
@@ -135,6 +136,9 @@ namespace Cliente_TFG.Pages
         {
             try
             {
+
+                // TODO - Estas dos lineas seguramente hay que borrarlas cuando acabe
+
                 // Agregar a la lista de amigos
                 listaDeAmigos.Add(new Amigo
                 {
@@ -149,18 +153,47 @@ namespace Cliente_TFG.Pages
                 // Eliminar la solicitud
                 solicitudesPendientes.Remove(solicitud);
 
+                Dispatcher.Invoke(() => AceptarSolicitudAmistadEnServidorAsync(solicitud));
+
                 // Actualizar la UI
                 ActualizarSolicitudesPendientes();
 
                 // Mostrar notificación
                 MostrarNotificacion($"Has aceptado la solicitud de {solicitud.NombreUsuario}", NotificationType.Success);
 
-                // Aquí puedes agregar la llamada al servidor para aceptar la solicitud
-                // await AceptarSolicitudEnServidorAsync(solicitud);
             }
             catch (Exception ex)
             {
                 MostrarNotificacion($"Error al aceptar solicitud: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task AceptarSolicitudAmistadEnServidorAsync(SolicitudAmistad sol)
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad/aceptar";
+
+            try
+            {
+                String bodyString = "{\r\n   \"solicitud_id\": " + sol.Id + "\r\n}";
+                var content = new StringContent(bodyString, Encoding.UTF8, "application/json");
+                // Hacer la solicitud
+                HttpResponseMessage response = await client.PostAsync(url,content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MostrarNotificacion($"Se ha agregado con exito: {response.StatusCode})", NotificationType.Success);
+                    ActualizarSolicitudesPendientes();
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hubo un error obteniendo solucitudes de amistad: " + ex);
+                return;
             }
         }
 
@@ -177,12 +210,40 @@ namespace Cliente_TFG.Pages
                 // Mostrar notificación
                 MostrarNotificacion($"Has rechazado la solicitud de {solicitud.NombreUsuario}", NotificationType.Warning);
 
-                // Aquí puedes agregar la llamada al servidor para rechazar la solicitud
-                // await RechazarSolicitudEnServidorAsync(solicitud);
+                Dispatcher.Invoke(() => RechazarSolicitudAmistadEnServidorAsync(solicitud));
             }
             catch (Exception ex)
             {
                 MostrarNotificacion($"Error al rechazar solicitud: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task RechazarSolicitudAmistadEnServidorAsync(SolicitudAmistad sol)
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad/rechazar";
+
+            try
+            {
+                String bodyString = "{\r\n   \"solicitud_id\": " + sol.Id + "\r\n}";
+                var content = new StringContent(bodyString, Encoding.UTF8, "application/json");
+                // Hacer la solicitud
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MostrarNotificacion($"Se ha agregado con exito: {response.StatusCode})", NotificationType.Success);
+                    ActualizarSolicitudesPendientes();
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hubo un error obteniendo solucitudes de amistad: " + ex);
+                return;
             }
         }
 
@@ -221,6 +282,7 @@ namespace Cliente_TFG.Pages
             // Crear el contenedor principal
             Border bordeSolicitud = new Border
             {
+                Name = "id_"+solicitud.IdUsuario,
                 Background = new SolidColorBrush(Color.FromRgb(37, 37, 37)), // #252525
                 BorderBrush = AppTheme.Actual.BordePanel,
                 BorderThickness = new Thickness(1),
@@ -289,7 +351,7 @@ namespace Cliente_TFG.Pages
                 BorderThickness = new Thickness(1),
                 Foreground = AppTheme.Actual.TextoPrincipal,
                 Cursor = Cursors.Hand,
-                Tag = solicitud
+                Tag = solicitud,
             };
             botonAceptar.Click += (sender, e) =>
             {
@@ -368,18 +430,64 @@ namespace Cliente_TFG.Pages
         {
             try
             {
-                // Aquí harías la llamada al servidor para obtener solicitudes actualizadas
-                // var nuevasSolicitudes = await ObtenerSolicitudesDelServidorAsync();
+                // Llamada al servidor para obtener solicitudes actualizadas
+                await ObtenerSolicitudesDelServidorAsync();
 
-                // Por ahora, simular nuevas solicitudes ocasionalmente
-                if (new Random().Next(1, 100) <= 50) // 50% de probabilidad
-                {
-                    AgregarSolicitudSimulada();
-                }
+                // Por ahora, simulamos nuevas solicitudes cada 30 segs
+                //if (new Random().Next(1, 100) <= 50) // 50% de probabilidad
+                //{
+                //    AgregarSolicitudSimulada();
+                //}
             }
             catch (Exception ex)
             {
                 MostrarNotificacion($"Error al actualizar solicitudes: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task ObtenerSolicitudesDelServidorAsync()
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/users/?id={ventanaPrincipal.Usuario.id_usuario}&solicitudes&estado_solicitudes=pendiente";
+
+            try
+            {
+
+                // Hacer la solicitud
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    MostrarNotificacion(jsonResponse,NotificationType.Success);
+                    var jsonObj = JObject.Parse(jsonResponse);
+                    var recibidas = jsonObj["recibidas"];
+
+                    foreach (var solicitud in recibidas)
+                    {
+                        int solicitud_id = (int)solicitud["id_solicitud"];
+                        int solicitud_id_usuario = (int)solicitud["id_usuario"];
+                        string solicitud_nombre_usuario = (string)solicitud["nombre_usuario"];
+
+                        SolicitudAmistad nuevaSolicitud = (new SolicitudAmistad(solicitud_id, solicitud_id_usuario, solicitud_nombre_usuario));
+                        if (!solicitudesPendientes.Exists(s => s.IdUsuario == nuevaSolicitud.IdUsuario))
+                        {
+                            solicitudesPendientes.Add(nuevaSolicitud);
+                            ActualizarSolicitudesPendientes();
+                            MostrarNotificacion($"Nueva solicitud de amistad de {solicitud_nombre_usuario}", NotificationType.Info);
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MostrarNotificacion("Hubo un error obteniendo solucitudes de amistad: "+ ex, NotificationType.Error);
+                return;
             }
         }
 
@@ -388,9 +496,10 @@ namespace Cliente_TFG.Pages
             var nombresSimulados = new[] { "Carlos", "María", "Pedro", "Ana", "Luis", "Sofia" };
             var random = new Random();
             var nombre = nombresSimulados[random.Next(nombresSimulados.Length)];
+            var iduser = random.Next(100000, 999999);
             var id = random.Next(100000, 999999);
 
-            var nuevaSolicitud = new SolicitudAmistad(id, nombre);
+            var nuevaSolicitud = new SolicitudAmistad(id,iduser, nombre);
 
             // Verificar que no exista ya
             if (!solicitudesPendientes.Exists(s => s.IdUsuario == nuevaSolicitud.IdUsuario))
@@ -820,7 +929,6 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        // TODO - Comprobar errores
         private SolicitudAmistad GetUsuarioPorCodigoDeAmigo(String friendCode)
         {
             try
@@ -848,7 +956,8 @@ namespace Cliente_TFG.Pages
 
                     int id_usuario = (int)usuarioJson["id_usuario"];
                     string nombre_usuario = (string)usuarioJson["nombre_usuario"];
-                    return new SolicitudAmistad(id_usuario, nombre_usuario);
+                    //la id de la solicitud no es relevante aqui
+                    return new SolicitudAmistad(0,id_usuario, nombre_usuario);
                 }
             }
             catch
@@ -874,12 +983,13 @@ namespace Cliente_TFG.Pages
 
         public class SolicitudAmistad
         {
-            public SolicitudAmistad(int id_usuario, string nombre_usuario)
+            public SolicitudAmistad(int id,int id_usuario, string nombre_usuario)
             {
+                Id = id.ToString();
                 IdUsuario = id_usuario.ToString();
                 NombreUsuario = nombre_usuario;
             }
-
+            public string Id { get; set; }
             public string NombreUsuario { get; set; }
             public string IdUsuario { get; set; }
         }
