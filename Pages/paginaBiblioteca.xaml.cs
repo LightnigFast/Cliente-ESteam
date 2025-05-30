@@ -41,6 +41,10 @@ namespace Cliente_TFG.Pages
 
         //PARA LOS DEMAS JUEGOS DE LA BIBLIOTECA
         private List<int> listaAppids;
+        private BibliotecaResponse bibliotecaTotal = new BibliotecaResponse
+        {
+            juegos = new List<Juego>()
+        };
 
         public paginaBiblioteca(MainWindow ventanaPrincipal)
         {
@@ -53,6 +57,8 @@ namespace Cliente_TFG.Pages
 
                 CargarDatosJson();
 
+                //OBTENEMOS LA BIBLIOTECA PRIMERO
+                await ObtenerBibliotecaDesdeApiAsync();
 
                 await CargarImagenesFondo();
             };
@@ -104,36 +110,38 @@ namespace Cliente_TFG.Pages
 
         public async Task<BibliotecaResponse> ObtenerBibliotecaDesdeApiAsync()
         {
-
-            var bibliotecaTotal = new BibliotecaResponse
-            {
-                juegos = new List<Juego>()
-            };
-
             using (HttpClient client = new HttpClient())
             {
-                foreach (var appid in listaAppids)
+                try
                 {
-                    try
-                    {
-                        string url = $"http://127.0.0.1:50000/library/{appid}";
-                        string json = await client.GetStringAsync(url);
-                        BibliotecaResponse response = JsonConvert.DeserializeObject<BibliotecaResponse>(json);
+                    string url = "http://" + Config.IP + $":50000/library/" + ventanaPrincipal.Usuario.IdUsuario;
+                    //MessageBox.Show($"Llamando a API: {url}");
 
-                        if (response?.juegos != null)
-                        {
-                            bibliotecaTotal.juegos.AddRange(response.juegos);
-                        }
-                    }
-                    catch (Exception)
-                    {
+                    string json = await client.GetStringAsync(url);
+                    //MessageBox.Show($"Respuesta API: {json.Substring(0, Math.Min(200, json.Length))}");
 
+                    BibliotecaResponse response = JsonConvert.DeserializeObject<BibliotecaResponse>(json);
+
+                    if (response?.juegos != null)
+                    {
+                        bibliotecaTotal.juegos = response.juegos;
                     }
+                    else
+                    {
+                        bibliotecaTotal.juegos = new List<Juego>();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error obteniendo biblioteca: " + ex.Message);
+                    bibliotecaTotal.juegos = new List<Juego>();
                 }
             }
 
             return bibliotecaTotal;
         }
+
+
 
 
 
@@ -437,44 +445,143 @@ namespace Cliente_TFG.Pages
 
         private BitmapImage GenerarImagenFallback(string appid, string nombreVertical)
         {
-            string fallbackUrl = "juego.header ?? juego.captura;";
+            int id = int.Parse(appid);
+            var juego = bibliotecaTotal?.juegos?.FirstOrDefault(j => j.app_id == id);
+
+            if (juego == null)
+                return null;
+
+            string fallbackUrl = juego.header ?? juego.captura;
+
+            if (string.IsNullOrEmpty(fallbackUrl))
+                return null;
 
             try
             {
-                double altura = 170;
-                double proporcion = 600.0 / 900.0;
-                double ancho = altura * proporcion;
-
-                // CARGAR IMAGEN SINCRÓNICAMENTE
-                BitmapImage imagenCargada = new BitmapImage();
-                imagenCargada.BeginInit();
-                imagenCargada.UriSource = new Uri(fallbackUrl);
-                imagenCargada.CacheOption = BitmapCacheOption.OnLoad; // Carga completa
-                imagenCargada.EndInit();
-
-                // Crear Image control con esa imagen
-                Image imagen = new Image
+                // Descargar imagen en memoria
+                byte[] imageBytes;
+                using (var httpClient = new HttpClient())
                 {
-                    Source = imagenCargada,
-                    Width = ancho,
-                    Height = altura,
-                    Stretch = Stretch.Uniform
-                };
+                    imageBytes = httpClient.GetByteArrayAsync(fallbackUrl).GetAwaiter().GetResult();
+                }
 
-                // Forzar layout
-                imagen.Measure(new Size(ancho, altura));
-                imagen.Arrange(new Rect(0, 0, ancho, altura));
-                imagen.UpdateLayout();
+                // Guardar la imagen descargada en localStorage como bytes con nombre appid.png
+                string nombreArchivoBytes = $"{appid}_vertical.png";
+                LocalStorage.GuardarImagen(nombreArchivoBytes, imageBytes);
 
-                // Renderizar a bitmap
-                RenderTargetBitmap renderBitmap = new RenderTargetBitmap((int)ancho, (int)altura, 96, 96, PixelFormats.Pbgra32);
-                renderBitmap.Render(imagen);
+                // Crear BitmapImage desde el stream en memoria
+                BitmapImage imagenCargada = new BitmapImage();
+                using (var ms = new MemoryStream(imageBytes))
+                {
+                    imagenCargada.BeginInit();
+                    imagenCargada.CacheOption = BitmapCacheOption.OnLoad;
+                    imagenCargada.StreamSource = ms;
+                    imagenCargada.EndInit();
+                    imagenCargada.Freeze();
+                }
 
-                // Guardar imagen renderizada
-                LocalStorage.GuardarImagenRenderizada(nombreVertical, renderBitmap);
+                if (imagenCargada.PixelWidth == 0 || imagenCargada.PixelHeight == 0)
+                {
+                    MessageBox.Show("La imagen no se cargó correctamente o está vacía.");
+                    return null;
+                }
 
-                // Cargar y devolver
-                return LocalStorage.CargarImagenLocal(nombreVertical);
+                // Tamaño fijo final
+                int anchoFinal = 300;
+                int altoFinal = 450;
+
+                // Proporción original
+                double ratioOriginal = (double)imagenCargada.PixelWidth / imagenCargada.PixelHeight;
+                double ratioDestino = (double)anchoFinal / altoFinal;
+
+                // Calcular tamaño para imagen pequeña centrada
+                int anchoRender;
+                int altoRender;
+                if (ratioOriginal > ratioDestino)
+                {
+                    anchoRender = anchoFinal;
+                    altoRender = (int)(anchoFinal / ratioOriginal);
+                }
+                else
+                {
+                    altoRender = altoFinal;
+                    anchoRender = (int)(altoFinal * ratioOriginal);
+                }
+                int desplazamientoY = (altoFinal - altoRender) / 2;
+
+                // --- PRIMER PASO: crear imagen de fondo a tamaño completo (300x450) ---
+                // Para el fondo la imagen debe ocupar TODO, estiramos sin respetar proporción
+                double ratioFondo = (double)imagenCargada.PixelWidth / imagenCargada.PixelHeight;
+
+                int anchoFondo, altoFondo;
+                if (ratioFondo > (double)anchoFinal / altoFinal)
+                {
+                    altoFondo = altoFinal;
+                    anchoFondo = (int)(altoFinal * ratioFondo);
+                }
+                else
+                {
+                    anchoFondo = anchoFinal;
+                    altoFondo = (int)(anchoFinal / ratioFondo);
+                }
+
+                int offsetX = (anchoFinal - anchoFondo) / 2;
+                int offsetY = (altoFinal - altoFondo) / 2;
+
+                DrawingVisual fondoVisual = new DrawingVisual();
+                using (DrawingContext dc = fondoVisual.RenderOpen())
+                {
+                    dc.DrawImage(imagenCargada, new Rect(offsetX, offsetY, anchoFondo, altoFondo));
+                }
+                RenderTargetBitmap fondoBitmap = new RenderTargetBitmap(anchoFinal, altoFinal, 96, 96, PixelFormats.Pbgra32);
+                fondoBitmap.Render(fondoVisual);
+
+                // --- APLICAR BLUR SOBRE EL FONDO ---
+                // Crear un Visual para aplicar BlurEffect
+                DrawingVisual blurVisual = new DrawingVisual();
+                blurVisual.Effect = new BlurEffect { Radius = 15 }; // Ajusta el radio para el blur que quieras
+                using (DrawingContext dc = blurVisual.RenderOpen())
+                {
+                    dc.DrawImage(fondoBitmap, new Rect(0, 0, anchoFinal, altoFinal));
+                }
+                RenderTargetBitmap fondoBlurred = new RenderTargetBitmap(anchoFinal, altoFinal, 96, 96, PixelFormats.Pbgra32);
+                fondoBlurred.Render(blurVisual);
+
+                // --- SEGUNDO PASO: crear imagen final con fondo borroso y la imagen centrada ---
+                DrawingVisual finalVisual = new DrawingVisual();
+                using (DrawingContext dc = finalVisual.RenderOpen())
+                {
+                    // Dibujar fondo borroso
+                    dc.DrawImage(fondoBlurred, new Rect(0, 0, anchoFinal, altoFinal));
+
+                    // Dibujar imagen pequeña centrada verticalmente
+                    dc.DrawImage(imagenCargada, new Rect((anchoFinal - anchoRender) / 2, desplazamientoY, anchoRender, altoRender));
+                }
+
+                RenderTargetBitmap renderBitmap = new RenderTargetBitmap(anchoFinal, altoFinal, 96, 96, PixelFormats.Pbgra32);
+                renderBitmap.Render(finalVisual);
+
+                // Guardar imagen renderizada con nombre appid_render.png
+                string nombreArchivoRender = $"{appid}_vertical.png";
+                LocalStorage.GuardarImagenRenderizada(nombreArchivoRender, renderBitmap);
+
+                // Convertir RenderTargetBitmap a BitmapImage para devolver
+                var bmp = new BitmapImage();
+                using (var stream = new MemoryStream())
+                {
+                    var encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
+                    encoder.Save(stream);
+                    stream.Position = 0;
+
+                    bmp.BeginInit();
+                    bmp.CacheOption = BitmapCacheOption.OnLoad;
+                    bmp.StreamSource = stream;
+                    bmp.EndInit();
+                    bmp.Freeze();
+                }
+
+                return bmp;
             }
             catch (Exception ex)
             {
@@ -484,6 +591,18 @@ namespace Cliente_TFG.Pages
         }
 
 
+
+
+
+        public static void GuardarImagenLocal(string ruta, BitmapSource bitmap)
+        {
+            using (var fileStream = new FileStream(ruta, FileMode.Create))
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                encoder.Save(fileStream);
+            }
+        }
 
 
 

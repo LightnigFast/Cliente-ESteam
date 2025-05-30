@@ -54,7 +54,7 @@ namespace Cliente_TFG.Classes
 
 
 
-        // Guardar una imagen descargada (byte[]) en disco
+        //GUARDAR LA IMAGEN EN BYTES[]
         public static void GuardarImagen(string nombreArchivo, byte[] datosImagen)
         {
             string rutaImagen = Path.Combine(rutaImagenes, nombreArchivo);
@@ -75,7 +75,7 @@ namespace Cliente_TFG.Classes
                 encoder.Save(stream);
             }
 
-            MessageBox.Show("Imagen guardada");
+            //MessageBox.Show("Imagen guardada");
         }
 
 
