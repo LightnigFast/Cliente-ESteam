@@ -239,7 +239,15 @@ namespace Cliente_TFG.Pages
                 string urlLogo = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/logo.png";
                 var imagenLogo = await ObtenerImagenAsync(urlLogo, nombreLogo);
                 if (imagenLogo != null)
+                {
                     imagenesLogos.Add(imagenLogo);
+                }
+                else
+                {
+                    //IMAGEN INVÁLIDA PARA FORZAR IMAGEFAILED
+
+                    //imagenesLogos.Add(new BitmapImage(new Uri("https://noexiste.este.dominio/logo.png")));
+                }
 
                 string nombreVertical = $"{appidJuego}_vertical.jpg";
                 string urlVertical = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/library_600x900.jpg";
@@ -513,10 +521,6 @@ namespace Cliente_TFG.Pages
             }
         }
 
-
-
-
-
         public static BitmapSource RenderVisualToBitmap(UIElement element, int width, int height, double dpi = 96)
         {
             var renderTarget = new RenderTargetBitmap(width, height, dpi, dpi, PixelFormats.Pbgra32);
@@ -526,7 +530,7 @@ namespace Cliente_TFG.Pages
             return renderTarget;
         }
 
-       
+
 
 
 
@@ -548,6 +552,7 @@ namespace Cliente_TFG.Pages
                     imgFondo.ImageFailed -= ImgFondo_ImageFailed;
                     ImagenLogo.ImageFailed -= ImagenLogo_ImageFailed;
                     txtFalloLogo.Background = Brushes.Transparent;
+                    txtFalloLogo.Text = "";
 
                     //ASIGNAMOS TAG PARA SABER QUÉ ÍNDICE ES EN EL EVENTO
                     ImagenLogo.Tag = index;
@@ -557,23 +562,26 @@ namespace Cliente_TFG.Pages
                     imgFondo.Source = imagenesFondo[index.Value];
                     ImagenLogo.Source = imagenesLogos[index.Value];
 
-                    //ASIGNAMOS MANEJADORES DE NUEVO
+                    //ASIGNAMOS MANEJADORES DE NUEVO PRIMERO
                     imgFondo.ImageFailed += ImgFondo_ImageFailed;
                     ImagenLogo.ImageFailed += ImagenLogo_ImageFailed;
 
-                    txtFalloLogo.Text = "";
+                   
 
+                    //ANIMACIÓN ENTRADA
                     var fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(300)));
                     imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 };
 
+                //APLICAMOS LA ANIMACIÓN PARA QUE SE DISPARA EL .Completed
                 imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOut);
             }
         }
+
 
         private async void ImgFondo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
         {
@@ -595,6 +603,8 @@ namespace Cliente_TFG.Pages
             {
                 txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
                 txtFalloLogo.Text = Nombres[idx];
+                txtFalloLogo.Visibility = Visibility.Visible;
+                MessageBox.Show("sdasas");
             }
         }
 
