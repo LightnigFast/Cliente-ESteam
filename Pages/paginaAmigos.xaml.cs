@@ -158,8 +158,6 @@ namespace Cliente_TFG.Pages
                 // Actualizar la UI
                 ActualizarSolicitudesPendientes();
 
-                // Mostrar notificación
-                MostrarNotificacion($"Has aceptado la solicitud de {solicitud.NombreUsuario}", NotificationType.Success);
 
             }
             catch (Exception ex)
@@ -168,20 +166,20 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        private async Task AceptarSolicitudAmistadEnServidorAsync(SolicitudAmistad sol)
+        private async Task AceptarSolicitudAmistadEnServidorAsync(SolicitudAmistad Solicitud)
         {
             string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad/aceptar";
 
             try
             {
-                String bodyString = "{\r\n   \"solicitud_id\": " + sol.Id + "\r\n}";
+                String bodyString = "{\r\n   \"solicitud_id\": " + Solicitud.Id + "\r\n}";
                 var content = new StringContent(bodyString, Encoding.UTF8, "application/json");
                 // Hacer la solicitud
                 HttpResponseMessage response = await client.PostAsync(url,content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MostrarNotificacion($"Se ha agregado con exito: {response.StatusCode})", NotificationType.Success);
+                    MostrarNotificacion($"Has aceptado la solicitud de {Solicitud.NombreUsuario}", NotificationType.Success);
                     ActualizarSolicitudesPendientes();
                 }
                 else
@@ -207,9 +205,6 @@ namespace Cliente_TFG.Pages
                 // Actualizar la UI
                 ActualizarSolicitudesPendientes();
 
-                // Mostrar notificación
-                MostrarNotificacion($"Has rechazado la solicitud de {solicitud.NombreUsuario}", NotificationType.Warning);
-
                 Dispatcher.Invoke(() => RechazarSolicitudAmistadEnServidorAsync(solicitud));
             }
             catch (Exception ex)
@@ -218,20 +213,20 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        private async Task RechazarSolicitudAmistadEnServidorAsync(SolicitudAmistad sol)
+        private async Task RechazarSolicitudAmistadEnServidorAsync(SolicitudAmistad solicitud)
         {
             string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad/rechazar";
 
             try
             {
-                String bodyString = "{\r\n   \"solicitud_id\": " + sol.Id + "\r\n}";
+                String bodyString = "{\r\n   \"solicitud_id\": " + solicitud.Id + "\r\n}";
                 var content = new StringContent(bodyString, Encoding.UTF8, "application/json");
                 // Hacer la solicitud
                 HttpResponseMessage response = await client.PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MostrarNotificacion($"Se ha agregado con exito: {response.StatusCode})", NotificationType.Success);
+                    MostrarNotificacion($"Se ha rechazado con exito a {solicitud.NombreUsuario}", NotificationType.Warning);
                     ActualizarSolicitudesPendientes();
                 }
                 else
