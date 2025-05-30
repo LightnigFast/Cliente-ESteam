@@ -845,7 +845,7 @@ namespace Cliente_TFG.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al cargar datos del carrusel: {ex.Message}");
+                    MessageBox.Show($"Error al cargar datos del juego: {ex.Message}");
                 }
             }
         }

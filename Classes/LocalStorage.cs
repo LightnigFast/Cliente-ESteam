@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
 using System.Windows.Media.Imaging;
+using System.Windows;
 
 namespace Cliente_TFG.Classes
 {
@@ -59,6 +60,24 @@ namespace Cliente_TFG.Classes
             string rutaImagen = Path.Combine(rutaImagenes, nombreArchivo);
             File.WriteAllBytes(rutaImagen, datosImagen);
         }
+
+        //GUARDAR IMAGEN QUE GENERAMOS NOSOTROS
+        public static void GuardarImagenRenderizada(string nombreArchivo, BitmapSource imagen)
+        {
+            string ruta = Path.Combine(rutaImagenes, nombreArchivo);
+
+            //CREAMOS EL ENCODER PNG
+            PngBitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(imagen));
+
+            using (FileStream stream = new FileStream(ruta, FileMode.Create))
+            {
+                encoder.Save(stream);
+            }
+
+            MessageBox.Show("Imagen guardada");
+        }
+
 
         // Comprobar si la imagen existe localmente
         public static bool ExisteImagen(string nombreArchivo)

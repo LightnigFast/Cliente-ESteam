@@ -108,7 +108,6 @@ namespace Cliente_TFG
 
         public void GuardarDatosLocal()
         {
-            MessageBox.Show("hola " + user);
             LocalStorage.GuardarUsuario(user);
             LocalStorage.GuardarBiblioteca(user.BibliotecaJuegos);
         }
@@ -184,6 +183,7 @@ namespace Cliente_TFG
 
 
         public string IP => ip;
+        public bool Online => online;
 
 
     }

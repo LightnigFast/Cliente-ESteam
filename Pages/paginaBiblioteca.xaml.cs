@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Policy;
@@ -13,6 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -38,6 +40,7 @@ namespace Cliente_TFG.Pages
         private List<BitmapImage> imagenVerticalJuegos = new List<BitmapImage>();
 
         //PARA LOS DEMAS JUEGOS DE LA BIBLIOTECA
+        private List<int> listaAppids;
 
         public paginaBiblioteca(MainWindow ventanaPrincipal)
         {
@@ -47,7 +50,6 @@ namespace Cliente_TFG.Pages
             this.Loaded += async (s, e) =>
             {
                 borrarDatos();
-
 
                 CargarDatosJson();
 
@@ -72,21 +74,20 @@ namespace Cliente_TFG.Pages
         {
             try
             {
-                // Cargar la biblioteca local (lista de appids)
-                List<int> listaAppids = LocalStorage.CargarBiblioteca();
+                //Cargar la biblioteca local (lista de appids)
+                listaAppids = LocalStorage.CargarBiblioteca();
 
                 if (listaAppids == null || listaAppids.Count == 0)
                 {
                     Console.WriteLine("No hay juegos en la biblioteca local.");
                     appids = new string[0];
-                    Nombres = new string[0]; // si quieres nombres tendrás que obtenerlos de otro sitio
+                    Nombres = new string[0]; 
                     return;
                 }
 
-                // Convertir a string[]
+                //Convertir a string[]
                 appids = listaAppids.Select(id => id.ToString()).ToArray();
 
-                // Como no tienes nombres en el JSON, simplemente rellena Nombres con valores vacíos o iguales a appids
                 Nombres = appids.Select(id => $"Juego {id}").ToArray();
 
                 Console.WriteLine($"Se cargaron {appids.Length} appids desde biblioteca local.");
@@ -101,11 +102,49 @@ namespace Cliente_TFG.Pages
 
 
 
+        public async Task<BibliotecaResponse> ObtenerBibliotecaDesdeApiAsync()
+        {
+
+            var bibliotecaTotal = new BibliotecaResponse
+            {
+                juegos = new List<Juego>()
+            };
+
+            using (HttpClient client = new HttpClient())
+            {
+                foreach (var appid in listaAppids)
+                {
+                    try
+                    {
+                        string url = $"http://127.0.0.1:50000/library/{appid}";
+                        string json = await client.GetStringAsync(url);
+                        BibliotecaResponse response = JsonConvert.DeserializeObject<BibliotecaResponse>(json);
+
+                        if (response?.juegos != null)
+                        {
+                            bibliotecaTotal.juegos.AddRange(response.juegos);
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+            }
+
+            return bibliotecaTotal;
+        }
+
+
+
+
+
         public class Juego
         {
             public int app_id { get; set; }
             public string captura { get; set; }
             public string nombre { get; set; }
+            public string header { get; set; }
         }
 
         public class BibliotecaResponse
@@ -196,8 +235,16 @@ namespace Cliente_TFG.Pages
                 string nombreVertical = $"{appidJuego}_vertical.jpg";
                 string urlVertical = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/library_600x900.jpg";
                 var imagenVertical = await ObtenerImagenAsync(urlVertical, nombreVertical);
+
+                if (imagenVertical == null)
+                {
+                    imagenVertical = GenerarImagenFallback(appidJuego, nombreVertical);
+                }
+
                 if (imagenVertical != null)
+                {
                     imagenVerticalJuegos.Add(imagenVertical);
+                }
             }
 
             if (imagenesFondo.Count == 0)
@@ -290,6 +337,8 @@ namespace Cliente_TFG.Pages
                 img.ImageFailed += (s, e) =>
                 {
                     var appid = appids[currentIndex];
+                    string nombreVertical = $"{appid}_vertical.jpg";
+                    string fallbacKString = $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg";
                     Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg");
 
                     //FONDO DIFUMINADO
@@ -299,21 +348,38 @@ namespace Cliente_TFG.Pages
                         Stretch = Stretch.UniformToFill,
                         Height = altura,
                         Width = ancho,
-                        Effect = new System.Windows.Media.Effects.BlurEffect { Radius = 10 },
+                        Effect = new BlurEffect { Radius = 10 },
                         Opacity = 0.6
                     };
 
-                    //IMAGEN ENCIMA
                     Image imagenPrincipal = new Image
                     {
                         Source = new BitmapImage(fallbackUri),
                         Stretch = Stretch.Uniform,
                         Height = altura,
-                        Width = ancho,
+                        Width = ancho
                     };
 
                     Grid contenedor = new Grid
                     {
+                        Width = ancho,
+                        Height = altura
+                    };
+
+                    contenedor.Children.Add(fondoDifuminado);
+                    contenedor.Children.Add(imagenPrincipal);
+
+                    // RENDERIZAS EL GRID A UNA SOLA IMAGEN
+                    BitmapSource imagenCombinada = RenderVisualToBitmap(contenedor, (int)ancho, (int)altura);
+
+                    //GUARDAMOS LA IMAGEN
+                    LocalStorage.GuardarImagenRenderizada(nombreVertical, imagenCombinada);
+
+                    // CREAS UNA IMAGEN NUEVA Y LE APLICAS LOS MISMOS EVENTOS
+                    Image imagenFinal = new Image
+                    {
+                        Source = imagenCombinada,
+                        Width = ancho,
                         Height = altura,
                         Margin = new Thickness(11),
                         Tag = currentIndex,
@@ -321,32 +387,28 @@ namespace Cliente_TFG.Pages
                         RenderTransformOrigin = new Point(0.5, 0.5)
                     };
 
-                    contenedor.Children.Add(fondoDifuminado);
-                    contenedor.Children.Add(imagenPrincipal);
+                    imagenFinal.MouseLeftButtonUp += ImagenJuego_Click;
 
-                    //EVENTOS
-                    contenedor.MouseLeftButtonUp += ImagenJuego_Click;
-
-                    contenedor.MouseEnter += (s2, e2) =>
+                    imagenFinal.MouseEnter += (s2, e2) =>
                     {
                         var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
                         scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
                         scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
                     };
 
-                    contenedor.MouseLeave += (s2, e2) =>
+                    imagenFinal.MouseLeave += (s2, e2) =>
                     {
                         var anim = new DoubleAnimation(1.1, 1.0, TimeSpan.FromMilliseconds(150));
                         scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
                         scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
                     };
 
-                    //SUSTITUIS LA IMAGEN POR EL GRID
+                    // REEMPLAZAS LA IMAGEN FALLIDA EN EL PANEL
                     int pos = panelJuegosBiblioteca.Children.IndexOf((UIElement)s);
                     if (pos >= 0)
                     {
                         panelJuegosBiblioteca.Children.RemoveAt(pos);
-                        panelJuegosBiblioteca.Children.Insert(pos, contenedor);
+                        panelJuegosBiblioteca.Children.Insert(pos, imagenFinal);
                     }
                 };
 
@@ -371,6 +433,72 @@ namespace Cliente_TFG.Pages
             }
 
         }
+
+
+        private BitmapImage GenerarImagenFallback(string appid, string nombreVertical)
+        {
+            string fallbackUrl = "juego.header ?? juego.captura;";
+
+            try
+            {
+                double altura = 170;
+                double proporcion = 600.0 / 900.0;
+                double ancho = altura * proporcion;
+
+                // CARGAR IMAGEN SINCRÓNICAMENTE
+                BitmapImage imagenCargada = new BitmapImage();
+                imagenCargada.BeginInit();
+                imagenCargada.UriSource = new Uri(fallbackUrl);
+                imagenCargada.CacheOption = BitmapCacheOption.OnLoad; // Carga completa
+                imagenCargada.EndInit();
+
+                // Crear Image control con esa imagen
+                Image imagen = new Image
+                {
+                    Source = imagenCargada,
+                    Width = ancho,
+                    Height = altura,
+                    Stretch = Stretch.Uniform
+                };
+
+                // Forzar layout
+                imagen.Measure(new Size(ancho, altura));
+                imagen.Arrange(new Rect(0, 0, ancho, altura));
+                imagen.UpdateLayout();
+
+                // Renderizar a bitmap
+                RenderTargetBitmap renderBitmap = new RenderTargetBitmap((int)ancho, (int)altura, 96, 96, PixelFormats.Pbgra32);
+                renderBitmap.Render(imagen);
+
+                // Guardar imagen renderizada
+                LocalStorage.GuardarImagenRenderizada(nombreVertical, renderBitmap);
+
+                // Cargar y devolver
+                return LocalStorage.CargarImagenLocal(nombreVertical);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ERROR: " + ex.Message);
+                return null;
+            }
+        }
+
+
+
+
+
+        public static BitmapSource RenderVisualToBitmap(UIElement element, int width, int height, double dpi = 96)
+        {
+            var renderTarget = new RenderTargetBitmap(width, height, dpi, dpi, PixelFormats.Pbgra32);
+            element.Measure(new Size(width, height));
+            element.Arrange(new Rect(new Size(width, height)));
+            renderTarget.Render(element);
+            return renderTarget;
+        }
+
+       
+
+
 
         private void ImagenJuego_Click(object sender, MouseButtonEventArgs e)
         {
@@ -417,12 +545,17 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        private void ImgFondo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        private async void ImgFondo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
         {
             if (sender is Image img && img.Tag is int index)
             {
+                string nombreFondo = $"{appids[index]}_fondo.jpg";
+                string fallbackString = $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appids[index]}/header.jpg";
                 Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appids[index]}/header.jpg");
                 img.Source = new BitmapImage(fallbackUri);
+                var imagenFondo = await ObtenerImagenAsync(fallbackString, nombreFondo);
+                if (imagenFondo != null)
+                    imagenesFondo.Add(imagenFondo);
             }
         }
 
