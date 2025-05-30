@@ -246,7 +246,7 @@ namespace Cliente_TFG.Pages
                 {
                     //IMAGEN INVÁLIDA PARA FORZAR IMAGEFAILED
 
-                    //imagenesLogos.Add(new BitmapImage(new Uri("https://noexiste.este.dominio/logo.png")));
+                    imagenesLogos.Add(null);
                 }
 
                 string nombreVertical = $"{appidJuego}_vertical.jpg";
@@ -558,26 +558,33 @@ namespace Cliente_TFG.Pages
                     ImagenLogo.Tag = index;
                     imgFondo.Tag = index;
 
-                    //CAMBIAMOS IMÁGENES
-                    imgFondo.Source = imagenesFondo[index.Value];
-                    ImagenLogo.Source = imagenesLogos[index.Value];
 
                     //ASIGNAMOS MANEJADORES DE NUEVO PRIMERO
                     imgFondo.ImageFailed += ImgFondo_ImageFailed;
                     ImagenLogo.ImageFailed += ImagenLogo_ImageFailed;
 
-                   
+                    //CAMBIAMOS IMÁGENES
+                    imgFondo.Source = imagenesFondo[index.Value];
+
+                    if (imagenesLogos[index.Value] != null)
+                        ImagenLogo.Source = imagenesLogos[index.Value];
+                    else
+                        ImagenLogo.Source = new BitmapImage(new Uri("https://noexiste.este.dominio/logo.png"));
+
+
 
                     //ANIMACIÓN ENTRADA
                     var fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(300)));
                     imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                    txtFalloLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 };
 
                 //APLICAMOS LA ANIMACIÓN PARA QUE SE DISPARA EL .Completed
                 imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+                txtFalloLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOut);
             }
         }
@@ -601,12 +608,22 @@ namespace Cliente_TFG.Pages
         {
             if (sender is Image img && img.Tag is int idx)
             {
-                txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
-                txtFalloLogo.Text = Nombres[idx];
-                txtFalloLogo.Visibility = Visibility.Visible;
-                MessageBox.Show("sdasas");
+                //OBTENEMOS EL ID
+                int appid = appids != null && idx < appids.Length ? int.Parse(appids[idx]) : -1;
+
+                //BUSCAMOS EL JUEGO EN LA BIBLIOTECA
+                var juego = bibliotecaTotal?.juegos?.FirstOrDefault(j => j.app_id == appid);
+
+                //MOSTRAMOS EL NOMBRE SI EXISTE
+                if (juego != null)
+                {
+                    txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
+                    txtFalloLogo.Text = juego.nombre;
+                    txtFalloLogo.Visibility = Visibility.Visible;
+                }
             }
         }
+
 
 
 
