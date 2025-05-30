@@ -58,7 +58,8 @@ namespace Cliente_TFG.Pages
                 CargarDatosJson();
 
                 //OBTENEMOS LA BIBLIOTECA PRIMERO
-                await ObtenerBibliotecaDesdeApiAsync();
+                if (ventanaPrincipal.Online)
+                    await ObtenerBibliotecaDesdeApiAsync();
 
                 await CargarImagenesFondo();
             };
@@ -251,6 +252,7 @@ namespace Cliente_TFG.Pages
 
                 if (imagenVertical != null)
                 {
+                    
                     imagenVerticalJuegos.Add(imagenVertical);
                 }
             }
@@ -342,83 +344,6 @@ namespace Cliente_TFG.Pages
                     RenderTransformOrigin = new Point(0.5, 0.5)
                 };
 
-                img.ImageFailed += (s, e) =>
-                {
-                    var appid = appids[currentIndex];
-                    string nombreVertical = $"{appid}_vertical.jpg";
-                    string fallbacKString = $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg";
-                    Uri fallbackUri = new Uri($"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg");
-
-                    //FONDO DIFUMINADO
-                    Image fondoDifuminado = new Image
-                    {
-                        Source = new BitmapImage(fallbackUri),
-                        Stretch = Stretch.UniformToFill,
-                        Height = altura,
-                        Width = ancho,
-                        Effect = new BlurEffect { Radius = 10 },
-                        Opacity = 0.6
-                    };
-
-                    Image imagenPrincipal = new Image
-                    {
-                        Source = new BitmapImage(fallbackUri),
-                        Stretch = Stretch.Uniform,
-                        Height = altura,
-                        Width = ancho
-                    };
-
-                    Grid contenedor = new Grid
-                    {
-                        Width = ancho,
-                        Height = altura
-                    };
-
-                    contenedor.Children.Add(fondoDifuminado);
-                    contenedor.Children.Add(imagenPrincipal);
-
-                    // RENDERIZAS EL GRID A UNA SOLA IMAGEN
-                    BitmapSource imagenCombinada = RenderVisualToBitmap(contenedor, (int)ancho, (int)altura);
-
-                    //GUARDAMOS LA IMAGEN
-                    LocalStorage.GuardarImagenRenderizada(nombreVertical, imagenCombinada);
-
-                    // CREAS UNA IMAGEN NUEVA Y LE APLICAS LOS MISMOS EVENTOS
-                    Image imagenFinal = new Image
-                    {
-                        Source = imagenCombinada,
-                        Width = ancho,
-                        Height = altura,
-                        Margin = new Thickness(11),
-                        Tag = currentIndex,
-                        RenderTransform = scale,
-                        RenderTransformOrigin = new Point(0.5, 0.5)
-                    };
-
-                    imagenFinal.MouseLeftButtonUp += ImagenJuego_Click;
-
-                    imagenFinal.MouseEnter += (s2, e2) =>
-                    {
-                        var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
-                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
-                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
-                    };
-
-                    imagenFinal.MouseLeave += (s2, e2) =>
-                    {
-                        var anim = new DoubleAnimation(1.1, 1.0, TimeSpan.FromMilliseconds(150));
-                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
-                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
-                    };
-
-                    // REEMPLAZAS LA IMAGEN FALLIDA EN EL PANEL
-                    int pos = panelJuegosBiblioteca.Children.IndexOf((UIElement)s);
-                    if (pos >= 0)
-                    {
-                        panelJuegosBiblioteca.Children.RemoveAt(pos);
-                        panelJuegosBiblioteca.Children.Insert(pos, imagenFinal);
-                    }
-                };
 
                 //ANIMACIONES SI CARGA BIEN
                 img.MouseLeftButtonUp += ImagenJuego_Click;
@@ -443,8 +368,15 @@ namespace Cliente_TFG.Pages
         }
 
 
+        //METODO PARA GENERAR LA IMAGEN SI NO SE CARGA CORRECTAMENTE POR QUE NO EXISTE
         private BitmapImage GenerarImagenFallback(string appid, string nombreVertical)
         {
+            //INTENTO CARGAR EL LOCAL PRIMERO
+            if (LocalStorage.ExisteImagen(nombreVertical))
+            {
+                return LocalStorage.CargarImagenLocal(nombreVertical);
+            }
+
             int id = int.Parse(appid);
             var juego = bibliotecaTotal?.juegos?.FirstOrDefault(j => j.app_id == id);
 
@@ -458,18 +390,14 @@ namespace Cliente_TFG.Pages
 
             try
             {
-                // Descargar imagen en memoria
+                //DECARGAR LA IMAGEN EN MEMORIA
                 byte[] imageBytes;
                 using (var httpClient = new HttpClient())
                 {
                     imageBytes = httpClient.GetByteArrayAsync(fallbackUrl).GetAwaiter().GetResult();
                 }
 
-                // Guardar la imagen descargada en localStorage como bytes con nombre appid.png
-                string nombreArchivoBytes = $"{appid}_vertical.png";
-                LocalStorage.GuardarImagen(nombreArchivoBytes, imageBytes);
 
-                // Crear BitmapImage desde el stream en memoria
                 BitmapImage imagenCargada = new BitmapImage();
                 using (var ms = new MemoryStream(imageBytes))
                 {
@@ -486,15 +414,13 @@ namespace Cliente_TFG.Pages
                     return null;
                 }
 
-                // Tamaño fijo final
                 int anchoFinal = 300;
                 int altoFinal = 450;
 
-                // Proporción original
                 double ratioOriginal = (double)imagenCargada.PixelWidth / imagenCargada.PixelHeight;
                 double ratioDestino = (double)anchoFinal / altoFinal;
 
-                // Calcular tamaño para imagen pequeña centrada
+                //CALCULAMOS EL TAMAÑO DE LA IMAGEN PEQUEÑA PARA QUE CUMPLA LA PROPORCION
                 int anchoRender;
                 int altoRender;
                 if (ratioOriginal > ratioDestino)
@@ -509,8 +435,7 @@ namespace Cliente_TFG.Pages
                 }
                 int desplazamientoY = (altoFinal - altoRender) / 2;
 
-                // --- PRIMER PASO: crear imagen de fondo a tamaño completo (300x450) ---
-                // Para el fondo la imagen debe ocupar TODO, estiramos sin respetar proporción
+                //IMAGEN DE FONDO CON BLUR
                 double ratioFondo = (double)imagenCargada.PixelWidth / imagenCargada.PixelHeight;
 
                 int anchoFondo, altoFondo;
@@ -536,10 +461,9 @@ namespace Cliente_TFG.Pages
                 RenderTargetBitmap fondoBitmap = new RenderTargetBitmap(anchoFinal, altoFinal, 96, 96, PixelFormats.Pbgra32);
                 fondoBitmap.Render(fondoVisual);
 
-                // --- APLICAR BLUR SOBRE EL FONDO ---
-                // Crear un Visual para aplicar BlurEffect
+                //APLICAR BLUR A LA IMAGEN
                 DrawingVisual blurVisual = new DrawingVisual();
-                blurVisual.Effect = new BlurEffect { Radius = 15 }; // Ajusta el radio para el blur que quieras
+                blurVisual.Effect = new BlurEffect { Radius = 15 };
                 using (DrawingContext dc = blurVisual.RenderOpen())
                 {
                     dc.DrawImage(fondoBitmap, new Rect(0, 0, anchoFinal, altoFinal));
@@ -547,25 +471,24 @@ namespace Cliente_TFG.Pages
                 RenderTargetBitmap fondoBlurred = new RenderTargetBitmap(anchoFinal, altoFinal, 96, 96, PixelFormats.Pbgra32);
                 fondoBlurred.Render(blurVisual);
 
-                // --- SEGUNDO PASO: crear imagen final con fondo borroso y la imagen centrada ---
+                //CREAMOS LA IAMGEN CENTRADA Y DETRAS LA DE FONDO CON BLUR
                 DrawingVisual finalVisual = new DrawingVisual();
                 using (DrawingContext dc = finalVisual.RenderOpen())
                 {
-                    // Dibujar fondo borroso
+                    //FONDO BORROSO
                     dc.DrawImage(fondoBlurred, new Rect(0, 0, anchoFinal, altoFinal));
 
-                    // Dibujar imagen pequeña centrada verticalmente
+                    //IMAGEN PEQUEÑA
                     dc.DrawImage(imagenCargada, new Rect((anchoFinal - anchoRender) / 2, desplazamientoY, anchoRender, altoRender));
                 }
 
                 RenderTargetBitmap renderBitmap = new RenderTargetBitmap(anchoFinal, altoFinal, 96, 96, PixelFormats.Pbgra32);
                 renderBitmap.Render(finalVisual);
 
-                // Guardar imagen renderizada con nombre appid_render.png
-                string nombreArchivoRender = $"{appid}_vertical.png";
+                //GUARDAR IMAGEN RENDERIZADA
+                string nombreArchivoRender = $"{appid}_vertical.jpg";
                 LocalStorage.GuardarImagenRenderizada(nombreArchivoRender, renderBitmap);
 
-                // Convertir RenderTargetBitmap a BitmapImage para devolver
                 var bmp = new BitmapImage();
                 using (var stream = new MemoryStream())
                 {
@@ -591,18 +514,6 @@ namespace Cliente_TFG.Pages
         }
 
 
-
-
-
-        public static void GuardarImagenLocal(string ruta, BitmapSource bitmap)
-        {
-            using (var fileStream = new FileStream(ruta, FileMode.Create))
-            {
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(bitmap));
-                encoder.Save(fileStream);
-            }
-        }
 
 
 

@@ -83,6 +83,8 @@ namespace Cliente_TFG.Classes
         public static bool ExisteImagen(string nombreArchivo)
         {
             string rutaImagen = Path.Combine(rutaImagenes, nombreArchivo);
+            //MessageBox.Show(rutaImagen);
+            //MessageBox.Show(File.Exists(rutaImagen).ToString());
             return File.Exists(rutaImagen);
         }
 
