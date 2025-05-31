@@ -63,6 +63,7 @@ namespace Cliente_TFG.Pages
         private async void TimerActualizacionSolicitudes_Tick(object sender, EventArgs e)
         {
             await ActualizarSolicitudesPendientesAsync();
+            await ObtenerAmigosDelServidorAsync();
         }
 
         private void InicializarDatosReales()
