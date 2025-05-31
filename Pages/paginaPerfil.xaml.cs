@@ -87,7 +87,6 @@ namespace Cliente_TFG.Pages
             {
                 string rutaImagenLocal = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "imagenes", "default.png");
                 imagenUser.Source = new BitmapImage(new Uri(rutaImagenLocal, UriKind.Absolute));
-                MessageBox.Show("URL de la foto inválida o vacía: " + urlImagen);
             }
         }
 
@@ -148,13 +147,11 @@ namespace Cliente_TFG.Pages
             }
             else
             {
+
                 MessageBox.Show("Foto actualizada correctamente");
             }
         }
 
-
-
-        // Método para recargar usuario desde servidor
         private async Task RecargarUsuarioDesdeServidor()
         {
             int idUsuario = ventanaPrincipal.Usuario.IdUsuario;
@@ -162,20 +159,34 @@ namespace Cliente_TFG.Pages
 
             if (usuarioActualizado != null)
             {
-                // Actualiza el objeto usuario local con los nuevos datos
                 ventanaPrincipal.user = usuarioActualizado;
 
-                // También actualiza la interfaz principal si tienes controles que muestran info del usuario
                 ventanaPrincipal.Cabecera_top.NombreUsuario = usuarioActualizado.NombreUsuario;
                 ventanaPrincipal.Cabecera_top.Dinero = usuarioActualizado.Dinero;
-                //PARA LA FOTO
-                var uri = new Uri(usuarioActualizado.FotoPerfil, UriKind.Absolute);
-                ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(uri);
 
-                // Refresca el UI en esta página
+                try
+                {
+                    string nombreArchivo = string.IsNullOrEmpty(usuarioActualizado.FotoPerfil)
+                        ? "default.png"
+                        : usuarioActualizado.FotoPerfil;
+
+                    string rutaRelativa = System.IO.Path.Combine("res", "imagenes", nombreArchivo);
+                    string rutaCompleta = System.IO.Path.GetFullPath(rutaRelativa);
+
+                    ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(new Uri(rutaCompleta, UriKind.Absolute));
+                }
+                catch (Exception ex)
+                {
+                    string rutaDefault = System.IO.Path.GetFullPath(System.IO.Path.Combine("res", "imagenes", "default.png"));
+                    ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(new Uri(rutaDefault, UriKind.Absolute));
+
+                    Console.WriteLine($"Error cargando imagen: {ex.Message}");
+                }
+
                 cargarDatosUser();
             }
         }
+
 
         private async Task<Usuario> ObtenerUsuarioActualizadoAsync(int idUsuario)
         {
