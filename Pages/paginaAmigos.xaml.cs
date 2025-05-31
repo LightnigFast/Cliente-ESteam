@@ -154,6 +154,7 @@ namespace Cliente_TFG.Pages
                 {
                     MostrarNotificacion($"Has aceptado la solicitud de {Solicitud.NombreUsuario}", NotificationType.Success);
                     ActualizarSolicitudesPendientes();
+                    await ObtenerAmigosDelServidorAsync();
                 }
                 else
                 {
