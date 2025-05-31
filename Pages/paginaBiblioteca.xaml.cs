@@ -234,14 +234,15 @@ namespace Cliente_TFG.Pages
                 string nombreFondo = $"{appidJuego}_fondo.jpg";
                 string urlFondo = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appidJuego}/library_hero.jpg";
                 var imagenFondo = await ObtenerImagenAsync(urlFondo, nombreFondo);
-                if (imagenFondo != null)
+                if (imagenFondo == null)
                 {
-                    imagenesFondo.Add(imagenFondo);
+                    //IMAGEN INVÁLIDA PARA FORZAR IMAGEFAILED
+                    imagenFondo = await GenerarImagenFondoFallback(appidJuego, nombreFondo);
                 }
                 else
                 {
-                    //IMAGEN INVÁLIDA PARA FORZAR IMAGEFAILED
-                    imagenesFondo.Add(null);
+                    
+                    imagenesFondo.Add(imagenFondo);
                 }
 
                 string nombreLogo = $"{appidJuego}_logo.png";
@@ -288,13 +289,13 @@ namespace Cliente_TFG.Pages
 
         private async Task<BitmapImage> ObtenerImagenAsync(string url, string nombreArchivo)
         {
-            // PRIMERO INTENTA CARGAR LOCAL
+            //PRIMERO INTENTA CARGAR LOCAL
             if (LocalStorage.ExisteImagen(nombreArchivo))
             {
                 return LocalStorage.CargarImagenLocal(nombreArchivo);
             }
 
-            // SI NO EXISTE LOCAL, INTENTA DESCARGAR Y GUARDAR
+            // I NO EXISTE LOCAL, INTENTA DESCARGAR Y GUARDAR
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -306,11 +307,60 @@ namespace Cliente_TFG.Pages
             }
             catch
             {
-                // SI FALLA DESCARGAR, DEVUELVE NULL
+                //SI FALLA DESCARGAR, DEVUELVE NULL
                 return null;
             }
         }
 
+        private async Task<BitmapImage> GenerarImagenFondoFallback(string appid, string nombreVertical)
+        {
+            // INTENTA CARGAR LA IMAGEN LOCAL
+            if (LocalStorage.ExisteImagen(nombreVertical))
+            {
+                return LocalStorage.CargarImagenLocal(nombreVertical);
+            }
+
+            int id = int.Parse(appid);
+            var juego = bibliotecaTotal?.juegos?.FirstOrDefault(j => j.app_id == id);
+
+            if (juego == null)
+                return null;
+
+            string fallbackUrl = juego.header ?? juego.captura;
+
+            if (string.IsNullOrEmpty(fallbackUrl))
+                return null;
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    byte[] datosImagen = await client.GetByteArrayAsync(fallbackUrl);
+
+                    // GUARDAR LA IMAGEN EN DISCO
+                    string nombreArchivo = $"{appid}_fondo.jpg";
+                    LocalStorage.GuardarImagen(nombreArchivo, datosImagen);
+
+                    // CREAR BitmapImage DESDE LOS DATOS EN MEMORIA
+                    BitmapImage bmp = new BitmapImage();
+                    using (MemoryStream ms = new MemoryStream(datosImagen))
+                    {
+                        bmp.BeginInit();
+                        bmp.CacheOption = BitmapCacheOption.OnLoad;
+                        bmp.StreamSource = ms;
+                        bmp.EndInit();
+                        bmp.Freeze(); // NECESARIO SI USARÁS ESTA IMAGEN EN OTRO HILO
+                    }
+
+                    return bmp;
+                }
+            }
+            catch (Exception)
+            {
+                // Manejo de errores (puedes loguear si tienes sistema de logs)
+                return null;
+            }
+        }
 
 
 
@@ -390,6 +440,9 @@ namespace Cliente_TFG.Pages
             string urlHeader = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg";
             return await ObtenerImagenAsync(urlHeader, nombreHeader);
         }
+
+
+
 
         //METODO PARA GENERAR LA IMAGEN SI NO SE CARGA CORRECTAMENTE POR QUE NO EXISTE
         private BitmapImage GenerarImagenFallback(string appid, string nombreVertical)
