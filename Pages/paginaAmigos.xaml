@@ -307,106 +307,10 @@
                         <!-- Lista de amigos existente -->
                         <StackPanel x:Name="listaAmigos">
                             <!-- Amigo 1 -->
-                            <Border x:Name="amigoPepe" 
-                                    Background="#252525" 
-                                    BorderBrush="Transparent" 
-                                    BorderThickness="1" 
-                                    CornerRadius="5" 
-                                    Margin="5,2" 
-                                    MouseEnter="amigo_MouseEnter" 
-                                    MouseLeave="amigo_MouseLeave" 
-                                    MouseLeftButtonDown="amigo_MouseLeftButtonDown">
-                                <Grid Height="40">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <!-- Indicador de estado (online) -->
-                                    <Border Grid.Column="0" 
-                                            Width="10" 
-                                            Height="10" 
-                                            Background="#4CAF50" 
-                                            CornerRadius="5" 
-                                            Margin="5,0,0,0" 
-                                            VerticalAlignment="Center"/>
-
-                                    <!-- Nombre de amigo -->
-                                    <TextBlock Grid.Column="1" 
-                                               Text="Pepe" 
-                                               Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
-                                               VerticalAlignment="Center" 
-                                               Margin="10,0"/>
-                                </Grid>
-                            </Border>
 
                             <!-- Amigo 2 -->
-                            <Border x:Name="amigoManolo" 
-                                    Background="#252525" 
-                                    BorderBrush="Transparent" 
-                                    BorderThickness="1" 
-                                    CornerRadius="5" 
-                                    Margin="5,2" 
-                                    MouseEnter="amigo_MouseEnter" 
-                                    MouseLeave="amigo_MouseLeave" 
-                                    MouseLeftButtonDown="amigo_MouseLeftButtonDown">
-                                <Grid Height="40">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <!-- Indicador de estado (online) -->
-                                    <Border Grid.Column="0" 
-                                            Width="10" 
-                                            Height="10" 
-                                            Background="#4CAF50" 
-                                            CornerRadius="5" 
-                                            Margin="5,0,0,0" 
-                                            VerticalAlignment="Center"/>
-
-                                    <!-- Nombre de amigo -->
-                                    <TextBlock Grid.Column="1" 
-                                               Text="Manolo" 
-                                               Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
-                                               VerticalAlignment="Center" 
-                                               Margin="10,0"/>
-                                </Grid>
-                            </Border>
 
                             <!-- Amigo 3 -->
-                            <Border x:Name="amigoJavi" 
-                                    Background="#252525" 
-                                    BorderBrush="Transparent" 
-                                    BorderThickness="1" 
-                                    CornerRadius="5" 
-                                    Margin="5,2" 
-                                    MouseEnter="amigo_MouseEnter" 
-                                    MouseLeave="amigo_MouseLeave" 
-                                    MouseLeftButtonDown="amigo_MouseLeftButtonDown">
-                                <Grid Height="40">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <!-- Indicador de estado (online) -->
-                                    <Border Grid.Column="0" 
-                                            Width="10" 
-                                            Height="10" 
-                                            Background="#4CAF50" 
-                                            CornerRadius="5" 
-                                            Margin="5,0,0,0" 
-                                            VerticalAlignment="Center"/>
-
-                                    <!-- Nombre de amigo -->
-                                    <TextBlock Grid.Column="1" 
-                                               Text="Javi" 
-                                               Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
-                                               VerticalAlignment="Center" 
-                                               Margin="10,0"/>
-                                </Grid>
-                            </Border>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>

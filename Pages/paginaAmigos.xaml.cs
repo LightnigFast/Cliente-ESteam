@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -40,13 +41,14 @@ namespace Cliente_TFG.Pages
             ventanaPrincipal = mainWindow;
 
             InicializarDatosReales();
-            InicializarDatosEjemplo();
+            //InicializarDatosEjemplo();
             InicializarTimerActualizacion();
             AplicarTemaActual();
 
             // Actualizar la UI después de inicializar los datos
             ActualizarSolicitudesPendientes();
             Dispatcher.Invoke(() => ActualizarSolicitudesPendientesAsync());
+            Dispatcher.Invoke(() => ObtenerAmigosDelServidorAsync());
         }
 
         private void InicializarTimerActualizacion()
@@ -94,24 +96,10 @@ namespace Cliente_TFG.Pages
             //solicitudesPendientes.Add(new SolicitudAmistad(123, "Antonia"));
 
             // Inicializar amigos
-            listaDeAmigos.Add(new Amigo
-            {
-                NombreUsuario = "Pepe",
-                IdUsuario = "100001",
-                Estado = EstadoAmigo.Conectado
-            });
-            listaDeAmigos.Add(new Amigo
-            {
-                NombreUsuario = "Manolo",
-                IdUsuario = "100002",
-                Estado = EstadoAmigo.Conectado
-            });
-            listaDeAmigos.Add(new Amigo
-            {
-                NombreUsuario = "Javi",
-                IdUsuario = "100003",
-                Estado = EstadoAmigo.Conectado
-            });
+            listaDeAmigos.Add(new Amigo("Pepe", "100001", EstadoAmigo.Conectado, ""));
+            listaDeAmigos.Add(new Amigo("Manolo", "100002", EstadoAmigo.Conectado, ""));
+            listaDeAmigos.Add(new Amigo("Javi", "100003", EstadoAmigo.Conectado, ""));
+
 
             // Inicializar historial de chat
             historialChat["Pepe"] = new List<MensajeChat>
@@ -136,20 +124,6 @@ namespace Cliente_TFG.Pages
         {
             try
             {
-
-                // TODO - Estas dos lineas seguramente hay que borrarlas cuando acabe
-
-                // Agregar a la lista de amigos
-                listaDeAmigos.Add(new Amigo
-                {
-                    NombreUsuario = solicitud.NombreUsuario,
-                    IdUsuario = solicitud.IdUsuario,
-                    Estado = EstadoAmigo.Conectado
-                });
-
-                // Crear un nuevo elemento en la lista de amigos
-                AgregarAmigoALista(solicitud.NombreUsuario);
-
                 // Eliminar la solicitud
                 solicitudesPendientes.Remove(solicitud);
 
@@ -157,7 +131,6 @@ namespace Cliente_TFG.Pages
 
                 // Actualizar la UI
                 ActualizarSolicitudesPendientes();
-
 
             }
             catch (Exception ex)
@@ -425,14 +398,7 @@ namespace Cliente_TFG.Pages
         {
             try
             {
-                // Llamada al servidor para obtener solicitudes actualizadas
                 await ObtenerSolicitudesDelServidorAsync();
-
-                // Por ahora, simulamos nuevas solicitudes cada 30 segs
-                //if (new Random().Next(1, 100) <= 50) // 50% de probabilidad
-                //{
-                //    AgregarSolicitudSimulada();
-                //}
             }
             catch (Exception ex)
             {
@@ -453,7 +419,7 @@ namespace Cliente_TFG.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    MostrarNotificacion(jsonResponse,NotificationType.Success);
+                    //MostrarNotificacion(jsonResponse,NotificationType.Success);
                     var jsonObj = JObject.Parse(jsonResponse);
                     var recibidas = jsonObj["recibidas"];
 
@@ -482,6 +448,75 @@ namespace Cliente_TFG.Pages
             catch (Exception ex)
             {
                 MostrarNotificacion("Hubo un error obteniendo solucitudes de amistad: "+ ex, NotificationType.Error);
+                return;
+            }
+        }
+
+        private async Task ObtenerAmigosDelServidorAsync()
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/users/?id={ventanaPrincipal.Usuario.id_usuario}&amigos";
+
+            try
+            {
+
+                // Hacer la solicitud
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    MostrarNotificacion("Leyendo amigos: "+jsonResponse, NotificationType.Success);
+                    var amigos = JArray.Parse(jsonResponse);
+
+                    foreach (var amigo in amigos)
+                    {
+                        string nombre = (string)amigo["nombre_usuario"];
+                        string estadoString = (string)amigo["estado"];
+                        int id = (int)amigo["id_usuario"];
+                        string foto = (string)amigo["foto_perfil"];
+                        EstadoAmigo estado;
+
+                        switch (estadoString.ToLower())
+                        {
+                            case "conectado":
+                                estado = EstadoAmigo.Conectado;
+                                break;
+                            case "ausente":
+                                estado = EstadoAmigo.Ausente;
+                                break;
+                            case "ocupado":
+                                estado = EstadoAmigo.Ocupado;
+                                break;
+                            case "invisible":
+                                estado = EstadoAmigo.Desconectado;
+                                break;
+                            case "desconectado":
+                                estado = EstadoAmigo.Desconectado;
+                                break;
+                            default:
+                                estado = EstadoAmigo.Desconectado;
+                                break;
+                        }
+
+                        Amigo nuevoAmigo= (new Amigo(nombre,id.ToString(),estado,foto));
+                        if (!listaDeAmigos.Exists(s => s.IdUsuario == nuevoAmigo.IdUsuario))
+                        {
+                            listaDeAmigos.Add(nuevoAmigo);
+                            AgregarAmigoALista(nombre); 
+                            MostrarNotificacion($"Se ha agregado el usuario {nuevoAmigo.NombreUsuario} a la lista de amigos", NotificationType.Info);
+                        }
+
+                    }
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MostrarNotificacion("Hubo un error obteniendo la lista de amigos: " + ex, NotificationType.Error);
                 return;
             }
         }
@@ -567,7 +602,7 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        // Resto de métodos existentes...
+        // TODO - Deberia pasarle el amigo entero y modificarlo en base a eso
         private void AgregarAmigoALista(string nombreAmigo)
         {
             // Crear un nuevo elemento en la lista de amigos
@@ -897,6 +932,7 @@ namespace Cliente_TFG.Pages
 
                 // Construir la cadena del body
                 string jsonBody = $"{{\n  \"de_usuario_id\": {ventanaPrincipal.user.id_usuario},\n  \"para_usuario_id\": {user.IdUsuario}\n}}";
+                MessageBox.Show(jsonBody);
                 var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
                 // Hacer la solicitud
@@ -991,9 +1027,18 @@ namespace Cliente_TFG.Pages
 
         public class Amigo
         {
+            public Amigo(string nombreUsuario, string idUsuario, EstadoAmigo estado, string foto)
+            {
+                NombreUsuario = nombreUsuario;
+                IdUsuario = idUsuario;
+                Estado = estado;
+                Foto = foto;
+            }
+
             public string NombreUsuario { get; set; }
             public string IdUsuario { get; set; }
             public EstadoAmigo Estado { get; set; }
+            public string Foto { get; set; }
         }
 
         public enum EstadoAmigo
