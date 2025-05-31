@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Policy;
 using System.Text;
@@ -237,7 +238,7 @@ namespace Cliente_TFG.Pages
                 if (imagenFondo == null)
                 {
                     //IMAGEN INVÁLIDA PARA FORZAR IMAGEFAILED
-                    imagenFondo = await GenerarImagenFondoFallback(appidJuego, nombreFondo);
+                    imagenFondo = GenerarImagenFondoFallback(appidJuego, nombreFondo);
                 }
                 else
                 {
@@ -312,7 +313,7 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        private async Task<BitmapImage> GenerarImagenFondoFallback(string appid, string nombreVertical)
+        private BitmapImage GenerarImagenFondoFallback(string appid, string nombreVertical)
         {
             // INTENTA CARGAR LA IMAGEN LOCAL
             if (LocalStorage.ExisteImagen(nombreVertical))
@@ -333,9 +334,9 @@ namespace Cliente_TFG.Pages
 
             try
             {
-                using (HttpClient client = new HttpClient())
+                using (WebClient client = new WebClient())
                 {
-                    byte[] datosImagen = await client.GetByteArrayAsync(fallbackUrl);
+                    byte[] datosImagen = client.DownloadData(fallbackUrl);
 
                     // GUARDAR LA IMAGEN EN DISCO
                     string nombreArchivo = $"{appid}_fondo.jpg";
@@ -357,10 +358,10 @@ namespace Cliente_TFG.Pages
             }
             catch (Exception)
             {
-                // Manejo de errores (puedes loguear si tienes sistema de logs)
                 return null;
             }
         }
+
 
 
 
