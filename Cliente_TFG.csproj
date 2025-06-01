@@ -66,6 +66,7 @@
     <Compile Include="Classes\AppTheme.cs" />
     <Compile Include="Classes\Config.cs" />
     <Compile Include="Classes\LocalStorage.cs" />
+    <Compile Include="Classes\Notificacion.cs" />
     <Compile Include="Classes\Usuario.cs" />
     <Compile Include="Pages\paginaAmigos.xaml.cs">
       <DependentUpon>paginaAmigos.xaml</DependentUpon>

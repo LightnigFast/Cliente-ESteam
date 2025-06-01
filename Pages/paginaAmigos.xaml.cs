@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using static Cliente_TFG.Classes.Notificacion;
 using static Cliente_TFG.Pages.paginaRecargaSaldo;
 
 namespace Cliente_TFG.Pages
@@ -31,6 +32,7 @@ namespace Cliente_TFG.Pages
         private List<SolicitudAmistad> solicitudesPendientes = new List<SolicitudAmistad>();
         private List<Amigo> listaDeAmigos = new List<Amigo>();
         private static readonly HttpClient client = new HttpClient();
+        private Notificacion notificacion;
 
         // Timer para actualizar solicitudes automáticamente
         private DispatcherTimer timerActualizacionSolicitudes;
@@ -39,6 +41,7 @@ namespace Cliente_TFG.Pages
         {
             InitializeComponent();
             ventanaPrincipal = mainWindow;
+            notificacion = new Notificacion(panelNotificaciones);
 
             InicializarDatosReales();
             //InicializarDatosEjemplo();
@@ -136,7 +139,7 @@ namespace Cliente_TFG.Pages
             }
             catch (Exception ex)
             {
-                MostrarNotificacion($"Error al aceptar solicitud: {ex.Message}", NotificationType.Error);
+                notificacion.MostrarNotificacion($"Error al aceptar solicitud: {ex.Message}", NotificationType.Error);
             }
         }
 
@@ -153,19 +156,19 @@ namespace Cliente_TFG.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MostrarNotificacion($"Has aceptado la solicitud de {Solicitud.NombreUsuario}", NotificationType.Success);
+                    notificacion.MostrarNotificacion($"Has aceptado la solicitud de {Solicitud.NombreUsuario}", NotificationType.Success);
                     ActualizarSolicitudesPendientes();
                     await ObtenerAmigosDelServidorAsync();
                 }
                 else
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                    notificacion.MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Hubo un error obteniendo solucitudes de amistad: " + ex);
+                notificacion.MostrarNotificacion("Hubo un error obteniendo solucitudes de amistad: " + ex, NotificationType.Error);
                 return;
             }
         }
@@ -184,7 +187,7 @@ namespace Cliente_TFG.Pages
             }
             catch (Exception ex)
             {
-                MostrarNotificacion($"Error al rechazar solicitud: {ex.Message}", NotificationType.Error);
+                notificacion.MostrarNotificacion($"Error al rechazar solicitud: {ex.Message}", NotificationType.Error);
             }
         }
 
@@ -201,13 +204,13 @@ namespace Cliente_TFG.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MostrarNotificacion($"Se ha rechazado con exito a {solicitud.NombreUsuario}", NotificationType.Warning);
+                    notificacion.MostrarNotificacion($"Se ha rechazado con exito a {solicitud.NombreUsuario}", NotificationType.Warning);
                     ActualizarSolicitudesPendientes();
                 }
                 else
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                    notificacion.MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
                 }
             }
             catch (Exception ex)
@@ -404,7 +407,7 @@ namespace Cliente_TFG.Pages
             }
             catch (Exception ex)
             {
-                MostrarNotificacion($"Error al actualizar solicitudes: {ex.Message}", NotificationType.Error);
+                notificacion.MostrarNotificacion($"Error al actualizar solicitudes: {ex.Message}", NotificationType.Error);
             }
         }
 
@@ -436,7 +439,7 @@ namespace Cliente_TFG.Pages
                         {
                             solicitudesPendientes.Add(nuevaSolicitud);
                             ActualizarSolicitudesPendientes();
-                            MostrarNotificacion($"Nueva solicitud de amistad de {solicitud_nombre_usuario}", NotificationType.Info);
+                            notificacion.MostrarNotificacion($"Nueva solicitud de amistad de {solicitud_nombre_usuario}", NotificationType.Info);
                         }
                         
                     }
@@ -444,12 +447,12 @@ namespace Cliente_TFG.Pages
                 else
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                    notificacion.MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MostrarNotificacion("Hubo un error obteniendo solucitudes de amistad: "+ ex, NotificationType.Error);
+                notificacion.MostrarNotificacion("Hubo un error obteniendo solucitudes de amistad: "+ ex, NotificationType.Error);
                 return;
             }
         }
@@ -467,7 +470,7 @@ namespace Cliente_TFG.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    MostrarNotificacion("Leyendo amigos: "+jsonResponse, NotificationType.Success);
+                    notificacion.MostrarNotificacion("Leyendo amigos: "+jsonResponse, NotificationType.Success);
                     var amigos = JArray.Parse(jsonResponse);
 
                     foreach (var amigo in amigos)
@@ -504,8 +507,8 @@ namespace Cliente_TFG.Pages
                         if (!listaDeAmigos.Exists(s => s.IdUsuario == nuevoAmigo.IdUsuario))
                         {
                             listaDeAmigos.Add(nuevoAmigo);
-                            AgregarAmigoALista(nombre); 
-                            MostrarNotificacion($"Se ha agregado el usuario {nuevoAmigo.NombreUsuario} a la lista de amigos", NotificationType.Info);
+                            AgregarAmigoALista(nombre);
+                            notificacion.MostrarNotificacion($"Se ha agregado el usuario {nuevoAmigo.NombreUsuario} a la lista de amigos", NotificationType.Info);
                         }
 
                     }
@@ -513,12 +516,12 @@ namespace Cliente_TFG.Pages
                 else
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                    notificacion.MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MostrarNotificacion("Hubo un error obteniendo la lista de amigos: " + ex, NotificationType.Error);
+                notificacion.MostrarNotificacion("Hubo un error obteniendo la lista de amigos: " + ex, NotificationType.Error);
                 return;
             }
         }
@@ -538,71 +541,11 @@ namespace Cliente_TFG.Pages
             {
                 solicitudesPendientes.Add(nuevaSolicitud);
                 ActualizarSolicitudesPendientes();
-                MostrarNotificacion($"Nueva solicitud de amistad de {nombre}", NotificationType.Info);
+                notificacion.MostrarNotificacion($"Nueva solicitud de amistad de {nombre}", NotificationType.Info);
             }
         }
 
-        // Enum para tipos de notificación
-        public enum NotificationType
-        {
-            Success,
-            Warning,
-            Error,
-            Info
-        }
 
-        private void MostrarNotificacion(string mensaje, NotificationType tipo)
-        {
-            // Crear una notificación temporal en la UI
-            var notificacion = new Border
-            {
-                Background = ObtenerColorNotificacion(tipo),
-                CornerRadius = new CornerRadius(5),
-                Padding = new Thickness(10),
-                Margin = new Thickness(10),
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Top
-            };
-
-            var textoNotificacion = new TextBlock
-            {
-                Text = mensaje,
-                Foreground = Brushes.White,
-                FontWeight = FontWeights.Bold
-            };
-
-            notificacion.Child = textoNotificacion;
-
-            // Agregar a un panel de notificaciones
-            panelNotificaciones.Children.Add(notificacion);
-
-            // Remover después de 3 segundos
-            var timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(3);
-            timer.Tick += (s, e) =>
-            {
-                timer.Stop();
-                panelNotificaciones.Children.Remove(notificacion);
-            };
-            timer.Start();
-        }
-
-        private Brush ObtenerColorNotificacion(NotificationType tipo)
-        {
-            switch (tipo)
-            {
-                case NotificationType.Success:
-                    return new SolidColorBrush(Color.FromRgb(76, 175, 80)); // Verde
-                case NotificationType.Warning:
-                    return new SolidColorBrush(Color.FromRgb(255, 193, 7)); // Amarillo
-                case NotificationType.Error:
-                    return new SolidColorBrush(Color.FromRgb(244, 67, 54)); // Rojo
-                case NotificationType.Info:
-                    return new SolidColorBrush(Color.FromRgb(33, 150, 243)); // Azul
-                default:
-                    return new SolidColorBrush(Color.FromRgb(158, 158, 158)); // Gris
-            }
-        }
 
         // TODO - Deberia pasarle el amigo entero y modificarlo en base a eso
         private void AgregarAmigoALista(string nombreAmigo)
@@ -895,7 +838,7 @@ namespace Cliente_TFG.Pages
         {
             String output = txtIdAmigoUsuarioActual.Text;
             System.Windows.Clipboard.SetText(output);
-            MostrarNotificacion("Código de amigo copiado al portapapeles", NotificationType.Success);
+            notificacion.MostrarNotificacion("Código de amigo copiado al portapapeles", NotificationType.Success);
         }
 
         private void btnEnviarSolicitud_Click(object sender, RoutedEventArgs e)
@@ -903,13 +846,13 @@ namespace Cliente_TFG.Pages
             String friendCodeABuscar = txtBuscarAmigos.Text;
             if (String.IsNullOrEmpty(friendCodeABuscar))
             {
-                MostrarNotificacion("Tienes que rellenar el campo con el código de amigo", NotificationType.Warning);
+                notificacion.MostrarNotificacion("Tienes que rellenar el campo con el código de amigo", NotificationType.Warning);
                 return;
             }
             SolicitudAmistad user = GetUsuarioPorCodigoDeAmigo(friendCodeABuscar);
             if (user == null)
             {
-                MostrarNotificacion($"No existe un usuario con código de amigo: {friendCodeABuscar}", NotificationType.Error);
+                notificacion.MostrarNotificacion($"No existe un usuario con código de amigo: {friendCodeABuscar}", NotificationType.Error);
                 return;
             }
             MandarSolicitudDeAmistadAsync(user);
@@ -923,18 +866,18 @@ namespace Cliente_TFG.Pages
                 // Validar inputs
                 if (ventanaPrincipal.user == null || ventanaPrincipal.user.id_usuario <= 0)
                 {
-                    MostrarNotificacion("Error: El usuario actual no está definido o tiene un ID inválido.", NotificationType.Error);
+                    notificacion.MostrarNotificacion("Error: El usuario actual no está definido o tiene un ID inválido.", NotificationType.Error);
                     return;
                 }
                 if (user == null)
                 {
-                    MostrarNotificacion("Error: El usuario destino no está definido o tiene un ID inválido.", NotificationType.Error);
+                    notificacion.MostrarNotificacion("Error: El usuario destino no está definido o tiene un ID inválido.", NotificationType.Error);
                     return;
                 }
 
                 // Construir la cadena del body
                 string jsonBody = $"{{\n  \"de_usuario_id\": {ventanaPrincipal.user.id_usuario},\n  \"para_usuario_id\": {user.IdUsuario}\n}}";
-                MessageBox.Show(jsonBody);
+                //MessageBox.Show(jsonBody);
                 var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
                 // Hacer la solicitud
@@ -943,22 +886,22 @@ namespace Cliente_TFG.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    MostrarNotificacion("Solicitud de amistad enviada correctamente.", NotificationType.Success);
+                    notificacion.MostrarNotificacion("Solicitud de amistad enviada correctamente.", NotificationType.Success);
                     txtBuscarAmigos.Text = ""; // Limpiar el campo
                 }
                 else
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                    notificacion.MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
                 }
             }
             catch (HttpRequestException ex)
             {
-                MostrarNotificacion($"Error de red: {ex.Message}", NotificationType.Error);
+                notificacion.MostrarNotificacion($"Error de red: {ex.Message}", NotificationType.Error);
             }
             catch (Exception ex)
             {
-                MostrarNotificacion($"Error inesperado: {ex.Message}", NotificationType.Error);
+                notificacion.MostrarNotificacion($"Error inesperado: {ex.Message}", NotificationType.Error);
             }
         }
 
