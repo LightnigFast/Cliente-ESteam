@@ -382,6 +382,10 @@ namespace Cliente_TFG.Pages
                     txtFalloLogo.Background = (Brush)(new BrushConverter().ConvertFrom("#80000000"));
                     txtFalloLogo.Text = nombresJuegos[0];
                 }
+                else
+                {
+                    ImagenLogo.Source = imagenesLogos.First();
+                }
                 
             }
         }
