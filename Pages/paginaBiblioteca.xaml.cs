@@ -394,7 +394,7 @@ namespace Cliente_TFG.Pages
         //METODO PARA CARGAR TODOS LOS DEMAS JUEGOS DE LA BIBLIOTECA
         private void CargarJuegosBibioteca()
         {
-            for (int i = 0; i < imagenVerticalJuegos.Count; i++)
+            for (int i = 0; i < listaAppids.Count; i++)
             {
                 int currentIndex = i;
                 var juegosBiblioteca = imagenVerticalJuegos[currentIndex];

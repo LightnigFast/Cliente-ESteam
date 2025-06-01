@@ -37,7 +37,18 @@ namespace Cliente_TFG.Pages
             InitializeComponent();
             this.ventanaPrincipal = ventanaPrincipal;
             this.Loaded += Page_Loaded;
-            CargarUltimosJuegos();
+            if (!ventanaPrincipal.Online)
+            {
+                gameCoversPanel.Opacity = 0;
+                txtUltimosJuegosComprados.Opacity = 0;
+            }
+            else
+            {
+                CargarUltimosJuegos();
+                gameCoversPanel.Opacity = 1;
+                txtUltimosJuegosComprados.Opacity = 1;
+            }
+            
             cargarTemas();
 
             cargarDatosUser();
@@ -277,24 +288,44 @@ namespace Cliente_TFG.Pages
                         // Cargar datos en UI
                         for (int i = 0; i < Math.Min(juegos.Count, juegosUI.Count); i++)
                         {
+                            var itemJson = juegosJson[i]; // para acceder al "header"
                             Juego juego = juegos[i];
 
-                            // OBTENER RUTA DE IMAGEN LOCAL
                             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                             string rutaImagen = System.IO.Path.Combine(appData, "ClienteTFG", "imagenes", $"{juego.AppId}_vertical.jpg");
+                            string urlHeader = itemJson["header"].Value<string>();
 
-                            // CARGAR IMAGEN LOCAL
                             BitmapImage bitmap = new BitmapImage();
-                            bitmap.BeginInit();
-                            bitmap.UriSource = new Uri(rutaImagen, UriKind.Absolute);
-                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                            bitmap.EndInit();
+
+                            try
+                            {
+                                bitmap.BeginInit();
+                                bitmap.UriSource = new Uri(rutaImagen, UriKind.Absolute);
+                                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                bitmap.EndInit();
+                            }
+                            catch
+                            {
+                                // Si no carga imagen local, cargar desde URL header
+                                try
+                                {
+                                    bitmap = new BitmapImage();
+                                    bitmap.BeginInit();
+                                    bitmap.UriSource = new Uri(urlHeader, UriKind.Absolute);
+                                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                    bitmap.EndInit();
+                                }
+                                catch (Exception)
+                                {
+                                    // Opcional: poner imagen por defecto o dejar en blanco
+                                    bitmap = null;
+                                    // Aquí puedes asignar una imagen por defecto si quieres.
+                                }
+                            }
 
                             juegosUI[i].caratula.Source = bitmap;
                             juegosUI[i].caratula.Tag = juego;
-
                             juegosUI[i].caratula.MouseEnter += CaratulaJuego_MouseEnter;
-
                             juegosUI[i].nombre.Text = juego.Nombre;
                             juegosUI[i].fecha.Text = $"Comprado: {juego.FechaCompra:dd/MM/yyyy}";
                         }
