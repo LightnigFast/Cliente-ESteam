@@ -698,7 +698,7 @@ namespace Cliente_TFG.Pages
 
             for (int i = 0; i < imagenVerticalJuegos.Count; i++)
             {
-                if (i < Nombres.Length && Nombres[i].ToLower().Contains(filtro))
+                if (i < nombresJuegos.Count && nombresJuegos[i].ToLower().Contains(filtro))
                 {
                     hayCoincidencias = true;
 
@@ -776,6 +776,10 @@ namespace Cliente_TFG.Pages
                 gridContenedor.Height = panelJuegosBiblioteca.ActualHeight;
             };
         }
+
+
+
+
 
     }
 }
