@@ -279,18 +279,21 @@ namespace Cliente_TFG.Pages
                         {
                             Juego juego = juegos[i];
 
+                            // OBTENER RUTA DE IMAGEN LOCAL
+                            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                            string rutaImagen = System.IO.Path.Combine(appData, "ClienteTFG", "imagenes", $"{juego.AppId}_vertical.jpg");
+
+                            // CARGAR IMAGEN LOCAL
                             BitmapImage bitmap = new BitmapImage();
                             bitmap.BeginInit();
-                            bitmap.UriSource = new Uri(juego.UrlCaratula, UriKind.Absolute);
+                            bitmap.UriSource = new Uri(rutaImagen, UriKind.Absolute);
                             bitmap.CacheOption = BitmapCacheOption.OnLoad;
                             bitmap.EndInit();
 
                             juegosUI[i].caratula.Source = bitmap;
                             juegosUI[i].caratula.Tag = juego;
 
-                            // ⚠️ Añadir los eventos aquí:
                             juegosUI[i].caratula.MouseEnter += CaratulaJuego_MouseEnter;
-                            //juegosUI[i].caratula.MouseLeave += CaratulaJuego_MouseLeave;
 
                             juegosUI[i].nombre.Text = juego.Nombre;
                             juegosUI[i].fecha.Text = $"Comprado: {juego.FechaCompra:dd/MM/yyyy}";
