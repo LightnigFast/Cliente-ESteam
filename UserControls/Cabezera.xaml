@@ -246,7 +246,8 @@
                             <ImageBrush x:Name="marcoUser"/>
                         </Border.Background>
                         <Border Width="32" Height="32" CornerRadius="6" ClipToBounds="True" BorderBrush="Gray" BorderThickness="1">
-                            <Image Source="{Binding FotoPerfil}" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Image Source="{Binding FotoPerfil}" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                   RenderOptions.BitmapScalingMode="HighQuality"/>
                         </Border>
                     </Border>
 
