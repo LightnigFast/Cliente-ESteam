@@ -132,6 +132,8 @@ namespace Cliente_TFG.Pages
                 solicitudesPendientes.Remove(solicitud);
 
                 Dispatcher.Invoke(() => AceptarSolicitudAmistadEnServidorAsync(solicitud));
+                Dispatcher.Invoke(() => CrearGrupoChatEnServidorAsync(solicitud.IdUsuario));
+
 
                 // Actualizar la UI
                 ActualizarSolicitudesPendientes();
@@ -140,6 +142,34 @@ namespace Cliente_TFG.Pages
             catch (Exception ex)
             {
                 notificacion.MostrarNotificacion($"Error al aceptar solicitud: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task CrearGrupoChatEnServidorAsync(string idAmigo)
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/chats/crear_chat_privado";
+
+            try
+            {
+                String bodyString = "{\r\n    \"id_usuario_1\": "+ventanaPrincipal.user.id_usuario+",\r\n    \"id_usuario_2\": "+idAmigo+"\r\n}";
+                var content = new StringContent(bodyString, Encoding.UTF8, "application/json");
+                // Hacer la solicitud
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    notificacion.MostrarNotificacion($"Se ha creado un chat con el usuario con id {idAmigo}", NotificationType.Info);
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    notificacion.MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                notificacion.MostrarNotificacion($"Hubo un error intentando crear un chat con el usuario con id {idAmigo}: " + ex, NotificationType.Error);
+                return;
             }
         }
 
@@ -470,7 +500,7 @@ namespace Cliente_TFG.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    notificacion.MostrarNotificacion("Leyendo amigos: "+jsonResponse, NotificationType.Success);
+                    //notificacion.MostrarNotificacion("Leyendo amigos: "+jsonResponse, NotificationType.Success);
                     var amigos = JArray.Parse(jsonResponse);
 
                     foreach (var amigo in amigos)
@@ -507,7 +537,7 @@ namespace Cliente_TFG.Pages
                         if (!listaDeAmigos.Exists(s => s.IdUsuario == nuevoAmigo.IdUsuario))
                         {
                             listaDeAmigos.Add(nuevoAmigo);
-                            AgregarAmigoALista(nombre);
+                            AgregarAmigoALista(nuevoAmigo);
                             notificacion.MostrarNotificacion($"Se ha agregado el usuario {nuevoAmigo.NombreUsuario} a la lista de amigos", NotificationType.Info);
                         }
 
@@ -548,7 +578,8 @@ namespace Cliente_TFG.Pages
 
 
         // TODO - Deberia pasarle el amigo entero y modificarlo en base a eso
-        private void AgregarAmigoALista(string nombreAmigo)
+        private void AgregarAmigoALista(Amigo amigo)
+
         {
             // Crear un nuevo elemento en la lista de amigos
             Border bordeAmigo = new Border
@@ -563,7 +594,7 @@ namespace Cliente_TFG.Pages
             bordeAmigo.MouseEnter += amigo_MouseEnter;
             bordeAmigo.MouseLeave += amigo_MouseLeave;
             bordeAmigo.MouseLeftButtonDown += amigo_MouseLeftButtonDown;
-            bordeAmigo.Tag = nombreAmigo;
+            bordeAmigo.Tag = amigo.IdUsuario;
 
             Grid gridAmigo = new Grid { Height = 40 };
             gridAmigo.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -585,7 +616,7 @@ namespace Cliente_TFG.Pages
             // Nombre del amigo
             TextBlock textoNombre = new TextBlock
             {
-                Text = nombreAmigo,
+                Text = amigo.NombreUsuario,
                 Foreground = AppTheme.Actual.TextoPrincipal,
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(10, 0, 0, 0)
@@ -596,10 +627,11 @@ namespace Cliente_TFG.Pages
             bordeAmigo.Child = gridAmigo;
             listaAmigos.Children.Add(bordeAmigo);
 
+            // TODO - Si algo falla con los chats, es posible que sea esto, comprobarlo
             // Inicializar historial de chat vacío para el nuevo amigo
-            if (!historialChat.ContainsKey(nombreAmigo))
+            if (!historialChat.ContainsKey(amigo.IdUsuario))
             {
-                historialChat[nombreAmigo] = new List<MensajeChat>();
+                historialChat[amigo.IdUsuario] = new List<MensajeChat>();
             }
 
             // Aplicar animación de entrada
@@ -629,29 +661,17 @@ namespace Cliente_TFG.Pages
         {
             if (sender is Border border)
             {
-                string nombreAmigo = "";
+                string idAmigo = "";
 
                 // Obtener el nombre del amigo
                 if (border.Tag != null)
                 {
-                    nombreAmigo = border.Tag.ToString();
-                }
-                else if (border.Name == "amigoPepe")
-                {
-                    nombreAmigo = "Pepe";
-                }
-                else if (border.Name == "amigoManolo")
-                {
-                    nombreAmigo = "Manolo";
-                }
-                else if (border.Name == "amigoJavi")
-                {
-                    nombreAmigo = "Javi";
+                    idAmigo = border.Tag.ToString();
                 }
 
                 // Cambiar el amigo actual y cargar su historial de chat
-                amigoActual = nombreAmigo;
-                CargarHistorialChat(nombreAmigo);
+                amigoActual = idAmigo;
+                CargarHistorialChat(idAmigo);
             }
         }
 
