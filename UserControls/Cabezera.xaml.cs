@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Cliente_TFG.Classes;
+using Newtonsoft.Json;
 
 namespace Cliente_TFG.UserControls
 {
@@ -212,15 +214,50 @@ namespace Cliente_TFG.UserControls
         }
 
         //CLICK EN EL MENU DE LOS ESTADOS
-        private void StatusMenuItem_Click(object sender, RoutedEventArgs e)
+        private async void StatusMenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem)
             {
                 string nuevoEstado = menuItem.Tag.ToString();
                 
                 EstadoActual = nuevoEstado;
+
+                // Enviar el estado al servidor
+                await ActualizarEstadoServidorAsync(nuevoEstado);
             }
         }
+
+        private async Task ActualizarEstadoServidorAsync(string nuevoEstado)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    int idUsuario = 14;
+                    var url = $"http://" + Config.IP + $":50000/user_profile/{idUsuario}/estado";
+
+                    var json = JsonConvert.SerializeObject(new { estado = nuevoEstado });
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync(url, content);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string error = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Error al actualizar estado: {error}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Estado actualizado correctamente en el servidor");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Excepción al actualizar estado: {ex.Message}");
+            }
+        }
+
 
         //VER PERFIL CLICK
         public void VerPerfil_Click(object sender, RoutedEventArgs e)
