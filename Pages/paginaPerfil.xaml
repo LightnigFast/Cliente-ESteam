@@ -5,7 +5,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Cliente_TFG.Pages"
       mc:Ignorable="d" d:DesignWidth="1280"
-      Title="paginaPerfil">
+      Title="paginaPerfil"
+      Loaded="Page_Loaded">
 
     <Page.Resources>
         <!--ESTILO PARA EL CONTENEDOR PRINCIPAL CON BORDE ROJO SIEMPRE VISIBLE Y ANIMACION-->
@@ -459,7 +460,7 @@
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <TextBlock Text="👤" FontSize="18" Foreground="White" Margin="0,0,10,0"/>
                                         <TextBlock Text="Amigos • " FontSize="16" Foreground="White" VerticalAlignment="Center"/>
-                                        <TextBlock Name="txtNumeroAmigos" Text="127" FontSize="16" Foreground="White" VerticalAlignment="Center"/>
+                                        <TextBlock Name="txtNumeroAmigos" Text="127" FontSize="16" Foreground="White" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
 

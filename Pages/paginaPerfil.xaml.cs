@@ -68,7 +68,7 @@ namespace Cliente_TFG.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
 
         {
-
+            await ObtenerNumeroAmigos();
             await RecargarUsuarioDesdeServidor();
 
         }
@@ -102,6 +102,33 @@ namespace Cliente_TFG.Pages
 
 
 
+        private async Task<List<Usuario>> ObtenerAmigosAsync(int idUsuario)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                string url = $"http://{ventanaPrincipal.IP}:50000/users/?id={idUsuario}&amigos";
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<List<Usuario>>(json);
+                }
+                return new List<Usuario>();
+
+            }
+        }
+
+        private async Task ObtenerNumeroAmigos()
+        {
+            int idUsuario = ventanaPrincipal.Usuario.id_usuario;
+            List<Usuario> amigos = await ObtenerAmigosAsync(idUsuario); 
+            int cantidadAmigos = amigos.Count;  
+
+            txtNumeroAmigos.Text = cantidadAmigos.ToString();
+        }
+
+        
 
 
         private async Task<string> SubirImagenAImgurAsync(string ruta)
