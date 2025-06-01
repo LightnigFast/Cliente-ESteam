@@ -8,7 +8,8 @@
         xmlns:local="clr-namespace:Cliente_TFG"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Width="1280" Height="720" MinWidth="1280" MinHeight="720">
+        Title="Osiris" Width="1280" Height="720" MinWidth="1280" MinHeight="720"
+        Icon="res/imagenes/logo.ico">
     <Grid x:Name="mainGrid">
         <!--FONDO GRADIENTE
         <Grid.Background>
