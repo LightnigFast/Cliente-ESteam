@@ -36,6 +36,7 @@ namespace Cliente_TFG.UserControls
         //PARA EL MENU
         public event PropertyChangedEventHandler PropertyChanged;
         private string _nombreUsuario = "NombreUsuario";
+        public int IdUser { get; set; }
         public string NombreUsuario
         {
             get => _nombreUsuario;
@@ -227,14 +228,14 @@ namespace Cliente_TFG.UserControls
             }
         }
 
+        //METODO PARA CAMBIAR EL ESTADO EN LA BASE DE DATOS
         private async Task ActualizarEstadoServidorAsync(string nuevoEstado)
         {
             try
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    int idUsuario = 14;
-                    var url = $"http://" + Config.IP + $":50000/user_profile/{idUsuario}/estado";
+                    var url = $"http://" + Config.IP + $":50000/user_profile/{IdUser}/estado";
 
                     var json = JsonConvert.SerializeObject(new { estado = nuevoEstado });
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -305,6 +306,12 @@ namespace Cliente_TFG.UserControls
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
+
+        public void CambiarEstado(string nuevoEstado)
+        {
+            EstadoActual = nuevoEstado;
+            _ = ActualizarEstadoServidorAsync(nuevoEstado);
+        }
 
         public void CargarDatosUsuario(Usuario usuario)
         {

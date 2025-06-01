@@ -59,6 +59,7 @@ namespace Cliente_TFG
 
             framePrincipal.Navigated += FramePrincipal_Navigated;
 
+            Cabecera_top.IdUser = this.idUser;
             Cabecera_top.AtrasPresionado += boton_atras_presionado;
             Cabecera_top.AvanzarPresionado += boton_avanzar_presionado;
             Cabecera_top.BibliotecaPresionado += boton_biblioteca_presionado;
@@ -74,7 +75,8 @@ namespace Cliente_TFG
                 {
                     user = new Usuario(this);
                     user.CargarDatos(idUser); //SOLO CARGAMOS LOS DATOS SI ESTA EN MODO ONLINE
-
+                    //MessageBox.Show(user.estado);
+                    Cabecera_top.CambiarEstado(user.estado);
                     //GUARDAMOS TODO EL LOCAL DESPUES DE LA CARGA CORRECTA
                     GuardarDatosLocal();
                 }
