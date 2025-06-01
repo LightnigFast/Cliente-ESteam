@@ -22,6 +22,7 @@ using Cliente_TFG.Classes;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using static Cliente_TFG.Pages.paginaTienda;
+using static Cliente_TFG.Classes.Notificacion;
 
 
 namespace Cliente_TFG.Pages
@@ -32,6 +33,7 @@ namespace Cliente_TFG.Pages
     public partial class paginaJuegoTienda : Page
     {
         private MainWindow ventanaPrincipal;
+        private Notificacion notificacion;
         private int appid;
 
         private int indiceActual = 0;
@@ -63,6 +65,7 @@ namespace Cliente_TFG.Pages
             InitializeComponent();
             this.ventanaPrincipal = ventanaPrincipal;
             this.appid = appid;
+            this.notificacion = new Notificacion(panelNotificaciones);
 
             //APLICAMOS LOS BORDES A TODOS LOS COMPONENTES
             bordeDatosJuegos.BorderBrush = AppTheme.Actual.BordePanel;
@@ -323,7 +326,7 @@ namespace Cliente_TFG.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al cargar la imagen: " + ex.Message);
+                notificacion.MostrarNotificacion("Error al cargar la imagen: " + ex.Message,NotificationType.Warning);
             }
             return bitmap;
         }
@@ -697,7 +700,7 @@ namespace Cliente_TFG.Pages
                     {
                         double nuevoDinero = resultado.DineroRestante;
                         ventanaPrincipal.Cabecera_top.Dinero = nuevoDinero;
-                        MessageBox.Show(resultado.Mensaje);
+                        notificacion.MostrarNotificacion(resultado.Mensaje, NotificationType.Success);
 
                         ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
                         ventanaPrincipal.GuardarDatosLocal();
@@ -706,7 +709,7 @@ namespace Cliente_TFG.Pages
                         return true;
                     }
 
-                    MessageBox.Show("Compra realizada con éxito.");
+                    notificacion.MostrarNotificacion("Compra realizada con éxito.", NotificationType.Success);
 
                     ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
                     ventanaPrincipal.GuardarDatosLocal();
@@ -718,7 +721,7 @@ namespace Cliente_TFG.Pages
                 else
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show($"Error al comprar el juego: {errorResponse}");
+                    notificacion.MostrarNotificacion($"Error al comprar el juego: {errorResponse}",NotificationType.Error);
                     return false;
                 }
 
@@ -726,7 +729,7 @@ namespace Cliente_TFG.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Excepción al comprar: {ex.Message}");
+                notificacion.MostrarNotificacion($"Excepción al comprar: {ex.Message}", NotificationType.Error);
                 return false;
             }
         }
@@ -845,7 +848,7 @@ namespace Cliente_TFG.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al cargar datos del juego: {ex.Message}");
+                    notificacion.MostrarNotificacion($"Error al cargar datos del juego: {ex.Message}", NotificationType.Warning);
                 }
             }
         }

@@ -21,6 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static Cliente_TFG.Classes.Notificacion;
 using static Cliente_TFG.Pages.paginaJuegoTienda;
 using static Cliente_TFG.Pages.paginaTienda;
 
@@ -32,6 +33,7 @@ namespace Cliente_TFG.Pages
     public partial class paginaTienda : Page
     {
         private MainWindow ventanaPrincipal;
+        private Notificacion notificacion;
 
         //CARRUSEL
         private List<int> appidCarrusel = new List<int>();
@@ -96,6 +98,7 @@ namespace Cliente_TFG.Pages
             BtnSiguiente.MouseLeave += BotonCarrusel_MouseLeave;
 
             ventanaPrincipal = mainWindow;
+            notificacion = new Notificacion(panelNotificaciones);
 
             //DESHABILITAR ESTO PARA EVITAR ERRORES EN LA CARGA DEL PRORGAMA
             carruselMiniaturasImagenes.IsEnabled = false;
@@ -186,7 +189,7 @@ namespace Cliente_TFG.Pages
 
                     if (imagenesCarrusel.Count == 0)
                     {
-                        MessageBox.Show("No se encontraron imágenes en el carrusel.");
+                        notificacion.MostrarNotificacion("No se encontraron imágenes en el carrusel.", NotificationType.Warning);
                     }
                     else
                     {
@@ -197,7 +200,7 @@ namespace Cliente_TFG.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al cargar datos del carrusel: {ex.Message}");
+                    notificacion.MostrarNotificacion($"Error al cargar datos del carrusel: {ex.Message}",NotificationType.Error);
                 }
             }
         }
@@ -672,7 +675,7 @@ namespace Cliente_TFG.Pages
 
                     if (imagenesOfertas.Count == 0)
                     {
-                        MessageBox.Show("No se encontraron imágenes para las ofertas.");
+                        notificacion.MostrarNotificacion("No se encontraron imágenes para las ofertas.", NotificationType.Error);
                     }
                     else
                     {
@@ -682,7 +685,7 @@ namespace Cliente_TFG.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al cargar datos del carrusel: {ex.Message}");
+                    notificacion.MostrarNotificacion($"Error al cargar datos del carrusel: {ex.Message}", NotificationType.Error);
                 }
             }
         }
@@ -935,7 +938,7 @@ namespace Cliente_TFG.Pages
 
                     if (imagenesOfertas.Count == 0)
                     {
-                        MessageBox.Show("No se encontraron imágenes para las ofertas.");
+                        notificacion.MostrarNotificacion("No se encontraron imágenes para las ofertas.", NotificationType.Warning);
                     }
                     else
                     {
@@ -945,7 +948,7 @@ namespace Cliente_TFG.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al cargar datos de las ofertas espciales: {ex.Message}");
+                    notificacion.MostrarNotificacion($"Error al cargar datos de las ofertas espciales: {ex.Message}", NotificationType.Error);
                 }
             }
         }
@@ -1151,7 +1154,7 @@ namespace Cliente_TFG.Pages
 
                     if (imagenesOfertas.Count == 0)
                     {
-                        MessageBox.Show("No se encontraron imágenes para las ofertas.");
+                        notificacion.MostrarNotificacion("No se encontraron imágenes para las ofertas.", NotificationType.Error);
                     }
                     else
                     {
@@ -1161,7 +1164,7 @@ namespace Cliente_TFG.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al cargar datos de las ofertas espciales: {ex.Message}");
+                    notificacion.MostrarNotificacion($"Error al cargar datos de las ofertas espciales: {ex.Message}", NotificationType.Error);
                 }
             }
         }

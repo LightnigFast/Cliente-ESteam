@@ -215,7 +215,7 @@ namespace Cliente_TFG.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Hubo un error obteniendo solucitudes de amistad: " + ex);
+                notificacion.MostrarNotificacion("Hubo un error obteniendo solucitudes de amistad: " + ex, NotificationType.Error);
                 return;
             }
         }
@@ -826,12 +826,6 @@ namespace Cliente_TFG.Pages
                 };
                 timer.Start();
             }
-        }
-
-        private void btnBuscarAmigos_Click(object sender, RoutedEventArgs e)
-        {
-            // Implementar lógica para buscar amigos
-            MessageBox.Show("Funcionalidad de búsqueda de amigos en desarrollo", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void btnCopiarIdAmigo_Click(object sender, RoutedEventArgs e)
