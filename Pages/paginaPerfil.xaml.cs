@@ -29,7 +29,6 @@ namespace Cliente_TFG.Pages
     public partial class paginaPerfil : Page
     {
 
-        //private const string URL_API = "http://26.84.183.227:50000/";
         private MainWindow ventanaPrincipal;
         private List<string> imagenVerticalJuegos = new List<string>();
 
@@ -164,22 +163,18 @@ namespace Cliente_TFG.Pages
                 ventanaPrincipal.Cabecera_top.NombreUsuario = usuarioActualizado.NombreUsuario;
                 ventanaPrincipal.Cabecera_top.Dinero = usuarioActualizado.Dinero;
 
+
                 try
                 {
-                    string nombreArchivo = string.IsNullOrEmpty(usuarioActualizado.FotoPerfil)
-                        ? "default.png"
-                        : usuarioActualizado.FotoPerfil;
-
-                    string rutaRelativa = System.IO.Path.Combine("res", "imagenes", nombreArchivo);
-                    string rutaCompleta = System.IO.Path.GetFullPath(rutaRelativa);
-
-                    ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(new Uri(rutaCompleta, UriKind.Absolute));
+                    ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(new Uri(usuarioActualizado.FotoPerfil, UriKind.Absolute));
+                   
                 }
                 catch (Exception ex)
                 {
                     string rutaDefault = System.IO.Path.GetFullPath(System.IO.Path.Combine("res", "imagenes", "default.png"));
                     ventanaPrincipal.Cabecera_top.FotoPerfil = new BitmapImage(new Uri(rutaDefault, UriKind.Absolute));
 
+                    //MessageBox.Show($"Error cargando imagen: {ex.Message}");
                     Console.WriteLine($"Error cargando imagen: {ex.Message}");
                 }
 
