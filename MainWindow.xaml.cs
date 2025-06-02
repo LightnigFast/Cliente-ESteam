@@ -55,7 +55,6 @@ namespace Cliente_TFG
             this.DataContext = AppTheme.Actual;
             AppTheme.SetDark();
             cargarTema();
-            user = new Usuario(this);
 
             framePrincipal.Navigated += FramePrincipal_Navigated;
 

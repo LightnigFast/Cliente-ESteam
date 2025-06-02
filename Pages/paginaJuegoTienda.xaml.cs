@@ -23,6 +23,7 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using static Cliente_TFG.Pages.paginaTienda;
 using static Cliente_TFG.Classes.Notificacion;
+using Newtonsoft.Json.Linq;
 
 
 namespace Cliente_TFG.Pages
@@ -705,6 +706,7 @@ namespace Cliente_TFG.Pages
                         ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
                         ventanaPrincipal.GuardarDatosLocal();
                         CargarBotonCompra();
+                        botonCompra.Content = "EN BIBLIOTECA";
 
                         return true;
                     }
@@ -721,7 +723,19 @@ namespace Cliente_TFG.Pages
                 else
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    notificacion.MostrarNotificacion($"Error al comprar el juego: {errorResponse}",NotificationType.Error);
+
+                    try
+                    {
+                        var errorJson = JObject.Parse(errorResponse);
+                        string mensajeError = errorJson["message"]?.ToString() ?? "Error desconocido.";
+                        notificacion.MostrarNotificacion("Error: " + mensajeError, NotificationType.Error);
+                    }
+                    catch
+                    {
+                        // Por si la respuesta no es un JSON válido
+                        notificacion.MostrarNotificacion("Error al comprar el juego.", NotificationType.Error);
+                        MessageBox.Show("Error al comprar el juego.");
+                    }
                     return false;
                 }
 

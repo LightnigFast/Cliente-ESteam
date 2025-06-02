@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -15,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Cliente_TFG.Classes;
+using Cliente_TFG.Windows;
 using Newtonsoft.Json;
 
 namespace Cliente_TFG.UserControls
@@ -166,7 +168,7 @@ namespace Cliente_TFG.UserControls
                 btn.Background = AppTheme.Actual.BordePanel;
                 btn.Foreground = AppTheme.Actual.FondoPanel;
 
-                if (btn.Content is Path path)
+                if (btn.Content is System.Windows.Shapes.Path path)
                 {
                     path.Fill = AppTheme.Actual.FondoPanel;
                 }
@@ -180,7 +182,7 @@ namespace Cliente_TFG.UserControls
                 btn.Background = AppTheme.Actual.FondoPanel;
                 btn.Foreground = AppTheme.Actual.BordePanel;
 
-                if (btn.Content is Path path)
+                if (btn.Content is System.Windows.Shapes.Path path)
                 {
                     path.Fill = AppTheme.Actual.BordePanel;
                 }
@@ -266,6 +268,7 @@ namespace Cliente_TFG.UserControls
             VerPerfilPresionado?.Invoke(this, e);
         }
 
+        //RECARGAR SALDO CLICK
         private void RecargarSaldo_Click(object sender, RoutedEventArgs e)
         {
             RecargarSaldoPresionado?.Invoke(this, e);
@@ -291,7 +294,7 @@ namespace Cliente_TFG.UserControls
                         EstadoColor = (Color)ColorConverter.ConvertFromString("#FFE6B905");
                         break;
                     case "Desconectado":
-                        EstadoTexto = "Desconectado";
+                        EstadoTexto = "Ocupado";
                         EstadoColor = (Color)ColorConverter.ConvertFromString("#FFBD3E3E");
                         break;
                     default:
@@ -327,6 +330,42 @@ namespace Cliente_TFG.UserControls
             {
                 //SI LA URL NO ES VÁLIDA O DA ERROR, USAR UNA IMAGEN POR DEFECTO
                 FotoPerfil = new BitmapImage(new Uri("pack://application:,,,/res/imagenes/default.png"));
+            }
+        }
+
+        //CERRAR SESION CLCIK
+        public void CerrarSesion_Click(object sender, RoutedEventArgs e)
+        {
+            //BORRAMOS EL TOKEN
+            string rutaToken = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ClienteTFG", "token.txt"
+            );
+
+            if (File.Exists(rutaToken))
+            {
+                try
+                {
+                    File.Delete(rutaToken);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al borrar token: " + ex.Message);
+                }
+            }
+
+            //ABRIMOS LA VENTANA DEL LOGIN
+            LoginWindow loginWindow = new LoginWindow();
+            loginWindow.Show();
+
+            //CERRAMOS LA VENTANA ACTUAL DONDE SE HA HECHO CLICK EN EL BOTON PARA ASI NO TENER ERRORES
+            if (sender is DependencyObject dependencyObject)
+            {
+                Window window = Window.GetWindow(dependencyObject);
+                if (window != null)
+                {
+                    window.Close();
+                }
             }
         }
 

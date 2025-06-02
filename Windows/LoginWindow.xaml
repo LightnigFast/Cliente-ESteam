@@ -8,6 +8,7 @@
         Title="Iniciar sesión"
         Height="500"
         Width="900"
+        Icon="..//res/imagenes/logo.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="{Binding Source={StaticResource AppTheme}, Path=Fondo}"

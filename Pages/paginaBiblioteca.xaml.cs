@@ -64,6 +64,8 @@ namespace Cliente_TFG.Pages
                     await ObtenerBibliotecaDesdeApiAsync();
 
                 await CargarImagenesFondo();
+
+                AplicarFadeIn(gridPrincipal);
             };
         }
 
@@ -281,6 +283,7 @@ namespace Cliente_TFG.Pages
                 var fallbackPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "library", "Banner_no_games_library.png");
                 var fallbackImage = new BitmapImage(new Uri(fallbackPath));
                 imagenesFondo.Add(fallbackImage);
+                BotonJugar.Opacity = 0;
             }
 
             CargarFondo();
@@ -782,7 +785,42 @@ namespace Cliente_TFG.Pages
         }
 
 
+        //EFECTOS
+        //METODO PARA HACER EL EFECTO FADEIN EN TODOS LOS ELEMENTOS DE LA INTERFAZ
+        private async Task FadeOutATodo()
+        {
+            await AplicarFadeOutAsync(gridPrincipal);
 
+        }
+
+
+        //METODO PARA QUE TODO SE VEA MAS NATURAL CON UNA TRASICION FADEIN
+        private void AplicarFadeIn(UIElement elemento)
+        {
+            var fadeIn = new DoubleAnimation
+            {
+                From = 0,
+                To = 1,
+                Duration = TimeSpan.FromMilliseconds(500),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
+            elemento.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+        }
+
+        private async Task AplicarFadeOutAsync(UIElement elemento)
+        {
+            var fadeOut = new DoubleAnimation
+            {
+                From = 1,
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(500),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
+            elemento.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+
+            await Task.Delay(500); //ESPERA A QUE TERMINE LA ANIMACIÓN
+            AplicarFadeIn(elemento);
+        }
 
 
     }
