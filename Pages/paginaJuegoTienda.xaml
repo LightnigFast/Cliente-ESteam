@@ -9,6 +9,79 @@
       Title="paginaJuegoTienda">
 
     <Page.Resources>
+        <!--ESTILO DEL BOTON DE COMPRA-->
+        <Style x:Key="PurchaseButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#d11f45"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Margin" Value="10,10,10,0"/>
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Content" Value="🛒 Comprar Ahora"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="PART_Border" 
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="8"
+                        BorderThickness="0"
+                        ClipToBounds="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Content}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="PART_Border" Property="Background" Value="#b91a3d"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="PART_Border" Property="Background" Value="#a01735"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="PART_Border" Property="Background" Value="#cccccc"/>
+                                <Setter Property="Foreground" Value="#666666"/>
+                            </Trigger>
+                            <!-- Trigger para estado biblioteca -->
+                            <Trigger Property="Tag" Value="biblioteca">
+                                <Setter TargetName="PART_Border" Property="Background" Value="#5ebd3e"/>
+                                <Setter Property="Content" Value="📚 En Biblioteca"/>
+                            </Trigger>
+                            <!-- Trigger combinado para hover en estado biblioteca -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Tag" Value="biblioteca"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="PART_Border" Property="Background" Value="#4da832"/>
+                            </MultiTrigger>
+                            <!-- Trigger combinado para pressed en estado biblioteca -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Tag" Value="biblioteca"/>
+                                    <Condition Property="IsPressed" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="PART_Border" Property="Background" Value="#3d8a26"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!--ESTILO DEL SCROLLVIEW VERTICAL-->
         <Style x:Key="VerticalScrollBarStyle" TargetType="ScrollBar">
             <Setter Property="Width" Value="3"/>
@@ -199,7 +272,24 @@
 
 
                             <!--BOTON PARA COMPRAR O AÑADIR A LA BIBLIOTECA-->
-                            <Button x:Name="botonCompra" Margin="10,10,10,0" Opacity="0" Click="botonCompra_Click"/>
+                            <Button x:Name="botonCompra" 
+                                    Style="{StaticResource PurchaseButtonStyle}"
+                                Click="botonCompra_Click">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                From="0" To="1" Duration="0:0:0.8"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Button.Triggers>
+                            </Button>
+                            
+                            
+                            
+                            
 
                             <!--GRID PARA LA DESCRIPCCION CORTA-->
                             <Grid x:Name="gridDescripccionCorta" Margin="0,10,0,0">

@@ -671,11 +671,15 @@ namespace Cliente_TFG.Pages
 
         private async void botonCompra_Click(object sender, RoutedEventArgs e)
         {
-            int userId = ventanaPrincipal.Usuario.IdUsuario; 
-            int gameId = appid; 
+            int userId = ventanaPrincipal.Usuario.IdUsuario;
+            int gameId = appid;
 
             bool exito = await ComprarJuegoAsync(userId, gameId);
 
+            if (exito)
+            {
+                botonCompra.Tag = "biblioteca"; // SI ESTA EN BIBLIOTECA, SE PONE EL BOTON EN VERDE
+            }
         }
 
         //METODO PARA COMPRAR UN JUEGO HACIENDO UNA PETICION POST AL SERVER
