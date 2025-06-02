@@ -422,6 +422,15 @@ namespace Cliente_TFG.Pages
                 //ANIMACIONES SI CARGA BIEN
                 img.MouseLeftButtonUp += ImagenJuego_Click;
 
+                // ASIGNAR MENU
+                ContextMenu menu = CrearContextMenuJuego(currentIndex);
+                img.ContextMenu = menu;
+                img.MouseRightButtonUp += (s, e) =>
+                {
+                    img.ContextMenu.IsOpen = true;
+                    img.ContextMenu.PlacementTarget = img;
+                };
+
                 img.MouseEnter += (s, e) =>
                 {
                     var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
@@ -442,11 +451,56 @@ namespace Cliente_TFG.Pages
         }
 
 
-        private async Task<BitmapImage> CargarImagenFallbackFondo(string appid)
+        private ContextMenu CrearContextMenuJuego(int index)
         {
-            string nombreHeader = $"{appid}_header.jpg";
-            string urlHeader = $"https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg";
-            return await ObtenerImagenAsync(urlHeader, nombreHeader);
+            ContextMenu menu = new ContextMenu
+            {
+                Style = (Style)FindResource("EstiloContextMenu")
+            };
+
+            MenuItem jugarItem = new MenuItem
+            {
+                Header = "Jugar",
+                Style = (Style)FindResource("EstiloMenuItem")
+            };
+
+            MenuItem cambiarEjecutableItem = new MenuItem
+            {
+                Header = "Cambiar ejecutable",
+                Style = (Style)FindResource("EstiloMenuItem")
+            };
+
+            MenuItem detallesItem = new MenuItem
+            {
+                Header = "Ver detalles",
+                Style = (Style)FindResource("EstiloMenuItem")
+            };
+
+            MenuItem eliminarItem = new MenuItem
+            {
+                Header = "Eliminar de la biblioteca",
+                Style = (Style)FindResource("EstiloMenuItem")
+            };
+
+            //ASIGNAR OPCIONES
+            // jugarItem.Click += (s, e) => IniciarJuego(index);
+            detallesItem.Click += (s, e) => MostrarDetallesJuego(index);
+            // eliminarItem.Click += (s, e) => EliminarJuego(index);
+
+            menu.Items.Add(jugarItem);
+            menu.Items.Add(cambiarEjecutableItem);
+            menu.Items.Add(detallesItem);
+            menu.Items.Add(eliminarItem);
+
+            return menu;
+        }
+
+        private async void MostrarDetallesJuego(int index)
+        {
+            await FadeOutATodo();
+            paginaJuegoTienda newPage = new paginaJuegoTienda(ventanaPrincipal, listaAppids[index]);
+            ventanaPrincipal.framePrincipal.Navigate(newPage);
+            
         }
 
 

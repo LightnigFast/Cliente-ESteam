@@ -34,7 +34,7 @@
                      BorderThickness="1"/>
 
                 <TextBlock Text="Contraseña" Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoSecundario}" />
-                <PasswordBox x:Name="txtPassword" Margin="0 5 0 20" Height="35" FontSize="14" Padding="6"
+                <PasswordBox x:Name="txtPassword" Margin="0 5 0 15" Height="35" FontSize="14" Padding="6"
                      Background="{Binding Source={StaticResource AppTheme}, Path=Fondo}"
                      Foreground="{Binding Source={StaticResource AppTheme}, Path=TextoPrincipal}"
                      BorderBrush="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"
