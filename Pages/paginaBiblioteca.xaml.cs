@@ -43,6 +43,7 @@ namespace Cliente_TFG.Pages
         //PARA LOS DEMAS JUEGOS DE LA BIBLIOTECA
         private List<int> listaAppids;
         private List<string> nombresJuegos;
+        private List<JuegoInfo> juegosGuardados = new List<JuegoInfo>();
         private BibliotecaResponse bibliotecaTotal = new BibliotecaResponse
         {
             juegos = new List<Juego>()
@@ -397,10 +398,29 @@ namespace Cliente_TFG.Pages
         //METODO PARA CARGAR TODOS LOS DEMAS JUEGOS DE LA BIBLIOTECA
         private void CargarJuegosBibioteca()
         {
+            var juegosExistentes = CargarJuegosDesdeJson();
+            juegosGuardados.Clear();
+
             for (int i = 0; i < listaAppids.Count; i++)
             {
                 int currentIndex = i;
                 var juegosBiblioteca = imagenVerticalJuegos[currentIndex];
+
+                string appid = listaAppids[currentIndex].ToString();
+                string nombre = nombresJuegos[currentIndex];
+
+                //BUSCAMOS SI YA EXISTE EN EL JSON
+                string rutaEjecutable = juegosExistentes
+                    .FirstOrDefault(j => j.AppId == appid)?.RutaEjecutable ?? "";
+
+                //AÑADIR A LA LISTA
+                juegosGuardados.Add(new JuegoInfo
+                {
+                    AppId = appid,
+                    Nombre = nombre,
+                    RutaEjecutable = rutaEjecutable
+                });
+
 
                 var scale = new ScaleTransform(1.0, 1.0);
                 double altura = 170;
@@ -446,8 +466,39 @@ namespace Cliente_TFG.Pages
                 };
 
                 panelJuegosBiblioteca.Children.Add(img);
+                GuardarJuegosEnJson();
             }
 
+        }
+
+        public class JuegoInfo
+        {
+            public string AppId { get; set; }
+            public string Nombre { get; set; }
+            public string RutaEjecutable { get; set; }
+        }
+
+        private string rutaJsonJuegos = System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "ClienteTFG", "juegos_biblioteca.json");
+
+
+        //METODO PARA GUARDAR LOS JUEGOS EN EL JSON
+        private void GuardarJuegosEnJson()
+        {
+            string json = JsonConvert.SerializeObject(juegosGuardados, Formatting.Indented);
+            System.IO.File.WriteAllText(rutaJsonJuegos, json);
+        }
+
+        //METODO PARA CARGAR LOS JUEGOS DEL JSON (LO USAMOS PARA NO BORRAR LOS DATOS DE LOS JUEGOS ANTERIORES POR SI CAMBIAMOS DE LOGIN)
+        private List<JuegoInfo> CargarJuegosDesdeJson()
+        {
+            if (System.IO.File.Exists(rutaJsonJuegos))
+            {
+                string json = System.IO.File.ReadAllText(rutaJsonJuegos);
+                return JsonConvert.DeserializeObject<List<JuegoInfo>>(json) ?? new List<JuegoInfo>();
+            }
+            return new List<JuegoInfo>();
         }
 
 
@@ -483,7 +534,8 @@ namespace Cliente_TFG.Pages
             };
 
             //ASIGNAR OPCIONES
-            // jugarItem.Click += (s, e) => IniciarJuego(index);
+            jugarItem.Click += (s, e) => IniciarJuego(index);
+            cambiarEjecutableItem.Click += (s, e) => cambiarEjecutableJuego(index);
             detallesItem.Click += (s, e) => MostrarDetallesJuego(index);
             // eliminarItem.Click += (s, e) => EliminarJuego(index);
 
@@ -493,6 +545,35 @@ namespace Cliente_TFG.Pages
             menu.Items.Add(eliminarItem);
 
             return menu;
+        }
+
+        private void IniciarJuego(int index)
+        {
+            string ruta = juegosGuardados[index].RutaEjecutable;
+            MessageBox.Show(ruta);
+            if (!string.IsNullOrEmpty(ruta) && System.IO.File.Exists(ruta))
+            {
+                Process.Start(ruta);
+            }
+            else
+            {
+                MessageBox.Show("Ruta del ejecutable no válida. Cámbiala primero.");
+            }
+        }
+
+        //METODO PARA CAMBIAR LA RUTA DEL EJECUTABLE EL CUAL QUEREMOS INICIAR
+        private void cambiarEjecutableJuego(int index)
+        {
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "Archivos ejecutables (*.exe)|*.exe";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                juegosGuardados[index].RutaEjecutable = openFileDialog.FileName;
+                GuardarJuegosEnJson();
+                MessageBox.Show("Ruta actualizada con éxito.");
+            }
+
         }
 
         private async void MostrarDetallesJuego(int index)

@@ -90,6 +90,12 @@ namespace Cliente_TFG.UserControls
                         Directory.CreateDirectory(System.IO.Path.GetDirectoryName(rutaToken));
                         File.WriteAllText(rutaToken, token);
 
+                        string rutaJsonJuegos = System.IO.Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                            "ClienteTFG", "juegos_biblioteca.json"
+                        );
+                        BorrarJuegosBibliotecaJson(rutaJsonJuegos);
+
                         //MessageBox.Show("Login correcto. ID: " + idUsuario);
                         return idUsuario; // DEVUELVE EL ID DEL USUARIO
                     }
@@ -112,6 +118,14 @@ namespace Cliente_TFG.UserControls
         }
 
 
+        //BORRAMOS LOS DATOS DE LOS JUEGOS DEL ANTERIOR MENSAJE
+        private void BorrarJuegosBibliotecaJson(string rutaJsonJuegos)
+        {
+            if (File.Exists(rutaJsonJuegos))
+            {
+                File.Delete(rutaJsonJuegos);
+            }
+        }
 
 
 
