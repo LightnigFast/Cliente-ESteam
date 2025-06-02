@@ -290,17 +290,19 @@ namespace Cliente_TFG.Pages
                     JObject json = JObject.Parse(response);
                     var juegosJson = json["ultimas_compras"];
 
-                    if (juegosJson != null)
+                    if (juegosJson != null && juegosJson.HasValues)
                     {
+                        gameCoversPanel.Opacity = 1;
+                        txtUltimosJuegosComprados.Opacity = 1;
                         // Controles en la interfaz gráfica
                         var juegosUI = new List<(Image caratula, TextBlock nombre, TextBlock fecha)>
-                {
-                    (caratulaJuego1, nombreJuego1, fechaJuego1),
-                    (caratulaJuego2, nombreJuego2, fechaJuego2),
-                    (caratulaJuego3, nombreJuego3, fechaJuego3)
-                };
+                        {
+                            (caratulaJuego1, nombreJuego1, fechaJuego1),
+                            (caratulaJuego2, nombreJuego2, fechaJuego2),
+                            (caratulaJuego3, nombreJuego3, fechaJuego3)
+                        };
 
-                        // Crear lista de objetos Juego
+                        //Crear lista de objetos Juego
                         List<Juego> juegos = new List<Juego>();
                         foreach (var item in juegosJson)
                         {
@@ -356,6 +358,11 @@ namespace Cliente_TFG.Pages
                             juegosUI[i].nombre.Text = juego.Nombre;
                             juegosUI[i].fecha.Text = $"Comprado: {juego.FechaCompra:dd/MM/yyyy}";
                         }
+                    }
+                    else
+                    {
+                        gameCoversPanel.Opacity = 0;
+                        txtUltimosJuegosComprados.Opacity = 0;
                     }
                 }
             }
