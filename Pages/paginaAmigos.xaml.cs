@@ -67,6 +67,7 @@ namespace Cliente_TFG.Pages
             await ActualizarSolicitudesPendientesAsync();
             await ObtenerAmigosDelServidorAsync();
             await ConectarSocketIOAsync();
+            await UnirseAlChat(ventanaPrincipal.Usuario.id_usuario); // Unirse al chat del usuario actual   
         }
 
         private async Task ConectarSocketIOAsync()
@@ -77,39 +78,79 @@ namespace Cliente_TFG.Pages
 
                 var options = new SocketIOClient.SocketIOOptions
                 {
-                    Transport = SocketIOClient.Transport.TransportProtocol.Polling, // Aqui forzamos al cliente a usar polling
-                    AutoUpgrade = false // Impedimos que intente actualizar a WebSocket
-                }; 
+                    Transport = SocketIOClient.Transport.TransportProtocol.Polling,
+                    AutoUpgrade = false
+                };
 
                 cliente = new SocketIOClient.SocketIO($"http://{ventanaPrincipal.IP}:50000", options);
 
-                cliente.OnConnected += async (sender, e) =>
-                {
-                    MessageBox.Show("Conectado a Socket.IO (polling)");
-                    await cliente.EmitAsync("join_chat", new
-                    {
-                        id_chat = 1,
-                        id_usuario = ventanaPrincipal.Usuario.id_usuario
-                    });
-                };
+                
 
                 cliente.OnDisconnected += (sender, reason) =>
                 {
-                    notificacion.MostrarNotificacion($"Desconectado de Socket.IO: {reason}", NotificationType.Warning);
+                    notificacion.MostrarNotificacion($"❌ Desconectado de Socket.IO: {reason}", NotificationType.Warning);
                 };
 
-                // cliente.On espera y recibe evento/mensajes del server
-                cliente.On("mensaje_recibido", response =>
+                // Escuchar eventos del servidor
+                cliente.On("status", response =>
                 {
-                    string mensaje = response.GetValue<string>();
-                    notificacion.MostrarNotificacion($"Mensaje recibido: {mensaje}", NotificationType.Info);
+                    var mensaje = response.GetValue<MensajeDTO>().ToString();
+                    MessageBox.Show($"[Status]: {mensaje}");
                 });
 
-                
+                cliente.On("error", response =>
+                {
+                    var error = response.GetValue<MensajeDTO>().ToString();
+                    MessageBox.Show($"[Error servidor]: {error}");
+                });
+
+                cliente.On("nuevo_mensaje", response =>
+                {
+                    try
+                    {
+                        var rawJson = response.GetValue<MensajeDTO>().ToString();
+                        MessageBox.Show($"[Mensaje bruto]: {rawJson}");
+
+                        var datosArray = response.GetValue<MensajeDTO[]>();
+                        var datos = datosArray[0];
+
+                        DateTime timestamp = DateTime.TryParse(datos.timestamp, out var temp) ? temp : DateTime.Now;
+
+                        var mensajeRecibido = new MensajeChat(datos.nombre_usuario, datos.mensaje, timestamp);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            if (!historialChat.ContainsKey(datos.nombre_usuario))
+                                historialChat[datos.nombre_usuario] = new List<MensajeChat>();
+
+                            historialChat[datos.nombre_usuario].Add(mensajeRecibido);
+
+                            if (amigoActual == datos.nombre_usuario)
+                                AgregarMensajeAChat(mensajeRecibido);
+
+                            scrollMensajes.ScrollToEnd();
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"❌ Error al procesar mensaje: {ex.Message}");
+                    }
+                });
+
+                cliente.On("status", response =>
+                {
+                    var msg = response.GetValue<string>();
+                    MessageBox.Show($"✅ STATUS: {msg}");
+                });
+
+                cliente.On("error", response =>
+                {
+                    var error = response.GetValue<string>();
+                    MessageBox.Show($"❌ ERROR: {error}");
+                });
 
                 notificacion.MostrarNotificacion("Intentando conectar (polling)...", NotificationType.Info);
                 await cliente.ConnectAsync();
-                notificacion.MostrarNotificacion("Conectado a Socket.IO (polling)", NotificationType.Success);
             }
             catch (Exception ex)
             {
@@ -117,18 +158,51 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        public async Task Conectar()
+
+        private async void EnviarMensaje()
         {
-            cliente = new SocketIOClient.SocketIO("http://26.75.134.118:50000");
+            string contenido = txtMensaje.Text.Trim();
 
-            cliente.OnConnected += async (sender, e) =>
+            if (!string.IsNullOrEmpty(contenido) && !string.IsNullOrEmpty(amigoActual) && idChatActual != 0)
             {
-                MessageBox.Show("Conectado");
-                await cliente.EmitAsync("join_chat", new { id_chat = 1, id_usuario = 5 });
-            };
-
-            await cliente.ConnectAsync();
+                if (cliente.Connected)
+                {
+                    await cliente.EmitAsync("enviar_mensaje", new
+                    {
+                        id_usuario_remitente = ventanaPrincipal.Usuario.id_usuario,
+                        id_chat = idChatActual, // Usar ID dinámico
+                        mensaje = contenido
+                    });
+                    txtMensaje.Text = ""; // Limpiar campo
+                }
+                else
+                {
+                    notificacion.MostrarNotificacion("⚠️ No conectado al servidor", NotificationType.Error);
+                }
+            }
         }
+
+        public class MensajeDTO
+        {
+            public int id_mensaje { get; set; }
+            public string mensaje { get; set; }
+            public string timestamp { get; set; }
+            public int id_usuario_remitente { get; set; }
+            public string nombre_usuario { get; set; }
+        }
+
+        //public async Task Conectar()
+        //{
+        //    cliente = new SocketIOClient.SocketIO("http://26.75.134.118:50000");
+
+        //    cliente.OnConnected += async (sender, e) =>
+        //    {
+        //        MessageBox.Show("Conectado");
+        //        await cliente.EmitAsync("join_chat", new { id_chat = 1, id_usuario = 5 });
+        //    };
+
+        //    await cliente.ConnectAsync();
+        //}
 
         private void InicializarTimerActualizacion()
         {
@@ -756,10 +830,40 @@ namespace Cliente_TFG.Pages
             areaMensajes.Children.Clear();
 
             await BuscarChatEnComunConAmigo(IdAmigo);
+            await UnirseAlChat(idChatActual);
             await CargarHistorialChatDesdeElServidorAsync(IdAmigo);          
 
             // Hacer scroll hasta el último mensaje
             scrollMensajes.ScrollToEnd();
+        }
+
+        private async Task UnirseAlChat(int idChat)
+        {
+            if (cliente != null && cliente.Connected)
+            {
+                // Dejar sala anterior si existe
+                if (idChatActual != 0)
+                {
+                    await cliente.EmitAsync("leave_chat", new
+                    {
+                        id_chat = idChatActual,
+                        id_usuario = ventanaPrincipal.Usuario.id_usuario
+                    });
+                }
+
+                // Unirse a la nueva sala
+                await cliente.EmitAsync("join_chat", new
+                {
+                    id_chat = idChat,
+                    id_usuario = ventanaPrincipal.Usuario.id_usuario
+                });
+
+                notificacion.MostrarNotificacion($"Unido al chat: {idChat}", NotificationType.Info);
+            }
+            else
+            {
+                notificacion.MostrarNotificacion("No conectado al servidor", NotificationType.Error);
+            }
         }
 
         //TODO
@@ -920,31 +1024,33 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        private void EnviarMensaje()
-        {
-            string contenido = txtMensaje.Text.Trim();
+        //private void EnviarMensaje()
+        //{
+        //    string contenido = txtMensaje.Text.Trim();
 
-            if (!string.IsNullOrEmpty(contenido) && !string.IsNullOrEmpty(amigoActual))
-            {
-                // Crear nuevo mensaje
-                MensajeChat nuevoMensaje = new MensajeChat("Yo",contenido,DateTime.Now);
+        //    if (!string.IsNullOrEmpty(contenido) && !string.IsNullOrEmpty(amigoActual))
+        //    {
+        //        // Crear nuevo mensaje
+        //        MensajeChat nuevoMensaje = new MensajeChat("Yo",contenido,DateTime.Now);
 
-                // Agregar al historial
-                historialChat[amigoActual].Add(nuevoMensaje);
+        //        // Agregar al historial
+        //        historialChat[amigoActual].Add(nuevoMensaje);
 
-                // Mostrar en la UI
-                AgregarMensajeAChat(nuevoMensaje);
+        //        // Mostrar en la UI
+        //        AgregarMensajeAChat(nuevoMensaje);
 
-                // Limpiar el campo de texto
-                txtMensaje.Text = string.Empty;
+        //        // Limpiar el campo de texto
+        //        txtMensaje.Text = string.Empty;
 
-                // Hacer scroll hasta el último mensaje
-                scrollMensajes.ScrollToEnd();
+        //        // Hacer scroll hasta el último mensaje
+        //        scrollMensajes.ScrollToEnd();
 
-                // Simular respuesta después de un tiempo aleatorio (solo para demostración)
-                SimularRespuesta();
-            }
-        }
+        //        // Simular respuesta después de un tiempo aleatorio (solo para demostración)
+        //        SimularRespuesta();
+        //    }
+        //}
+
+       
 
         private void SimularRespuesta()
         {
