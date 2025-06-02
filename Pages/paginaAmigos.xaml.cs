@@ -1,10 +1,12 @@
 ﻿using Cliente_TFG.Classes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +37,9 @@ namespace Cliente_TFG.Pages
         private static readonly HttpClient client = new HttpClient();
         private Notificacion notificacion;
         private int idChatActual;
+
+        private ClientWebSocket _webSocket = new ClientWebSocket();
+        private bool _isConnected = false;
 
         // Timer para actualizar solicitudes automáticamente
         private DispatcherTimer timerActualizacionSolicitudes;
