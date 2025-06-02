@@ -50,7 +50,7 @@ namespace Cliente_TFG
         }
 
 
-        private async void cargarTODO()
+        private void cargarTODO()
         {
             this.DataContext = AppTheme.Actual;
             AppTheme.SetDark();

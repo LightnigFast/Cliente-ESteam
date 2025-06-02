@@ -41,7 +41,7 @@ namespace Cliente_TFG.Pages
         private SocketIOClient.SocketIO cliente;
 
         private ClientWebSocket _webSocket = new ClientWebSocket();
-        private bool _isConnected = false;
+        //private bool _isConnected = false;
 
         // Timer para actualizar solicitudes automáticamente
         private DispatcherTimer timerActualizacionSolicitudes;

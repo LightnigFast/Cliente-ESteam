@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -289,6 +290,18 @@ namespace Cliente_TFG.Pages
 
             CargarFondo();
             CargarJuegosBibioteca();
+
+            //PARTE PARA COMPROBAR SI EL PRIMER JUEGO TIENE RUTA PUESTA
+            string appid = listaAppids.First().ToString();
+
+            if (TieneRutaAsignada(appid))
+            {
+                var juegoSeleccionado = juegosGuardados.FirstOrDefault(j => j.AppId == appid);
+                if (juegoSeleccionado != null)
+                {
+                    ActualizarEstadoBotonJuego(BotonJugar, juegoSeleccionado);
+                }
+            }
         }
 
 
@@ -550,7 +563,7 @@ namespace Cliente_TFG.Pages
         private void IniciarJuego(int index)
         {
             string ruta = juegosGuardados[index].RutaEjecutable;
-            MessageBox.Show(ruta);
+            //MessageBox.Show(ruta);
             if (!string.IsNullOrEmpty(ruta) && System.IO.File.Exists(ruta))
             {
                 Process.Start(ruta);
@@ -571,10 +584,21 @@ namespace Cliente_TFG.Pages
             {
                 juegosGuardados[index].RutaEjecutable = openFileDialog.FileName;
                 GuardarJuegosEnJson();
-                MessageBox.Show("Ruta actualizada con éxito.");
+                //MessageBox.Show("Ruta actualizada con éxito.");
+                var juegoSeleccionado = juegosGuardados[index];
+                ActualizarEstadoBotonJuego(BotonJugar, juegoSeleccionado);
+
             }
 
         }
+
+        //METODO PARA COMPROBAR SI UN APPID TIENE RUTA ASIGANADA (SIRVE NADA MAS PARA EL PRIMER JUEGO QUE SE MUESTRA)
+        private bool TieneRutaAsignada(string appid)
+        {
+            var juego = juegosGuardados.FirstOrDefault(j => j.AppId == appid);
+            return juego != null && !string.IsNullOrWhiteSpace(juego.RutaEjecutable);
+        }
+
 
         private async void MostrarDetallesJuego(int index)
         {
@@ -769,6 +793,10 @@ namespace Cliente_TFG.Pages
                     ImagenLogo.Tag = index;
                     imgFondo.Tag = index;
 
+                    //CAMBIAR ESTADO DEL BOTÓN SEGÚN RUTA
+                    var juegoSeleccionado = juegosGuardados[index.Value];
+                    ActualizarEstadoBotonJuego(BotonJugar, juegoSeleccionado);
+
 
                     //ASIGNAMOS MANEJADORES DE NUEVO PRIMERO
                     imgFondo.ImageFailed += ImgFondo_ImageFailed;
@@ -797,6 +825,27 @@ namespace Cliente_TFG.Pages
                 ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 txtFalloLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+            }
+        }
+    
+        //METODO PARA ACTUALIZAR EL ESTADO DEL BOTON DEPENDIENDO DE SI TIENE RUTA COLOCADA EN EL ARCHIVO O NO
+        private void ActualizarEstadoBotonJuego(Button boton, JuegoInfo juego)
+        {
+            if (!string.IsNullOrWhiteSpace(juego.RutaEjecutable))
+            {
+                boton.Tag = "Play";
+                boton.Content = "Jugar";
+                boton.Click += (s, e) =>
+                {
+                    int index = juegosGuardados.FindIndex(j => j.AppId == juego.AppId);
+                    if (index != -1)
+                        IniciarJuego(index);
+                };
+            }
+            else
+            {
+                boton.Tag = "Unavailable";
+                boton.Content = "No disponible";
             }
         }
 
