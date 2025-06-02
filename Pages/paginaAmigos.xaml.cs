@@ -17,6 +17,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using static Cliente_TFG.Classes.Notificacion;
+using static Cliente_TFG.Pages.paginaAmigos;
 using static Cliente_TFG.Pages.paginaRecargaSaldo;
 
 namespace Cliente_TFG.Pages
@@ -33,6 +34,7 @@ namespace Cliente_TFG.Pages
         private List<Amigo> listaDeAmigos = new List<Amigo>();
         private static readonly HttpClient client = new HttpClient();
         private Notificacion notificacion;
+        private int idChatActual;
 
         // Timer para actualizar solicitudes automáticamente
         private DispatcherTimer timerActualizacionSolicitudes;
@@ -106,22 +108,22 @@ namespace Cliente_TFG.Pages
 
 
             // Inicializar historial de chat
-            historialChat["Pepe"] = new List<MensajeChat>
-            {
-                new MensajeChat { Remitente = "Pepe", Contenido = "Hola, ¿cómo estás?", Fecha = DateTime.Now.AddHours(-2) },
-                new MensajeChat { Remitente = "Yo", Contenido = "¡Muy bien! ¿Y tú?", Fecha = DateTime.Now.AddHours(-1) }
-            };
+            //historialChat["Pepe"] = new List<MensajeChat>
+            //{
+            //    new MensajeChat { Remitente = "Pepe", Contenido = "Hola, ¿cómo estás?", Fecha = DateTime.Now.AddHours(-2) },
+            //    new MensajeChat { Remitente = "Yo", Contenido = "¡Muy bien! ¿Y tú?", Fecha = DateTime.Now.AddHours(-1) }
+            //};
 
-            historialChat["Manolo"] = new List<MensajeChat>
-            {
-                new MensajeChat { Remitente = "Manolo", Contenido = "¿Jugamos una partida?", Fecha = DateTime.Now.AddDays(-1) }
-            };
+            //historialChat["Manolo"] = new List<MensajeChat>
+            //{
+            //    new MensajeChat { Remitente = "Manolo", Contenido = "¿Jugamos una partida?", Fecha = DateTime.Now.AddDays(-1) }
+            //};
 
-            historialChat["Javi"] = new List<MensajeChat>
-            {
-                new MensajeChat { Remitente = "Javi", Contenido = "¿Has visto las nuevas ofertas?", Fecha = DateTime.Now.AddDays(-2) },
-                new MensajeChat { Remitente = "Yo", Contenido = "Sí, están geniales", Fecha = DateTime.Now.AddDays(-2).AddMinutes(5) }
-            };
+            //historialChat["Javi"] = new List<MensajeChat>
+            //{
+            //    new MensajeChat { Remitente = "Javi", Contenido = "¿Has visto las nuevas ofertas?", Fecha = DateTime.Now.AddDays(-2) },
+            //    new MensajeChat { Remitente = "Yo", Contenido = "Sí, están geniales", Fecha = DateTime.Now.AddDays(-2).AddMinutes(5) }
+            //};
         }
 
         private void AceptarSolicitudAmistad(SolicitudAmistad solicitud)
@@ -575,9 +577,7 @@ namespace Cliente_TFG.Pages
             }
         }
 
-
-
-        // TODO - Deberia pasarle el amigo entero y modificarlo en base a eso
+        
         private void AgregarAmigoALista(Amigo amigo)
 
         {
@@ -671,26 +671,100 @@ namespace Cliente_TFG.Pages
 
                 // Cambiar el amigo actual y cargar su historial de chat
                 amigoActual = idAmigo;
-                CargarHistorialChat(idAmigo);
+                Dispatcher.Invoke(() => CargarHistorialChat(idAmigo));
             }
         }
 
-        private void CargarHistorialChat(string nombreAmigo)
+        private async Task CargarHistorialChat(string IdAmigo)
         {
             // Limpiar el área de mensajes
             areaMensajes.Children.Clear();
 
-            // Verificar si existe historial para este amigo
-            if (historialChat.ContainsKey(nombreAmigo))
-            {
-                foreach (var mensaje in historialChat[nombreAmigo])
-                {
-                    AgregarMensajeAChat(mensaje);
-                }
-            }
+            await BuscarChatEnComunConAmigo(IdAmigo);
+            await CargarHistorialChatDesdeElServidorAsync(IdAmigo);          
 
             // Hacer scroll hasta el último mensaje
             scrollMensajes.ScrollToEnd();
+        }
+
+        //TODO
+        private async Task BuscarChatEnComunConAmigo(string idAmigo)
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/chats/chat_en_comun?id_usuario_1={ventanaPrincipal.Usuario.id_usuario}&id_usuario_2={idAmigo}";
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    var jsonObj = JObject.Parse(jsonResponse);
+                    this.idChatActual = (int)jsonObj["chat_en_comun"];
+                    notificacion.MostrarNotificacion($"Se ha encontrado el chat con {idAmigo}: id chat {idChatActual}", NotificationType.Info);
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    notificacion.MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+                    // Si falla se crea el grupo y se busca de manera recursiva
+                    await CrearGrupoChatEnServidorAsync(idAmigo);
+                    await BuscarChatEnComunConAmigo(idAmigo);
+                }
+            }
+            catch (Exception ex)
+            {
+                notificacion.MostrarNotificacion($"Hubo un error intentando buscar el chat con el usuario con id {idAmigo}: " + ex, NotificationType.Error);
+                return;
+            }
+        }
+
+        private async Task CargarHistorialChatDesdeElServidorAsync(string idAmigo)
+        {
+            string url = $"http://{ventanaPrincipal.IP}:50000/chats/mensajes_chat?id_chat={idChatActual}";
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    //MessageBox.Show("Respuesta JSON: " + jsonResponse);
+                    var jsonObject = JObject.Parse(jsonResponse);
+                    var jsonMensajes = jsonObject["mensajes"] as JArray;
+                    historialChat.Clear();
+                    List<MensajeChat> listaDeMensajes = new List<MensajeChat>();
+                    foreach (var mensaje in jsonMensajes)
+                    {
+                        string remitente = (string)mensaje["nombre_usuario"];
+                        if (remitente == ventanaPrincipal.user.nombre_usuario)
+                            remitente = "Yo";
+                        string contenido = (string)mensaje["mensaje"];
+                        DateTime timeStamp = (DateTime)mensaje["timestamp"];
+
+                        listaDeMensajes.Add(new MensajeChat(remitente,contenido,timeStamp));
+                    }
+                    historialChat.Add(idAmigo,listaDeMensajes);
+
+                    foreach (var mensaje in historialChat[idAmigo])
+                    {
+                        AgregarMensajeAChat(mensaje);
+                    }
+                    notificacion.MostrarNotificacion($"Se ha cargado el historial de chat con {idAmigo}: id chat {idChatActual}", NotificationType.Info);
+                }
+                else
+                {
+                    string errorResponse = await response.Content.ReadAsStringAsync();
+                    notificacion.MostrarNotificacion($"Error del servidor: {errorResponse} (Código: {response.StatusCode})", NotificationType.Error);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                notificacion.MostrarNotificacion($"Hubo un error cargando el historial de chat con el usuario con id {idAmigo}: " + ex, NotificationType.Error);
+                return;
+            }
         }
 
         private void AgregarMensajeAChat(MensajeChat mensaje)
@@ -778,12 +852,7 @@ namespace Cliente_TFG.Pages
             if (!string.IsNullOrEmpty(contenido) && !string.IsNullOrEmpty(amigoActual))
             {
                 // Crear nuevo mensaje
-                MensajeChat nuevoMensaje = new MensajeChat
-                {
-                    Remitente = "Yo",
-                    Contenido = contenido,
-                    Fecha = DateTime.Now
-                };
+                MensajeChat nuevoMensaje = new MensajeChat("Yo",contenido,DateTime.Now);
 
                 // Agregar al historial
                 historialChat[amigoActual].Add(nuevoMensaje);
@@ -828,12 +897,7 @@ namespace Cliente_TFG.Pages
                     };
 
                     string respuesta = respuestas[rnd.Next(respuestas.Length)];
-                    MensajeChat mensajeRespuesta = new MensajeChat
-                    {
-                        Remitente = amigoActual,
-                        Contenido = respuesta,
-                        Fecha = DateTime.Now
-                    };
+                    MensajeChat mensajeRespuesta = new MensajeChat(amigoActual, respuesta, DateTime.Now);
 
                     // Agregar al historial
                     historialChat[amigoActual].Add(mensajeRespuesta);
@@ -966,6 +1030,13 @@ namespace Cliente_TFG.Pages
         // Clases auxiliares para manejar los datos (sin cambios)
         public class MensajeChat
         {
+            public MensajeChat(string remitente, string contenido, DateTime fecha)
+            {
+                Remitente = remitente;
+                Contenido = contenido;
+                Fecha = fecha;
+            }
+
             public string Remitente { get; set; }
             public string Contenido { get; set; }
             public DateTime Fecha { get; set; }
