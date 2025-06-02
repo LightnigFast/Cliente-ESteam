@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -79,6 +80,15 @@ namespace Cliente_TFG.UserControls
                         string respuestaJson = await response.Content.ReadAsStringAsync();
                         dynamic datosRespuesta = JsonConvert.DeserializeObject(respuestaJson);
                         int idUsuario = datosRespuesta.id_usuario;
+                        string token = datosRespuesta.token;
+
+                        //GUARDAMOS TOKEN EN LOCAL
+                        string rutaToken = System.IO.Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                            "ClienteTFG", "token.txt"
+                        );
+                        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(rutaToken));
+                        File.WriteAllText(rutaToken, token);
 
                         //MessageBox.Show("Login correcto. ID: " + idUsuario);
                         return idUsuario; // DEVUELVE EL ID DEL USUARIO

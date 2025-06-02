@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Cliente_TFG"
              xmlns:classes="clr-namespace:Cliente_TFG.Classes"
-             StartupUri="Windows/LoginWindow.xaml">
+              Startup="Application_Startup">
     <Application.Resources>
         <ObjectDataProvider x:Key="AppTheme" ObjectType="{x:Type classes:AppTheme}" MethodName="get_Actual" />
     </Application.Resources>
