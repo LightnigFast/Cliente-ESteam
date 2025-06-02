@@ -287,7 +287,7 @@
                 </StackPanel>
                 
                 <!--BOTON PARA JUGAR, INSTALAR O DEMÁS-->
-                <Button x:Name="BotonJugar" Grid.Row="1" Height="50" Width="170" Style="{StaticResource GameStoreButton}" Content="Jugar ahora" Tag="Play" 
+                <Button x:Name="BotonJugar" Grid.Row="1" Height="50" Width="170" Style="{StaticResource GameStoreButton}" Content="No disponible" Tag="Unavailable" 
                         VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,50,30" />
             </Grid>
 
