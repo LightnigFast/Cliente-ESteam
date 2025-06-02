@@ -195,7 +195,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid x:Name="gridPrincipal" Background="Black">
+    <Grid x:Name="gridPrincipal" Background="Black" Opacity="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
