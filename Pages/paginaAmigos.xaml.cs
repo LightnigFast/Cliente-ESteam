@@ -21,6 +21,7 @@ using System.Windows.Threading;
 using static Cliente_TFG.Classes.Notificacion;
 using static Cliente_TFG.Pages.paginaAmigos;
 using static Cliente_TFG.Pages.paginaRecargaSaldo;
+using SocketIOClient;
 
 namespace Cliente_TFG.Pages
 {
@@ -37,6 +38,7 @@ namespace Cliente_TFG.Pages
         private static readonly HttpClient client = new HttpClient();
         private Notificacion notificacion;
         private int idChatActual;
+        private SocketIOClient.SocketIO cliente;
 
         private ClientWebSocket _webSocket = new ClientWebSocket();
         private bool _isConnected = false;
@@ -57,8 +59,75 @@ namespace Cliente_TFG.Pages
 
             // Actualizar la UI después de inicializar los datos
             ActualizarSolicitudesPendientes();
-            Dispatcher.Invoke(() => ActualizarSolicitudesPendientesAsync());
-            Dispatcher.Invoke(() => ObtenerAmigosDelServidorAsync());
+            _ = InicializarAsync();
+        }
+
+        private async Task InicializarAsync()
+        {
+            await ActualizarSolicitudesPendientesAsync();
+            await ObtenerAmigosDelServidorAsync();
+            await ConectarSocketIOAsync();
+        }
+
+        private async Task ConectarSocketIOAsync()
+        {
+            try
+            {
+                notificacion.MostrarNotificacion("Creando cliente Socket.IO con transporte polling...", NotificationType.Info);
+
+                var options = new SocketIOClient.SocketIOOptions
+                {
+                    Transport = SocketIOClient.Transport.TransportProtocol.Polling, // Aqui forzamos al cliente a usar polling
+                    AutoUpgrade = false // Impedimos que intente actualizar a WebSocket
+                }; 
+
+                cliente = new SocketIOClient.SocketIO($"http://{ventanaPrincipal.IP}:50000", options);
+
+                cliente.OnConnected += async (sender, e) =>
+                {
+                    MessageBox.Show("Conectado a Socket.IO (polling)");
+                    await cliente.EmitAsync("join_chat", new
+                    {
+                        id_chat = 1,
+                        id_usuario = ventanaPrincipal.Usuario.id_usuario
+                    });
+                };
+
+                cliente.OnDisconnected += (sender, reason) =>
+                {
+                    notificacion.MostrarNotificacion($"Desconectado de Socket.IO: {reason}", NotificationType.Warning);
+                };
+
+                // cliente.On espera y recibe evento/mensajes del server
+                cliente.On("mensaje_recibido", response =>
+                {
+                    string mensaje = response.GetValue<string>();
+                    notificacion.MostrarNotificacion($"Mensaje recibido: {mensaje}", NotificationType.Info);
+                });
+
+                
+
+                notificacion.MostrarNotificacion("Intentando conectar (polling)...", NotificationType.Info);
+                await cliente.ConnectAsync();
+                notificacion.MostrarNotificacion("Conectado a Socket.IO (polling)", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                notificacion.MostrarNotificacion($"Error al conectar con Socket.IO: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        public async Task Conectar()
+        {
+            cliente = new SocketIOClient.SocketIO("http://26.75.134.118:50000");
+
+            cliente.OnConnected += async (sender, e) =>
+            {
+                MessageBox.Show("Conectado");
+                await cliente.EmitAsync("join_chat", new { id_chat = 1, id_usuario = 5 });
+            };
+
+            await cliente.ConnectAsync();
         }
 
         private void InicializarTimerActualizacion()
@@ -70,7 +139,7 @@ namespace Cliente_TFG.Pages
             timerActualizacionSolicitudes.Start();
         }
 
-        private async void TimerActualizacionSolicitudes_Tick(object sender, EventArgs e)
+               private async void TimerActualizacionSolicitudes_Tick(object sender, EventArgs e)
         {
             await ActualizarSolicitudesPendientesAsync();
             await ObtenerAmigosDelServidorAsync();
@@ -514,6 +583,7 @@ namespace Cliente_TFG.Pages
                     {
                         string nombre = (string)amigo["nombre_usuario"];
                         string estadoString = (string)amigo["estado"];
+                        estadoString = estadoString ?? "desconocido";
                         int id = (int)amigo["id_usuario"];
                         string foto = (string)amigo["foto_perfil"];
                         EstadoAmigo estado;

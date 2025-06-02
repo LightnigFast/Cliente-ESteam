@@ -50,7 +50,7 @@ namespace Cliente_TFG
         }
 
 
-        private void cargarTODO()
+        private async void cargarTODO()
         {
             this.DataContext = AppTheme.Actual;
             AppTheme.SetDark();
@@ -78,6 +78,7 @@ namespace Cliente_TFG
                     Cabecera_top.CambiarEstado(user.estado);
                     //GUARDAMOS TODO EL LOCAL DESPUES DE LA CARGA CORRECTA
                     GuardarDatosLocal();
+
                 }
                 catch
                 {
