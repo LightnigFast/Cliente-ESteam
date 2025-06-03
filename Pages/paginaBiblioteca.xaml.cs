@@ -50,6 +50,9 @@ namespace Cliente_TFG.Pages
             juegos = new List<Juego>()
         };
 
+        //PARA IDENTIFICAR EL JUEGO QUE SE ESTA VIENDO
+        private int appidActual;
+
         public paginaBiblioteca(MainWindow ventanaPrincipal)
         {
             InitializeComponent();
@@ -281,12 +284,15 @@ namespace Cliente_TFG.Pages
 
             if (imagenesFondo.Count == 0)
             {
-                // Cargar imagen por defecto si no hay fondos
+                //CARGAMOS LA IMAGEN POR DEFECTO POR SI NO HAY IMAGENES
                 var fallbackPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "library", "Banner_no_games_library.png");
                 var fallbackImage = new BitmapImage(new Uri(fallbackPath));
                 imagenesFondo.Add(fallbackImage);
                 BotonJugar.Opacity = 0;
             }
+
+            //PONEMOS EL APPID ACTUAL EN EL PRIMER JUEGO PARA PODER INDENTIFICARLO
+            appidActual = listaAppids.First();
 
             CargarFondo();
             CargarJuegosBibioteca();
@@ -780,8 +786,9 @@ namespace Cliente_TFG.Pages
 
             if (index.HasValue)
             {
-                var fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromMilliseconds(300)));
-                fadeOut.Completed += (s, _) =>
+                //ANIMACIÓN SOLO PARA imgFondo CON Completed
+                var fadeOutImgFondo = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromMilliseconds(300)));
+                fadeOutImgFondo.Completed += (s, _) =>
                 {
                     //QUITAMOS MANEJADORES ANTERIORES
                     imgFondo.ImageFailed -= ImgFondo_ImageFailed;
@@ -795,10 +802,10 @@ namespace Cliente_TFG.Pages
 
                     //CAMBIAR ESTADO DEL BOTÓN SEGÚN RUTA
                     var juegoSeleccionado = juegosGuardados[index.Value];
+                    appidActual = listaAppids[index.Value];
                     ActualizarEstadoBotonJuego(BotonJugar, juegoSeleccionado);
 
-
-                    //ASIGNAMOS MANEJADORES DE NUEVO PRIMERO
+                    //ASIGNAMOS MANEJADORES DE NUEVO
                     imgFondo.ImageFailed += ImgFondo_ImageFailed;
                     ImagenLogo.ImageFailed += ImagenLogo_ImageFailed;
 
@@ -810,37 +817,44 @@ namespace Cliente_TFG.Pages
                     else
                         ImagenLogo.Source = new BitmapImage(new Uri("https://noexiste.este.dominio/logo.png"));
 
-
-
                     //ANIMACIÓN ENTRADA
-                    var fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(300)));
+                    var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300));
                     imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     txtFalloLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                     BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 };
 
-                //APLICAMOS LA ANIMACIÓN PARA QUE SE DISPARA EL .Completed
-                imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
-                ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
-                txtFalloLogo.BeginAnimation(UIElement.OpacityProperty, fadeOut);
-                BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+                //EJECUTAMOS fadeOut SOLO EN imgFondo CON Completed (ASI NO SE EJECUTA VARIAS VECES)
+                imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeOutImgFondo);
+
+                //OTRAS ANIMACIONES SIN Completed
+                var fadeOutSimple = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(300));
+                ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeOutSimple);
+                txtFalloLogo.BeginAnimation(UIElement.OpacityProperty, fadeOutSimple);
+                BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOutSimple);
             }
+
         }
-    
+
         //METODO PARA ACTUALIZAR EL ESTADO DEL BOTON DEPENDIENDO DE SI TIENE RUTA COLOCADA EN EL ARCHIVO O NO
         private void ActualizarEstadoBotonJuego(Button boton, JuegoInfo juego)
         {
+
             if (!string.IsNullOrWhiteSpace(juego.RutaEjecutable))
             {
-                boton.Tag = "Play";
-                boton.Content = "Jugar";
-                boton.Click += (s, e) =>
+                if(appidActual == int.Parse(juego.AppId))
                 {
-                    int index = juegosGuardados.FindIndex(j => j.AppId == juego.AppId);
-                    if (index != -1)
-                        IniciarJuego(index);
-                };
+                    boton.Tag = "Play";
+                    boton.Content = "Jugar";
+                    boton.Click += (s, e) =>
+                    {
+                        int index = juegosGuardados.FindIndex(j => j.AppId == juego.AppId);
+                        if (index != -1)
+                            IniciarJuego(index);
+                    };
+                }
+               
             }
             else
             {
