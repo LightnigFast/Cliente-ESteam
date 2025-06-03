@@ -294,7 +294,8 @@ namespace Cliente_TFG.Pages
             }
 
             //PONEMOS EL APPID ACTUAL EN EL PRIMER JUEGO PARA PODER INDENTIFICARLO
-            appidActual = listaAppids.First();
+            if (listaAppids.Count != 0)
+                appidActual = listaAppids.First();
 
             CargarFondo();
             CargarJuegosBibioteca();
