@@ -29,7 +29,6 @@ namespace Cliente_TFG
                 "ClienteTFG", "token.txt"
             );
 
-            //VERIFICAMOS SI EXISTE EL TOKEN EN LA CARPETA
             if (File.Exists(rutaToken))
             {
                 string tokenGuardado = File.ReadAllText(rutaToken);
@@ -53,17 +52,42 @@ namespace Cliente_TFG
                             mainWindow.Show();
                             return;
                         }
+                        else
+                        {
+                            // Token inválido o expirado - abrir login
+                            LoginWindow loginWindow = new LoginWindow();
+                            loginWindow.Show();
+                            return;
+                        }
                     }
                     catch (Exception)
                     {
-                        //SI ALGO FALLA, ABRIMOS EL LOGINWINDOW
+                        // FALLÓ LA CONEXIÓN - INTENTAR MODO OFFLINE
+                        int idUsuarioOffline = LocalStorage.CargarIdUsuarioLocal();
+
+                        if (idUsuarioOffline != -1)
+                        {
+                            MainWindow mainWindow = new MainWindow(idUsuarioOffline);
+                            mainWindow.Show();
+                            MessageBox.Show("No hay conexión, se abrió la aplicación en modo offline.");
+                        }
+                        else
+                        {
+                            MessageBox.Show("No hay conexión y no hay datos guardados. Debes iniciar sesión cuando tengas conexión.");
+                            LoginWindow loginWindow = new LoginWindow();
+                            loginWindow.Show();
+                        }
+                        return;
                     }
                 }
             }
-
-            //SI NO HAY TOKEN, ABRIMOS LOGIN WINDOW
-            LoginWindow loginWindow = new LoginWindow();
-            loginWindow.Show();
+            else
+            {
+                // NO HAY TOKEN - ABRIR LOGIN
+                LoginWindow loginWindow = new LoginWindow();
+                loginWindow.Show();
+            }
         }
+
     }
 }

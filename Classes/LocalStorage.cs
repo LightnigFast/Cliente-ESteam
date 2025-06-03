@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using Newtonsoft.Json.Linq;
 
 namespace Cliente_TFG.Classes
 {
@@ -117,6 +118,35 @@ namespace Cliente_TFG.Classes
             bitmap.EndInit();
             bitmap.Freeze(); // para usar en UI thread
             return bitmap;
+        }
+
+        //METODO PARA SACAR EL ID DEL USER EN MODO OFFLINE
+        public static int CargarIdUsuarioLocal()
+        {
+            try
+            {
+                string ruta = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "ClienteTFG",
+                    "usuario.json"
+                );
+
+                if (!File.Exists(ruta))
+                    return -1;
+
+                string contenido = File.ReadAllText(ruta);
+                var json = JObject.Parse(contenido);
+
+                int idUsuario = json["id_usuario"] != null
+                    ? (int)json["id_usuario"]
+                    : (json["IdUsuario"] != null ? (int)json["IdUsuario"] : -1);
+
+                return idUsuario;
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
     }

@@ -131,7 +131,7 @@ namespace Cliente_TFG.Pages
                             }
                         });
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         //MessageBox.Show($"❌ Error al procesar mensaje: {ex.Message}");
                     }
