@@ -471,7 +471,7 @@ namespace Cliente_TFG.Pages
                 //ANIMACIONES SI CARGA BIEN
                 img.MouseLeftButtonUp += ImagenJuego_Click;
 
-                // ASIGNAR MENU
+                //ASIGNAR MENU
                 ContextMenu menu = CrearContextMenuJuego(currentIndex);
                 img.ContextMenu = menu;
                 img.MouseRightButtonUp += (s, e) =>
@@ -559,22 +559,15 @@ namespace Cliente_TFG.Pages
                 Style = (Style)FindResource("EstiloMenuItem")
             };
 
-            MenuItem eliminarItem = new MenuItem
-            {
-                Header = "Eliminar de la biblioteca",
-                Style = (Style)FindResource("EstiloMenuItem")
-            };
 
             //ASIGNAR OPCIONES
             jugarItem.Click += (s, e) => IniciarJuego(index);
             cambiarEjecutableItem.Click += (s, e) => cambiarEjecutableJuego(index);
             detallesItem.Click += (s, e) => MostrarDetallesJuego(index);
-            // eliminarItem.Click += (s, e) => EliminarJuego(index);
 
             menu.Items.Add(jugarItem);
             menu.Items.Add(cambiarEjecutableItem);
             menu.Items.Add(detallesItem);
-            menu.Items.Add(eliminarItem);
 
             return menu;
         }
@@ -626,8 +619,6 @@ namespace Cliente_TFG.Pages
             ventanaPrincipal.framePrincipal.Navigate(newPage);
             
         }
-
-
 
 
         //METODO PARA GENERAR LA IMAGEN SI NO SE CARGA CORRECTAMENTE POR QUE NO EXISTE
@@ -876,6 +867,16 @@ namespace Cliente_TFG.Pages
             }
         }
 
+        //EVENTO DE CLICK DE LOS JUEGOS AGREGADOS POR LA TIENDA
+        private void BotonJugar_Click(object sender, RoutedEventArgs e)
+        {
+            if (juegoSteamSeleccionado != null)
+            {
+                int index = juegosGuardados.FindIndex(j => j.AppId == juegoSteamSeleccionado.AppId);
+                if (index != -1)
+                    IniciarJuego(index);
+            }
+        }
 
         private async void ImgFondo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
         {
@@ -916,7 +917,7 @@ namespace Cliente_TFG.Pages
             if (openFileDialog.ShowDialog() == true)
             {
                 string ruta = openFileDialog.FileName;
-                string nombreJuego = System.IO.Path.GetFileNameWithoutExtension(ruta); // Sin InputBox
+                string nombreJuego = System.IO.Path.GetFileNameWithoutExtension(ruta); 
                 string nuevoAppId = DateTime.Now.Ticks.ToString();
 
                 var nuevoJuego = new JuegoInfo
@@ -936,6 +937,11 @@ namespace Cliente_TFG.Pages
         private string rutaJsonJuegosAgregados = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "ClienteTFG", "juegos_agregados_biblioteca.json");
+
+
+
+
+
 
 
         //METODO PARA GUARDAR LOS JUEGOS EN EL JSON
@@ -962,7 +968,7 @@ namespace Cliente_TFG.Pages
             //ELIMINAR SOLO LOS MANUALES
             for (int i = panelJuegosBiblioteca.Children.Count - 1; i >= 0; i--)
             {
-                var child = panelJuegosBiblioteca.Children[i] as Image;
+                var child = panelJuegosBiblioteca.Children[i] as Grid;
                 if (child?.Tag is JuegoInfo info && info.EsManual)
                 {
                     panelJuegosBiblioteca.Children.RemoveAt(i);
@@ -971,8 +977,7 @@ namespace Cliente_TFG.Pages
 
             foreach (var juego in juegosManual)
             {
-                juego.EsManual = true; // ← ASEGÚRATE DE MARCARLOS COMO MANUAL
-
+                juego.EsManual = true;
                 juegosAgregadosGuardados.Add(juego);
 
                 var scale = new ScaleTransform(1.0, 1.0);
@@ -980,43 +985,111 @@ namespace Cliente_TFG.Pages
                 double proporcion = 600.0 / 900.0;
                 double ancho = altura * proporcion;
 
+                Grid contenedor = new Grid
+                {
+                    Height = altura,
+                    Width = ancho,
+                    Margin = new Thickness(11),
+                    Tag = juego,
+                    RenderTransform = scale,
+                    RenderTransformOrigin = new Point(0.5, 0.5)
+                };
+
                 Image img = new Image
                 {
                     Source = new BitmapImage(new Uri("pack://application:,,,/res/library/juego_vertical_manual.png")),
-                    Stretch = Stretch.Uniform,
-                    Height = altura,
-                    Margin = new Thickness(11),
-                    RenderTransform = scale,
-                    RenderTransformOrigin = new Point(0.5, 0.5),
-                    Tag = juego
+                    Stretch = Stretch.UniformToFill,
+                    Height = altura
                 };
 
-                img.MouseEnter += (s, e) =>
+                //TEXTO CON EL NOMBRE DEL JUEGO
+                string nombreExe = System.IO.Path.GetFileNameWithoutExtension(juego.RutaEjecutable).ToUpper();
+                TextBlock texto = new TextBlock
+                {
+                    Text = nombreExe,
+                    Foreground = AppTheme.Actual.TextoPrincipal,
+                    Background = new SolidColorBrush(Color.FromArgb(160, 0, 0, 0)),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextAlignment = TextAlignment.Center,
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 12,
+                    IsHitTestVisible = false,
+                    Padding = new Thickness(4),
+                    MaxWidth = ancho,
+                    TextTrimming = TextTrimming.CharacterEllipsis
+                };
+
+                //AÑADIR AL GRID
+                contenedor.Children.Add(img);
+                contenedor.Children.Add(texto);
+
+                //ZOOM SOBRE EL CONTENEDOR
+                contenedor.MouseEnter += (s, e) =>
                 {
                     var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
                     scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
                     scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
                 };
 
-                img.MouseLeave += (s, e) =>
+                contenedor.MouseLeave += (s, e) =>
                 {
                     var anim = new DoubleAnimation(1.1, 1.0, TimeSpan.FromMilliseconds(150));
                     scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
                     scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
                 };
 
-                img.MouseLeftButtonUp += ImagenJuegoManual_Click;
+                contenedor.MouseLeftButtonUp += ImagenJuegoManual_Click;
 
+                //MENÚ CONTEXTUAL
+                ContextMenu menu = CrearContextMenuJuegoManual(juego);
+                contenedor.ContextMenu = menu;
+                contenedor.MouseRightButtonUp += (s, e) =>
+                {
+                    contenedor.ContextMenu.IsOpen = true;
+                    contenedor.ContextMenu.PlacementTarget = contenedor;
+                };
 
-                panelJuegosBiblioteca.Children.Add(img);
+                panelJuegosBiblioteca.Children.Add(contenedor);
             }
+        }
+
+        private ContextMenu CrearContextMenuJuegoManual(JuegoInfo juego)
+        {
+            ContextMenu menu = new ContextMenu
+            {
+                Style = (Style)FindResource("EstiloContextMenu")
+            };
+
+            MenuItem jugarItem = new MenuItem
+            {
+                Header = "Jugar",
+                Style = (Style)FindResource("EstiloMenuItem"),
+                Tag = juego // ← ASOCIAMOS EL JUEGO AQUÍ
+            };
+
+            MenuItem eliminarItem = new MenuItem
+            {
+                Header = "Eliminar de la biblioteca",
+                Style = (Style)FindResource("EstiloMenuItem"),
+                Tag = juego //ASOCIAMOS EL JUEGO
+            };
+
+
+            jugarItem.Click += JugarDesdeContextMenu;
+            eliminarItem.Click += EliminarDesdeContextMenu;
+
+            menu.Items.Add(jugarItem);
+            menu.Items.Add(eliminarItem);
+
+            return menu;
         }
 
         //METODO PARA CARGAR EL EVENTO DE CLCIK CUANDO HACEMOS CLICK EN UN JUEGO AGREGADO POR EL USER
         private void ImagenJuegoManual_Click(object sender, MouseButtonEventArgs e)
         {
-            var img = sender as Image;
-            if (img == null || !(img.Tag is JuegoInfo juego))
+            var grid = sender as Grid;
+            if (grid == null || !(grid.Tag is JuegoInfo juego))
                 return;
 
             juegoManualSeleccionado = juego;
@@ -1032,7 +1105,10 @@ namespace Cliente_TFG.Pages
                 imgFondo.ImageFailed -= ImgFondo_ImageFailed;
                 ImagenLogo.ImageFailed -= ImagenLogo_ImageFailed;
                 txtFalloLogo.Background = Brushes.Transparent;
-                txtFalloLogo.Text = "";
+                string nombreExe = System.IO.Path.GetFileNameWithoutExtension(juego.RutaEjecutable).ToUpper();
+                txtFalloLogo.Text = nombreExe;
+                txtFalloLogo.Background = new SolidColorBrush(Color.FromArgb(190, 0, 0, 0)); // 160 ≈ 62% opacidad
+
 
                 //EVENTO ESPECIAL YA QUE ESTOS JUEGOS SIEMPRE VAN A TENER UNA RUTA
                 BotonJugar.Tag = "Play";
@@ -1040,7 +1116,7 @@ namespace Cliente_TFG.Pages
                 BotonJugar.Click += BotonJugar_Click_Manual;
 
                 //CAMBIAMOS IMAGEN DE FONDO A UNA GENÉRICA
-                imgFondo.Source = new BitmapImage(new Uri("pack://application:,,,/res/library/Banner_no_games_library.png"));
+                imgFondo.Source = new BitmapImage(new Uri("pack://application:,,,/res/library/Banner_Juego_Manual.png"));
 
                 //QUITAMOS LOGO
                 ImagenLogo.Source = null;
@@ -1063,16 +1139,7 @@ namespace Cliente_TFG.Pages
             BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOutSimple);
         }
 
-        //EVENTO DE CLICK DE LOS JUEGOS AGREGADOS POR LA TIENDA
-        private void BotonJugar_Click(object sender, RoutedEventArgs e)
-        {
-            if (juegoSteamSeleccionado != null)
-            {
-                int index = juegosGuardados.FindIndex(j => j.AppId == juegoSteamSeleccionado.AppId);
-                if (index != -1)
-                    IniciarJuego(index);
-            }
-        }
+        
 
         //EVENTO PARA EL CLICK DE LOS JUEGOS QUE HAN SIDO AREGADOS MANUALMEENTE
         private JuegoInfo juegoManualSeleccionado;
@@ -1087,6 +1154,50 @@ namespace Cliente_TFG.Pages
             }
         }
 
+        //EVENETO DE JUGAR DEL CONTEXTMENU
+        private void JugarDesdeContextMenu(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem item && item.Tag is JuegoInfo juego)
+            {
+                if (System.IO.File.Exists(juego.RutaEjecutable))
+                    Process.Start(juego.RutaEjecutable);
+                else
+                    MessageBox.Show("No se encontró el ejecutable del juego.");
+            }
+        }
+
+        //METODO PARA ELIMINAR EL JUEGO DE LA APP
+        private void EliminarDesdeContextMenu(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem item && item.Tag is JuegoInfo juego)
+            {
+                // Confirmación
+                var resultado = MessageBox.Show($"¿Seguro que quieres eliminar \"{juego.Nombre}\" de la biblioteca?",
+                                                "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (resultado == MessageBoxResult.Yes)
+                {
+                    //LO ELIMINAMOS DEL LISTADO DE LA MEMORIA
+                    juegosAgregadosGuardados.RemoveAll(j => j.AppId == juego.AppId);
+
+                    //LO ELIMINAMOS DEL PANEL VISUAL
+                    for (int i = panelJuegosBiblioteca.Children.Count - 1; i >= 0; i--)
+                    {
+                        if (panelJuegosBiblioteca.Children[i] is Grid grid && grid.Tag is JuegoInfo j && j.AppId == juego.AppId)
+                        {
+                            panelJuegosBiblioteca.Children.RemoveAt(i);
+                            break;
+                        }
+                    }
+
+                    //LO ELIMINAMOS DEL JSON Y GUARDAMOS
+                    string jsonActualizado = Newtonsoft.Json.JsonConvert.SerializeObject(juegosAgregadosGuardados, Newtonsoft.Json.Formatting.Indented);
+                    System.IO.File.WriteAllText(rutaJsonJuegosAgregados, jsonActualizado);
+                }
+            }
+        }
+
+
         //METODO PARA QUITAR LOS HANDLER ANTERIORES (ESTO SIRVE PARA QUE AL HACER CLICK EN JUGAR, NO SE HABRAN DOS VECES)
         private void QuitarHandlersClickDeBoton()
         {
@@ -1094,6 +1205,10 @@ namespace Cliente_TFG.Pages
             BotonJugar.Click -= BotonJugar_Click_Manual;
                                                          
         }
+
+
+
+
 
 
         //PARTE PARA EL BUSCADOR

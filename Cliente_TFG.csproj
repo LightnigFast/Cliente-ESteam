@@ -235,6 +235,9 @@
     </Content>
     <Resource Include="res\library\juego_vertical_manual.png" />
     <Resource Include="res\imagenes\logo.ico" />
+    <Content Include="res\library\Banner_Juego_Manual.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="res\library\Banner_no_games_library.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
