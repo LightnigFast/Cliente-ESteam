@@ -1,4 +1,5 @@
 ﻿using Cliente_TFG.Classes;
+using Cliente_TFG.Windows;
 using Newtonsoft.Json;
 using System;
 using System.Globalization;
@@ -35,6 +36,8 @@ namespace Cliente_TFG.Pages
 
             CargarMetodosPago();
             AplicarAnimacionEntrada();
+
+
         }
 
         public void RestaurarOpacidad()
@@ -197,16 +200,21 @@ namespace Cliente_TFG.Pages
 
                     }
 
-                    MessageBox.Show(
-                        $"✅ Recarga procesada exitosamente!\n\n" +
-                        $"💰 Monto: {monto:F2}€\n" +
-                        $"💳 Método: {metodoSeleccionado}\n\n" +
-                        "El saldo se ha agregado a tu cuenta correctamente.\n"+
-                        $"Saldo actual: {resultado.DineroRestante}$",
-                        "Recarga Exitosa",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information
-                    );
+                    var ventana = new VentanaRecarga($"{monto:F2}€", 
+                                                    metodoSeleccionado, 
+                                                    $"{ventanaPrincipal.Cabecera_top.Dinero:F2}€");
+                    ventana.ShowDialog();
+
+                    //MessageBox.Show(
+                    //    $"✅ Recarga procesada exitosamente!\n\n" +
+                    //    $"💰 Monto: {monto:F2}€\n" +
+                    //    $"💳 Método: {metodoSeleccionado}\n\n" +
+                    //    "El saldo se ha agregado a tu cuenta correctamente.\n"+
+                    //    $"Saldo actual: {resultado.DineroRestante}$",
+                    //    "Recarga Exitosa",
+                    //    MessageBoxButton.OK,
+                    //    MessageBoxImage.Information
+                    //);
                 }
 
                 else

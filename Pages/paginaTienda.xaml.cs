@@ -76,6 +76,7 @@ namespace Cliente_TFG.Pages
         public paginaTienda(MainWindow mainWindow)
         {
             InitializeComponent();
+
             //CARGO LOS COLORES LO PRIMERO DE TODO
             carruselTituloJuego.Foreground = AppTheme.Actual.TextoPrincipal;
             carruselPrecioJuego.Foreground = AppTheme.Actual.TextoPrincipal;
@@ -110,6 +111,8 @@ namespace Cliente_TFG.Pages
             CargarDatosJsonNuevosLanzamientos();
 
             CargarNuevosLanzamientos();
+
+
         }
 
         public void RestaurarOpacidad()

@@ -294,15 +294,14 @@ namespace Cliente_TFG.Pages
                     {
                         gameCoversPanel.Opacity = 1;
                         txtUltimosJuegosComprados.Opacity = 1;
-                        // Controles en la interfaz gráfica
-                        var juegosUI = new List<(Image caratula, TextBlock nombre, TextBlock fecha)>
-                        {
-                            (caratulaJuego1, nombreJuego1, fechaJuego1),
-                            (caratulaJuego2, nombreJuego2, fechaJuego2),
-                            (caratulaJuego3, nombreJuego3, fechaJuego3)
-                        };
 
-                        //Crear lista de objetos Juego
+                        var juegosUI = new List<(Image caratula, TextBlock nombre, TextBlock fecha)>
+                {
+                    (caratulaJuego1, nombreJuego1, fechaJuego1),
+                    (caratulaJuego2, nombreJuego2, fechaJuego2),
+                    (caratulaJuego3, nombreJuego3, fechaJuego3)
+                };
+
                         List<Juego> juegos = new List<Juego>();
                         foreach (var item in juegosJson)
                         {
@@ -314,49 +313,74 @@ namespace Cliente_TFG.Pages
                             });
                         }
 
-                        // Cargar datos en UI
-                        for (int i = 0; i < Math.Min(juegos.Count, juegosUI.Count); i++)
+                        for (int i = 0; i < juegosUI.Count; i++)
                         {
-                            var itemJson = juegosJson[i]; // para acceder al "header"
-                            Juego juego = juegos[i];
-
-                            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                            string rutaImagen = System.IO.Path.Combine(appData, "ClienteTFG", "imagenes", $"{juego.AppId}_vertical.jpg");
-                            string urlHeader = itemJson["header"].Value<string>();
-
-                            BitmapImage bitmap = new BitmapImage();
-
-                            try
+                            if (i < juegos.Count)
                             {
-                                bitmap.BeginInit();
-                                bitmap.UriSource = new Uri(rutaImagen, UriKind.Absolute);
-                                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                                bitmap.EndInit();
-                            }
-                            catch
-                            {
-                                // Si no carga imagen local, cargar desde URL header
+                                var itemJson = juegosJson[i];
+                                Juego juego = juegos[i];
+
+                                string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                                string rutaImagen = System.IO.Path.Combine(appData, "ClienteTFG", "imagenes", $"{juego.AppId}_vertical.jpg");
+                                string urlHeader = itemJson["header"].Value<string>();
+
+                                BitmapImage bitmap = new BitmapImage();
+
                                 try
                                 {
-                                    bitmap = new BitmapImage();
                                     bitmap.BeginInit();
-                                    bitmap.UriSource = new Uri(urlHeader, UriKind.Absolute);
+                                    bitmap.UriSource = new Uri(rutaImagen, UriKind.Absolute);
                                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
                                     bitmap.EndInit();
                                 }
-                                catch (Exception)
+                                catch
                                 {
-                                    // Opcional: poner imagen por defecto o dejar en blanco
-                                    bitmap = null;
-                                    // Aquí puedes asignar una imagen por defecto si quieres.
+                                    try
+                                    {
+                                        bitmap = new BitmapImage();
+                                        bitmap.BeginInit();
+                                        bitmap.UriSource = new Uri(urlHeader, UriKind.Absolute);
+                                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                        bitmap.EndInit();
+                                    }
+                                    catch
+                                    {
+                                        bitmap = null;
+                                    }
                                 }
-                            }
 
-                            juegosUI[i].caratula.Source = bitmap;
-                            juegosUI[i].caratula.Tag = juego;
-                            juegosUI[i].caratula.MouseEnter += CaratulaJuego_MouseEnter;
-                            juegosUI[i].nombre.Text = juego.Nombre;
-                            juegosUI[i].fecha.Text = $"Comprado: {juego.FechaCompra:dd/MM/yyyy}";
+                                juegosUI[i].caratula.Source = bitmap;
+                                juegosUI[i].caratula.Tag = juego;
+                                juegosUI[i].caratula.MouseEnter += CaratulaJuego_MouseEnter;
+                                juegosUI[i].caratula.MouseLeftButtonUp -= ImagenPorDefecto_Click; // Quitar si estaba
+                                juegosUI[i].nombre.Text = juego.Nombre;
+                                juegosUI[i].fecha.Text = $"Comprado: {juego.FechaCompra:dd/MM/yyyy}";
+                            }
+                            else
+                            {
+                                // Imagen por defecto
+                                string rutaDefault = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res", "imagenes", "default.png");
+
+                                BitmapImage defaultBitmap = new BitmapImage();
+                                try
+                                {
+                                    defaultBitmap.BeginInit();
+                                    defaultBitmap.UriSource = new Uri(rutaDefault, UriKind.Absolute);
+                                    defaultBitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                    defaultBitmap.EndInit();
+                                }
+                                catch
+                                {
+                                    defaultBitmap = null;
+                                }
+
+                                juegosUI[i].caratula.Source = defaultBitmap;
+                                juegosUI[i].caratula.Tag = null;
+                                juegosUI[i].caratula.MouseEnter -= CaratulaJuego_MouseEnter;
+                                juegosUI[i].caratula.MouseLeftButtonUp += ImagenPorDefecto_Click;
+                                juegosUI[i].nombre.Text = "Sin juego";
+                                juegosUI[i].fecha.Text = string.Empty;
+                            }
                         }
                     }
                     else
@@ -371,6 +395,20 @@ namespace Cliente_TFG.Pages
                 MessageBox.Show($"Error al cargar juegos: {ex.Message}");
             }
         }
+
+        private void ImagenPorDefecto_Click(object sender, MouseButtonEventArgs e)
+        {
+            // Aquí puedes abrir la tienda o hacer lo que necesites
+            AbrirTienda();
+        }
+
+        private void AbrirTienda()
+        {
+            var ventana = new Windows.VentanaSinJuego();
+            ventana.Show();
+
+        }
+
 
         private void CaratulaJuego_MouseEnter(object sender, MouseEventArgs e)
         {
