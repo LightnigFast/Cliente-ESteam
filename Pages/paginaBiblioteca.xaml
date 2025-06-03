@@ -218,8 +218,6 @@
             </Setter>
         </Style>
 
-
-
         <Style TargetType="ContextMenu" x:Key="EstiloContextMenu">
             <Setter Property="Background" Value="#1E1E1E"/>
             <Setter Property="BorderBrush" Value="#444"/>
@@ -239,6 +237,89 @@
             </Setter>
         </Style>
 
+        <!-- Estilo Premium para Botón de Agregar -->
+        <Style x:Key="PremiumAddButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FF1E1E1E"/>
+            <Setter Property="Foreground" Value="#F1F1F1"/>
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="180"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="OuterBorder" 
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8"
+                            SnapsToDevicePixels="True">
+                            <Grid>
+                                <!--EFECTO DE RESPLANDO-->
+                                <Border x:Name="GlowEffect" 
+                                    CornerRadius="7" 
+                                    Opacity="0"
+                                    BorderThickness="1"
+                                    BorderBrush="#60FFFFFF"
+                                    Margin="1"/>
+
+                                <Border x:Name="AccentLayer"
+                                    CornerRadius="7"
+                                    Background="#10000000"
+                                    Margin="1"/>
+
+                                <!--CONTENIDO DEL BOTON -->
+                                <StackPanel x:Name="ContentPresenter" 
+                                        Orientation="Horizontal" 
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
+                                    <!--ICONO CON ANIMACION-->
+                                    <Grid Width="16" Height="16" Margin="0,0,10,0">
+                                        <Ellipse x:Name="AddIconCircle" 
+                                            Stroke="#F1F1F1" 
+                                            StrokeThickness="2"/>
+                                        <Path x:Name="AddIconCross" 
+                                          Data="M4,8 L12,8 M8,4 L8,12" 
+                                          Stroke="#F1F1F1" 
+                                          StrokeThickness="2"
+                                          StrokeEndLineCap="Round"/>
+                                    </Grid>
+                                    <TextBlock x:Name="ButtonText" 
+                                           Text="{TemplateBinding Content}"
+                                           VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!--EFECTO HOVER-->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="OuterBorder" Property="Background" Value="#FF2A2A2A"/>
+                                <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#666"/>
+                                <Setter TargetName="GlowEffect" Property="Opacity" Value="0.3"/>
+                                <Setter TargetName="AccentLayer" Property="Background" Value="#15FFFFFF"/>
+                                <Setter TargetName="AddIconCircle" Property="Stroke" Value="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"/>
+                                <Setter TargetName="AddIconCross" Property="Stroke" Value="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"/>
+                                <Setter TargetName="ButtonText" Property="Foreground" Value="{Binding Source={StaticResource AppTheme}, Path=BordePanel}"/>
+                            </Trigger>
+
+                            <!--EFECTO AL PRESIONAR-->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="OuterBorder" Property="Background" Value="#FF151515"/>
+                                <Setter TargetName="GlowEffect" Property="Opacity" Value="0.5"/>
+                                <Setter TargetName="GlowEffect" Property="BorderBrush" Value="#80FFFFFF"/>
+                                <Setter TargetName="AccentLayer" Property="Background" Value="#30000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
 
     </Page.Resources>
@@ -299,6 +380,15 @@
                 
             </WrapPanel>
         </ScrollViewer>
+        
+        <!--BOTON PARA AGREGAR JUEGOS MANUALMENTE-->
+        <Grid Grid.Row="1" Panel.ZIndex="2">
+            <Button Content="AGREGAR JUEGO" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20" 
+                    Style="{StaticResource PremiumAddButtonStyle}" Click="AgregarJuego_Click"/>
+        </Grid>
+
+
+
     </Grid>
 
 

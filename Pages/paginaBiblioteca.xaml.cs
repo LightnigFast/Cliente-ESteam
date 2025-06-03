@@ -45,6 +45,8 @@ namespace Cliente_TFG.Pages
         private List<int> listaAppids;
         private List<string> nombresJuegos;
         private List<JuegoInfo> juegosGuardados = new List<JuegoInfo>();
+        private List<JuegoInfo> juegosAgregadosGuardados = new List<JuegoInfo>();
+        private JuegoInfo juegoSteamSeleccionado;
         private BibliotecaResponse bibliotecaTotal = new BibliotecaResponse
         {
             juegos = new List<Juego>()
@@ -296,6 +298,7 @@ namespace Cliente_TFG.Pages
 
             CargarFondo();
             CargarJuegosBibioteca();
+            CargarJuegosEnInterfaz();
 
             try
             {
@@ -316,6 +319,7 @@ namespace Cliente_TFG.Pages
             catch { }
         }
 
+        
 
         private async Task<BitmapImage> ObtenerImagenAsync(string url, string nombreArchivo)
         {
@@ -496,11 +500,14 @@ namespace Cliente_TFG.Pages
 
         }
 
+
+
         public class JuegoInfo
         {
             public string AppId { get; set; }
             public string Nombre { get; set; }
             public string RutaEjecutable { get; set; }
+            public bool EsManual { get; set; }
         }
 
         private string rutaJsonJuegos = System.IO.Path.Combine(
@@ -846,6 +853,7 @@ namespace Cliente_TFG.Pages
         //METODO PARA ACTUALIZAR EL ESTADO DEL BOTON DEPENDIENDO DE SI TIENE RUTA COLOCADA EN EL ARCHIVO O NO
         private void ActualizarEstadoBotonJuego(Button boton, JuegoInfo juego)
         {
+            QuitarHandlersClickDeBoton();
 
             if (!string.IsNullOrWhiteSpace(juego.RutaEjecutable))
             {
@@ -853,12 +861,11 @@ namespace Cliente_TFG.Pages
                 {
                     boton.Tag = "Play";
                     boton.Content = "Jugar";
-                    boton.Click += (s, e) =>
-                    {
-                        int index = juegosGuardados.FindIndex(j => j.AppId == juego.AppId);
-                        if (index != -1)
-                            IniciarJuego(index);
-                    };
+                    //GUARDAMOS EL JUEGO PARA QUE LO USE EL HADLER
+                    juegoSteamSeleccionado = juego;
+
+                    //ASIGNAMOS EL EVENTO ESPECIAL PARA LOS JUEGOS QUE NO SON AGREGADOS MANUALMENTE
+                    boton.Click += BotonJugar_Click;
                 }
                
             }
@@ -897,6 +904,196 @@ namespace Cliente_TFG.Pages
         }
 
 
+        //PARTE PARA EL BOTON DE AÑADIR JUEGO MANUALMENTE
+        private void AgregarJuego_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Ejecutables (*.exe)|*.exe",
+                Title = "Selecciona el ejecutable del juego"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string ruta = openFileDialog.FileName;
+                string nombreJuego = System.IO.Path.GetFileNameWithoutExtension(ruta); // Sin InputBox
+                string nuevoAppId = DateTime.Now.Ticks.ToString();
+
+                var nuevoJuego = new JuegoInfo
+                {
+                    AppId = nuevoAppId,
+                    Nombre = nombreJuego,
+                    RutaEjecutable = ruta
+                };
+
+                juegosAgregadosGuardados.Add(nuevoJuego);
+                GuardarJuegosAgregadosEnJson();
+                CargarJuegosEnInterfaz();
+                MessageBox.Show("Juego agregado correctamente.");
+            }
+        }
+
+        private string rutaJsonJuegosAgregados = System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "ClienteTFG", "juegos_agregados_biblioteca.json");
+
+
+        //METODO PARA GUARDAR LOS JUEGOS EN EL JSON
+        private void GuardarJuegosAgregadosEnJson()
+        {
+            string json = JsonConvert.SerializeObject(juegosAgregadosGuardados, Formatting.Indented);
+            System.IO.File.WriteAllText(rutaJsonJuegosAgregados, json);
+        }
+
+        //METODO QUE METE LOS JUEGOS AGREGADOS POR NOSOTROSS EN LA INTERFAZ
+        private void CargarJuegosEnInterfaz()
+        {
+            if (!System.IO.File.Exists(rutaJsonJuegosAgregados))
+                return;
+
+            string json = System.IO.File.ReadAllText(rutaJsonJuegosAgregados);
+            var juegosManual = Newtonsoft.Json.JsonConvert.DeserializeObject<List<JuegoInfo>>(json);
+
+            if (juegosManual == null)
+                return;
+
+            juegosAgregadosGuardados.Clear();
+
+            //ELIMINAR SOLO LOS MANUALES
+            for (int i = panelJuegosBiblioteca.Children.Count - 1; i >= 0; i--)
+            {
+                var child = panelJuegosBiblioteca.Children[i] as Image;
+                if (child?.Tag is JuegoInfo info && info.EsManual)
+                {
+                    panelJuegosBiblioteca.Children.RemoveAt(i);
+                }
+            }
+
+            foreach (var juego in juegosManual)
+            {
+                juego.EsManual = true; // ← ASEGÚRATE DE MARCARLOS COMO MANUAL
+
+                juegosAgregadosGuardados.Add(juego);
+
+                var scale = new ScaleTransform(1.0, 1.0);
+                double altura = 170;
+                double proporcion = 600.0 / 900.0;
+                double ancho = altura * proporcion;
+
+                Image img = new Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/res/library/juego_vertical_manual.png")),
+                    Stretch = Stretch.Uniform,
+                    Height = altura,
+                    Margin = new Thickness(11),
+                    RenderTransform = scale,
+                    RenderTransformOrigin = new Point(0.5, 0.5),
+                    Tag = juego
+                };
+
+                img.MouseEnter += (s, e) =>
+                {
+                    var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                };
+
+                img.MouseLeave += (s, e) =>
+                {
+                    var anim = new DoubleAnimation(1.1, 1.0, TimeSpan.FromMilliseconds(150));
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                };
+
+                img.MouseLeftButtonUp += ImagenJuegoManual_Click;
+
+
+                panelJuegosBiblioteca.Children.Add(img);
+            }
+        }
+
+        //METODO PARA CARGAR EL EVENTO DE CLCIK CUANDO HACEMOS CLICK EN UN JUEGO AGREGADO POR EL USER
+        private void ImagenJuegoManual_Click(object sender, MouseButtonEventArgs e)
+        {
+            var img = sender as Image;
+            if (img == null || !(img.Tag is JuegoInfo juego))
+                return;
+
+            juegoManualSeleccionado = juego;
+
+            //ANIMACIÓN SOLO PARA imgFondo CON Completed
+            var fadeOutImgFondo = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromMilliseconds(300)));
+            fadeOutImgFondo.Completed += (s, _) =>
+            {
+                //LIMPIAMOS LOS HANDLER PREVIOS
+                QuitarHandlersClickDeBoton();
+
+                //QUITAMOS MANEJADORES ANTERIORES
+                imgFondo.ImageFailed -= ImgFondo_ImageFailed;
+                ImagenLogo.ImageFailed -= ImagenLogo_ImageFailed;
+                txtFalloLogo.Background = Brushes.Transparent;
+                txtFalloLogo.Text = "";
+
+                //EVENTO ESPECIAL YA QUE ESTOS JUEGOS SIEMPRE VAN A TENER UNA RUTA
+                BotonJugar.Tag = "Play";
+                BotonJugar.Content = "Jugar";
+                BotonJugar.Click += BotonJugar_Click_Manual;
+
+                //CAMBIAMOS IMAGEN DE FONDO A UNA GENÉRICA
+                imgFondo.Source = new BitmapImage(new Uri("pack://application:,,,/res/library/Banner_no_games_library.png"));
+
+                //QUITAMOS LOGO
+                ImagenLogo.Source = null;
+
+                //ANIMACIÓN ENTRADA
+                var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300));
+                imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                txtFalloLogo.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+            };
+
+            //EJECUTAMOS fadeOut SOLO EN imgFondo CON Completed (ASI NO SE EJECUTA VARIAS VECES)
+            imgFondo.BeginAnimation(UIElement.OpacityProperty, fadeOutImgFondo);
+
+            //OTRAS ANIMACIONES SIN Completed
+            var fadeOutSimple = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(300));
+            ImagenLogo.BeginAnimation(UIElement.OpacityProperty, fadeOutSimple);
+            txtFalloLogo.BeginAnimation(UIElement.OpacityProperty, fadeOutSimple);
+            BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOutSimple);
+        }
+
+        //EVENTO DE CLICK DE LOS JUEGOS AGREGADOS POR LA TIENDA
+        private void BotonJugar_Click(object sender, RoutedEventArgs e)
+        {
+            if (juegoSteamSeleccionado != null)
+            {
+                int index = juegosGuardados.FindIndex(j => j.AppId == juegoSteamSeleccionado.AppId);
+                if (index != -1)
+                    IniciarJuego(index);
+            }
+        }
+
+        //EVENTO PARA EL CLICK DE LOS JUEGOS QUE HAN SIDO AREGADOS MANUALMEENTE
+        private JuegoInfo juegoManualSeleccionado;
+        private void BotonJugar_Click_Manual(object sender, RoutedEventArgs e)
+        {
+            if (juegoManualSeleccionado != null)
+            {
+                if (System.IO.File.Exists(juegoManualSeleccionado.RutaEjecutable))
+                    Process.Start(juegoManualSeleccionado.RutaEjecutable);
+                else
+                    MessageBox.Show("No se encontró el ejecutable del juego.");
+            }
+        }
+
+        //METODO PARA QUITAR LOS HANDLER ANTERIORES (ESTO SIRVE PARA QUE AL HACER CLICK EN JUGAR, NO SE HABRAN DOS VECES)
+        private void QuitarHandlersClickDeBoton()
+        {
+            BotonJugar.Click -= BotonJugar_Click; 
+            BotonJugar.Click -= BotonJugar_Click_Manual;
+                                                         
+        }
 
 
         //PARTE PARA EL BUSCADOR
