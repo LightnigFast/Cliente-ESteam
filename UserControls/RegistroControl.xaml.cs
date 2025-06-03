@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,6 +30,17 @@ namespace Cliente_TFG.UserControls
         public RegistroControl()
         {
             InitializeComponent();
+            txtNombreCuenta.TextChanged += (s, e) => ResaltarCampo(txtNombreCuenta, false);
+            txtCorreo.TextChanged += (s, e) => ResaltarCampo(txtCorreo, false);
+            txtPassword.PasswordChanged += (s, e) => ResaltarCampo(txtPassword, false);
+        }
+
+        private void ResaltarCampo(Control control, bool error)
+        {
+            if (error)
+                control.BorderBrush = Brushes.Red;
+            else
+                control.ClearValue(Border.BorderBrushProperty);
         }
 
         private void VolverLogin_Click(object sender, MouseButtonEventArgs e)
@@ -62,6 +74,33 @@ namespace Cliente_TFG.UserControls
 
         public async Task<bool> RegistrarUsuarioAsync(string nombreCuenta, string correo, string contrasena)
         {
+            // Limpiar errores anteriores
+            txtErrores.Text = "";
+            ResaltarCampo(txtNombreCuenta, false);
+            ResaltarCampo(txtCorreo, false);
+            ResaltarCampo(txtPassword, false);
+
+            if (nombreCuenta.Length < 3)
+            {
+                txtErrores.Text = "El nombre de cuenta debe tener al menos 3 caracteres";
+                ResaltarCampo(txtNombreCuenta, true);
+                return false;
+            }
+
+            if (!Regex.IsMatch(correo, @"^[\w\.-]+@[\w\.-]+\.\w+$"))
+            {
+                txtErrores.Text = "Correo electrónico no válido";
+                ResaltarCampo(txtCorreo, true);
+                return false;
+            }
+
+            if (contrasena.Length <= 6 || !Regex.IsMatch(contrasena, "^[a-zA-Z0-9]+$"))
+            {
+                txtErrores.Text = "La contraseña debe tener más de 6 caracteres y ser alfanumérica";
+                ResaltarCampo(txtPassword, true);
+                return false;
+            }
+
             using (HttpClient client = new HttpClient())
             {
                 var datos = new
@@ -85,26 +124,38 @@ namespace Cliente_TFG.UserControls
 
                     if (response.IsSuccessStatusCode)
                     {
-                        //REGISTRO CORRECTO
                         return true;
                     }
                     else
                     {
                         string errorJson = await response.Content.ReadAsStringAsync();
-                        errorJson = errorJson.Replace('•', '\"'); // CORRIGE LAS COMILLAS MALFORMADAS
-                        dynamic errorObj = JsonConvert.DeserializeObject(errorJson);
-                        string mensajeError = errorObj.error;
-                        MessageBox.Show("Error en registro: " + mensajeError, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                        try
+                        {
+                            var errorObj = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(errorJson);
+                            if (errorObj != null && errorObj.ContainsKey("Errores"))
+                            {
+                                txtErrores.Text = string.Join("\n", errorObj["Errores"]);
+                            }
+                            else
+                            {
+                                txtErrores.Text = "Error desconocido al registrar.";
+                            }
+                        }
+                        catch
+                        {
+                            txtErrores.Text = "Error inesperado al procesar la respuesta del servidor.";
+                        }
+
                         return false;
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("ERROR DE CONEXIÓN: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    txtErrores.Text = "ERROR DE CONEXIÓN: " + ex.Message;
                     return false;
                 }
             }
         }
-
     }
 }
