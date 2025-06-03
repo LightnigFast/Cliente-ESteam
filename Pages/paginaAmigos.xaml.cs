@@ -22,6 +22,7 @@ using static Cliente_TFG.Classes.Notificacion;
 using static Cliente_TFG.Pages.paginaAmigos;
 using static Cliente_TFG.Pages.paginaRecargaSaldo;
 using SocketIOClient;
+using System.Windows.Markup;
 
 namespace Cliente_TFG.Pages
 {
@@ -67,89 +68,92 @@ namespace Cliente_TFG.Pages
             await ActualizarSolicitudesPendientesAsync();
             await ObtenerAmigosDelServidorAsync();
             await ConectarSocketIOAsync();
-            await UnirseAlChat(ventanaPrincipal.Usuario.id_usuario); // Unirse al chat del usuario actual   
         }
 
         private async Task ConectarSocketIOAsync()
         {
             try
             {
-                notificacion.MostrarNotificacion("Creando cliente Socket.IO con transporte polling...", NotificationType.Info);
+                //notificacion.MostrarNotificacion("Creando cliente Socket.IO con transporte polling...", NotificationType.Info);
 
                 var options = new SocketIOClient.SocketIOOptions
                 {
                     Transport = SocketIOClient.Transport.TransportProtocol.Polling,
                     AutoUpgrade = false
                 };
-
                 cliente = new SocketIOClient.SocketIO($"http://{ventanaPrincipal.IP}:50000", options);
 
                 
 
                 cliente.OnDisconnected += (sender, reason) =>
                 {
-                    notificacion.MostrarNotificacion($"❌ Desconectado de Socket.IO: {reason}", NotificationType.Warning);
+                    //notificacion.MostrarNotificacion($"❌ Desconectado de Socket.IO: {reason}", NotificationType.Warning);
                 };
 
                 // Escuchar eventos del servidor
                 cliente.On("status", response =>
                 {
-                    var mensaje = response.GetValue<MensajeDTO>().ToString();
-                    MessageBox.Show($"[Status]: {mensaje}");
+                    String mensaje = Newtonsoft.Json.JsonConvert.SerializeObject(response.GetValue<MensajeDTO>());
+                    //MessageBox.Show($"[Status]: {mensaje}");
                 });
 
                 cliente.On("error", response =>
                 {
-                    var error = response.GetValue<MensajeDTO>().ToString();
-                    MessageBox.Show($"[Error servidor]: {error}");
+                    String error = Newtonsoft.Json.JsonConvert.SerializeObject(response.GetValue<MensajeDTO>());
+                    //MessageBox.Show($"[Error servidor]: {error}");
                 });
 
                 cliente.On("nuevo_mensaje", response =>
                 {
+
                     try
                     {
-                        var rawJson = response.GetValue<MensajeDTO>().ToString();
-                        MessageBox.Show($"[Mensaje bruto]: {rawJson}");
+                        String rawJson = Newtonsoft.Json.JsonConvert.SerializeObject(response.GetValue<MensajeDTO>());
+                        //MessageBox.Show($"[Mensaje bruto]: {rawJson}");
 
-                        var datosArray = response.GetValue<MensajeDTO[]>();
-                        var datos = datosArray[0];
+                        var jsonObject = JObject.Parse(rawJson);
+                        String mensaje = (string)jsonObject["mensaje"];
+                        String nombre_usuario = (string)jsonObject["nombre_usuario"];
+                        String id_chat= (string)jsonObject["id_chat"];
+                        //DateTime timestamp = (DateTime)jsonObject["mensaje"];
+                        DateTime timestamp = DateTime.Now; //mejor que ponga la hora de cuando lo ha recibido
 
-                        DateTime timestamp = DateTime.TryParse(datos.timestamp, out var temp) ? temp : DateTime.Now;
-
-                        var mensajeRecibido = new MensajeChat(datos.nombre_usuario, datos.mensaje, timestamp);
+                        if (nombre_usuario == ventanaPrincipal.Usuario.nombre_usuario)
+                            nombre_usuario = "Yo";
+                        var mensajeRecibido = new MensajeChat(nombre_usuario, mensaje, timestamp);
 
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            if (!historialChat.ContainsKey(datos.nombre_usuario))
-                                historialChat[datos.nombre_usuario] = new List<MensajeChat>();
-
-                            historialChat[datos.nombre_usuario].Add(mensajeRecibido);
-
-                            if (amigoActual == datos.nombre_usuario)
+                            if (idChatActual.ToString() == id_chat)
+                            {
                                 AgregarMensajeAChat(mensajeRecibido);
-
-                            scrollMensajes.ScrollToEnd();
+                                scrollMensajes.ScrollToEnd();
+                            }
                         });
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"❌ Error al procesar mensaje: {ex.Message}");
+                        //MessageBox.Show($"❌ Error al procesar mensaje: {ex.Message}");
                     }
                 });
 
+
                 cliente.On("status", response =>
                 {
-                    var msg = response.GetValue<string>();
-                    MessageBox.Show($"✅ STATUS: {msg}");
+                    if (response != null)
+                    {
+                        string msg = Newtonsoft.Json.JsonConvert.SerializeObject(response);
+                        //MessageBox.Show($"✅ STATUS: {msg}");
+                    }
                 });
 
                 cliente.On("error", response =>
                 {
-                    var error = response.GetValue<string>();
-                    MessageBox.Show($"❌ ERROR: {error}");
+                    String error = Newtonsoft.Json.JsonConvert.SerializeObject(response);
+                    //MessageBox.Show($"❌ ERROR: {error}");
                 });
 
-                notificacion.MostrarNotificacion("Intentando conectar (polling)...", NotificationType.Info);
+                //notificacion.MostrarNotificacion("Intentando conectar (polling)...", NotificationType.Info);
                 await cliente.ConnectAsync();
             }
             catch (Exception ex)
@@ -182,9 +186,11 @@ namespace Cliente_TFG.Pages
             }
         }
 
+
         public class MensajeDTO
         {
             public int id_mensaje { get; set; }
+            public int id_chat { get; set; }
             public string mensaje { get; set; }
             public string timestamp { get; set; }
             public int id_usuario_remitente { get; set; }
@@ -308,7 +314,7 @@ namespace Cliente_TFG.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    notificacion.MostrarNotificacion($"Se ha creado un chat con el usuario con id {idAmigo}", NotificationType.Info);
+                    //notificacion.MostrarNotificacion($"Se ha creado un chat con el usuario con id {idAmigo}", NotificationType.Info);
                 }
                 else
                 {
@@ -689,7 +695,7 @@ namespace Cliente_TFG.Pages
                         {
                             listaDeAmigos.Add(nuevoAmigo);
                             AgregarAmigoALista(nuevoAmigo);
-                            notificacion.MostrarNotificacion($"Se ha agregado el usuario {nuevoAmigo.NombreUsuario} a la lista de amigos", NotificationType.Info);
+                            //notificacion.MostrarNotificacion($"Se ha agregado el usuario {nuevoAmigo.NombreUsuario} a la lista de amigos", NotificationType.Info);
                         }
 
                     }
@@ -821,6 +827,7 @@ namespace Cliente_TFG.Pages
                 // Cambiar el amigo actual y cargar su historial de chat
                 amigoActual = idAmigo;
                 Dispatcher.Invoke(() => CargarHistorialChat(idAmigo));
+                
             }
         }
 
@@ -858,7 +865,7 @@ namespace Cliente_TFG.Pages
                     id_usuario = ventanaPrincipal.Usuario.id_usuario
                 });
 
-                notificacion.MostrarNotificacion($"Unido al chat: {idChat}", NotificationType.Info);
+                //notificacion.MostrarNotificacion($"Unido al chat del socket: {idChat}", NotificationType.Info);
             }
             else
             {
@@ -880,7 +887,7 @@ namespace Cliente_TFG.Pages
                     string jsonResponse = await response.Content.ReadAsStringAsync();
                     var jsonObj = JObject.Parse(jsonResponse);
                     this.idChatActual = (int)jsonObj["chat_en_comun"];
-                    notificacion.MostrarNotificacion($"Se ha encontrado el chat con {idAmigo}: id chat {idChatActual}", NotificationType.Info);
+                    //notificacion.MostrarNotificacion($"Se ha encontrado el chat con {idAmigo}: id chat {idChatActual}", NotificationType.Info);
                 }
                 else
                 {
@@ -930,7 +937,7 @@ namespace Cliente_TFG.Pages
                     {
                         AgregarMensajeAChat(mensaje);
                     }
-                    notificacion.MostrarNotificacion($"Se ha cargado el historial de chat con {idAmigo}: id chat {idChatActual}", NotificationType.Info);
+                    //notificacion.MostrarNotificacion($"Se ha cargado el historial de chat con {idAmigo}: id chat {idChatActual}", NotificationType.Info);
                 }
                 else
                 {
