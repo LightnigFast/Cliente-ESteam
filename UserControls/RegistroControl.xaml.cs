@@ -94,9 +94,9 @@ namespace Cliente_TFG.UserControls
                 return false;
             }
 
-            if (contrasena.Length <= 6 || !Regex.IsMatch(contrasena, "^[a-zA-Z0-9]+$"))
+            if (contrasena.Length < 4 || !Regex.IsMatch(contrasena, "^[a-zA-Z0-9]+$"))
             {
-                txtErrores.Text = "La contraseña debe tener más de 6 caracteres y ser alfanumérica";
+                txtErrores.Text = "La contraseña debe tener más de 3 caracteres y ser alfanumérica";
                 ResaltarCampo(txtPassword, true);
                 return false;
             }
