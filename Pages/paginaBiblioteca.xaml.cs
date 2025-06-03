@@ -297,17 +297,23 @@ namespace Cliente_TFG.Pages
             CargarFondo();
             CargarJuegosBibioteca();
 
-            //PARTE PARA COMPROBAR SI EL PRIMER JUEGO TIENE RUTA PUESTA
-            string appid = listaAppids.First().ToString();
-
-            if (TieneRutaAsignada(appid))
+            try
             {
-                var juegoSeleccionado = juegosGuardados.FirstOrDefault(j => j.AppId == appid);
-                if (juegoSeleccionado != null)
+                //PARTE PARA COMPROBAR SI EL PRIMER JUEGO TIENE RUTA PUESTA
+                if (listaAppids != null || listaAppids.Count > 0)
                 {
-                    ActualizarEstadoBotonJuego(BotonJugar, juegoSeleccionado);
+                    string appid = listaAppids.First().ToString();
+                    if (TieneRutaAsignada(appid))
+                    {
+                        var juegoSeleccionado = juegosGuardados.FirstOrDefault(j => j.AppId == appid);
+                        if (juegoSeleccionado != null)
+                        {
+                            ActualizarEstadoBotonJuego(BotonJugar, juegoSeleccionado);
+                        }
+                    }
                 }
             }
+            catch { }
         }
 
 
