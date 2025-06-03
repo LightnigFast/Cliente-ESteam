@@ -474,7 +474,9 @@ namespace Cliente_TFG.Pages
 
             if (string.IsNullOrEmpty(nuevoNombre))
             {
-                MessageBox.Show("El nombre no puede estar vacío.", "Validación", MessageBoxButton.OK, MessageBoxImage.Warning);
+                var nombreVacio = new Windows.VNombreVacio();
+                nombreVacio.Show();
+                //MessageBox.Show("El nombre no puede estar vacío.", "Validación", MessageBoxButton.OK, MessageBoxImage.Warning);
                 nombreUserEdit.Focus();
                 return;
             }
@@ -521,7 +523,10 @@ namespace Cliente_TFG.Pages
                     btnEditar.Visibility = Visibility.Visible;
                     btnGuardar.Visibility = Visibility.Collapsed;
 
-                    MessageBox.Show("Perfil actualizado correctamente.");
+
+                    var perfilActualizado = new Windows.VPerfilActualizado();
+                    perfilActualizado.Show();   
+                    //MessageBox.Show("Perfil actualizado correctamente.");
                 }
                 else
                 {

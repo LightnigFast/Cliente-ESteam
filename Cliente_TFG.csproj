@@ -144,11 +144,26 @@
     <Compile Include="Windows\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\VEliminarJuego.xaml.cs">
+      <DependentUpon>VEliminarJuego.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\VentanaRecarga.xaml.cs">
       <DependentUpon>VentanaRecarga.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\VentanaSinJuego.xaml.cs">
       <DependentUpon>VentanaSinJuego.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\VJuegoAgregadoCorrecto.xaml.cs">
+      <DependentUpon>VJuegoAgregadoCorrecto.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\VNombreVacio.xaml.cs">
+      <DependentUpon>VNombreVacio.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\VPerfilActualizado.xaml.cs">
+      <DependentUpon>VPerfilActualizado.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\VRegistroExitoso.xaml.cs">
+      <DependentUpon>VRegistroExitoso.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -206,11 +221,31 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\VEliminarJuego.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\VentanaRecarga.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\VentanaSinJuego.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\VJuegoAgregadoCorrecto.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\VNombreVacio.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\VPerfilActualizado.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\VRegistroExitoso.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

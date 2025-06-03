@@ -66,7 +66,9 @@ namespace Cliente_TFG.UserControls
             bool exito = await RegistrarUsuarioAsync(nombreCuenta, correo, contrasena);
             if (exito)
             {
-                MessageBox.Show("Registro exitoso. Ahora puedes iniciar sesión.", "Registro", MessageBoxButton.OK, MessageBoxImage.Information);
+                var registroExitoso = new Windows.VRegistroExitoso();
+                registroExitoso.Show();
+                //MessageBox.Show("Registro exitoso. Ahora puedes iniciar sesión.", "Registro", MessageBoxButton.OK, MessageBoxImage.Information);
                 VolverAlLogin?.Invoke();
             }
         }

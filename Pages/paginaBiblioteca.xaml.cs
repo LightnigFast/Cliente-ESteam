@@ -21,6 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Cliente_TFG.Classes;
+using Cliente_TFG.Windows;
 using Newtonsoft.Json;
 using static System.Net.WebRequestMethods;
 namespace Cliente_TFG.Pages
@@ -931,9 +932,14 @@ namespace Cliente_TFG.Pages
                 juegosAgregadosGuardados.Add(nuevoJuego);
                 GuardarJuegosAgregadosEnJson();
                 CargarJuegosEnInterfaz();
-                MessageBox.Show("Juego agregado correctamente.");
+
+                var juegoAgregado = new VJuegoAgregadoCorrecto();
+                juegoAgregado.Show();
             }
         }
+
+
+
 
         private string rutaJsonJuegosAgregados = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -1167,16 +1173,15 @@ namespace Cliente_TFG.Pages
             }
         }
 
-        //METODO PARA ELIMINAR EL JUEGO DE LA APP
         private void EliminarDesdeContextMenu(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem item && item.Tag is JuegoInfo juego)
             {
-                // Confirmación
-                var resultado = MessageBox.Show($"¿Seguro que quieres eliminar \"{juego.Nombre}\" de la biblioteca?",
-                                                "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                var ventanaConfirmacion = new VEliminarJuego();
+                ventanaConfirmacion.Owner = Application.Current.MainWindow; // opcional para centrar
+                ventanaConfirmacion.ShowDialog();
 
-                if (resultado == MessageBoxResult.Yes)
+                if (ventanaConfirmacion.Confirmado)
                 {
                     //LO ELIMINAMOS DEL LISTADO DE LA MEMORIA
                     juegosAgregadosGuardados.RemoveAll(j => j.AppId == juego.AppId);
