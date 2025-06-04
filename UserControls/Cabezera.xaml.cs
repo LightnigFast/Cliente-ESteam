@@ -354,6 +354,24 @@ namespace Cliente_TFG.UserControls
                 }
             }
 
+            //BORRAMOS LOS JUEGOS AGREGADOS
+            string rutaJuegosGuardados = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ClienteTFG", "juegos_agregados_biblioteca.json"
+            );
+
+            if (File.Exists(rutaJuegosGuardados))
+            {
+                try
+                {
+                    File.Delete(rutaJuegosGuardados);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al borrar token: " + ex.Message);
+                }
+            }
+
             //ABRIMOS LA VENTANA DEL LOGIN
             LoginWindow loginWindow = new LoginWindow();
             loginWindow.Show();
