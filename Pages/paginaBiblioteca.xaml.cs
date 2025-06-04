@@ -1009,6 +1009,7 @@ namespace Cliente_TFG.Pages
                     Height = altura
                 };
 
+
                 //TEXTO CON EL NOMBRE DEL JUEGO
                 string nombreExe = System.IO.Path.GetFileNameWithoutExtension(juego.RutaEjecutable).ToUpper();
                 TextBlock texto = new TextBlock
@@ -1225,6 +1226,7 @@ namespace Cliente_TFG.Pages
 
             bool hayCoincidencias = false;
 
+            //BUCLE DE LOS JUEGOS DE LA TIENDA
             for (int i = 0; i < imagenVerticalJuegos.Count; i++)
             {
                 if (i < nombresJuegos.Count && nombresJuegos[i].ToLower().Contains(filtro))
@@ -1264,6 +1266,84 @@ namespace Cliente_TFG.Pages
                     panelJuegosBiblioteca.Children.Add(img);
                 }
             }
+
+            //BUCLE DE LOS JUEGOS AGREGADOS POR NOSOTROS
+            foreach (var juego in juegosAgregadosGuardados)
+            {
+                if (juego.Nombre.ToLower().Contains(filtro))
+                {
+                    hayCoincidencias = true;
+
+                    var scale = new ScaleTransform(1.0, 1.0);
+                    double altura = 170;
+                    double proporcion = 600.0 / 900.0;
+                    double ancho = altura * proporcion;
+
+                    Grid contenedor = new Grid
+                    {
+                        Height = altura,
+                        Width = ancho,
+                        Margin = new Thickness(11),
+                        Tag = juego,
+                        RenderTransform = scale,
+                        RenderTransformOrigin = new Point(0.5, 0.5)
+                    };
+
+                    Image img = new Image
+                    {
+                        Source = new BitmapImage(new Uri("pack://application:,,,/res/library/juego_vertical_manual.png")),
+                        Stretch = Stretch.UniformToFill,
+                        Height = altura
+                    };
+
+                    TextBlock texto = new TextBlock
+                    {
+                        Text = juego.Nombre.ToUpper(),
+                        Foreground = AppTheme.Actual.TextoPrincipal,
+                        Background = new SolidColorBrush(Color.FromArgb(160, 0, 0, 0)),
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        TextAlignment = TextAlignment.Center,
+                        TextWrapping = TextWrapping.Wrap,
+                        FontSize = 12,
+                        IsHitTestVisible = false,
+                        Padding = new Thickness(4),
+                        MaxWidth = ancho,
+                        TextTrimming = TextTrimming.CharacterEllipsis
+                    };
+
+                    contenedor.Children.Add(img);
+                    contenedor.Children.Add(texto);
+
+                    contenedor.MouseEnter += (s, e2) =>
+                    {
+                        var anim = new DoubleAnimation(1.0, 1.1, TimeSpan.FromMilliseconds(150));
+                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                    };
+
+                    contenedor.MouseLeave += (s, e2) =>
+                    {
+                        var anim = new DoubleAnimation(1.1, 1.0, TimeSpan.FromMilliseconds(150));
+                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
+                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                    };
+
+                    contenedor.MouseLeftButtonUp += ImagenJuegoManual_Click;
+
+                    // CONTEXT MENU
+                    ContextMenu menu = CrearContextMenuJuegoManual(juego);
+                    contenedor.ContextMenu = menu;
+                    contenedor.MouseRightButtonUp += (s, e2) =>
+                    {
+                        contenedor.ContextMenu.IsOpen = true;
+                        contenedor.ContextMenu.PlacementTarget = contenedor;
+                    };
+
+                    panelJuegosBiblioteca.Children.Add(contenedor);
+                }
+            }
+
 
             if (!hayCoincidencias)
             {
