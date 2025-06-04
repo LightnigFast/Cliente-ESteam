@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Cliente_TFG.Windows.VEliminarJuego"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Confirmación" Height="200" Width="400"
+        Title="Confirmación" Height="200" Width="410"
         Background="#1E1E1E" WindowStyle="None" AllowsTransparency="True"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
@@ -11,7 +11,7 @@
 
             <!-- Icono y mensaje principal -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10" Width="367">
-                <TextBlock Text="🤔" FontSize="24" Foreground="#d11f45" Margin="0,0,10,0"/>
+                <TextBlock Text="🤔" FontSize="24" Foreground="#d11f45" Margin="0,0,10,0" Padding="2"/>
                 <TextBlock x:Name="txtMensaje" Text="¿Seguro que quieres eliminar este juego?" 
                            FontSize="18" Foreground="White" VerticalAlignment="Center" TextWrapping="Wrap" Width="333"/>
             </StackPanel>
