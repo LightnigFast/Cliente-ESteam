@@ -62,6 +62,7 @@ namespace Cliente_TFG.Pages
             txtBiografia.Foreground = AppTheme.Actual.TextoPrincipal;
 
             gridCentral.Background = AppTheme.Actual.FondoPanel;
+            bordeCentral.Background = AppTheme.Actual.FondoPanel;
 
         }
 

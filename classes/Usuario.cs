@@ -59,23 +59,26 @@ namespace Cliente_TFG.Classes
 
         public void CargarBiblioteca(int idUser)
         {
-            var url = $"http://" + ventanaPrincipal.IP + $":50000/library/{idUser}";
-            using (var webClient = new WebClient())
+            if (ventanaPrincipal != null)
             {
-                string jsonString = webClient.DownloadString(url);
-
-                var jsonObj = JObject.Parse(jsonString);
-                var juegosArray = jsonObj["juegos"] as JArray;
-
-                bibliotecaJuegos.Clear();
-
-                foreach (var juego in juegosArray)
+                var url = $"http://" + ventanaPrincipal.IP + $":50000/library/{idUser}";
+                using (var webClient = new WebClient())
                 {
-                    int appId = (int)juego["app_id"];
-                    bibliotecaJuegos.Add(appId);
+                    string jsonString = webClient.DownloadString(url);
 
-                    string nombreJuego = (string)juego["nombre"];
-                    bibliotecaJuegosNombres.Add(nombreJuego);
+                    var jsonObj = JObject.Parse(jsonString);
+                    var juegosArray = jsonObj["juegos"] as JArray;
+
+                    bibliotecaJuegos.Clear();
+
+                    foreach (var juego in juegosArray)
+                    {
+                        int appId = (int)juego["app_id"];
+                        bibliotecaJuegos.Add(appId);
+
+                        string nombreJuego = (string)juego["nombre"];
+                        bibliotecaJuegosNombres.Add(nombreJuego);
+                    }
                 }
             }
         }
