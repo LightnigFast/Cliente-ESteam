@@ -81,7 +81,7 @@ namespace Cliente_TFG.Pages
                     Transport = SocketIOClient.Transport.TransportProtocol.Polling,
                     AutoUpgrade = false
                 };
-                cliente = new SocketIOClient.SocketIO($"http://{ventanaPrincipal.IP}:50000", options);
+                cliente = new SocketIOClient.SocketIO($"http://{Config.IP}:{Config.Puerto}", options);
 
                 
 
@@ -303,7 +303,7 @@ namespace Cliente_TFG.Pages
 
         private async Task CrearGrupoChatEnServidorAsync(string idAmigo)
         {
-            string url = $"http://{ventanaPrincipal.IP}:50000/chats/crear_chat_privado";
+            string url = $"http://{Config.IP}:{Config.Puerto}/chats/crear_chat_privado";
 
             try
             {
@@ -331,7 +331,7 @@ namespace Cliente_TFG.Pages
 
         private async Task AceptarSolicitudAmistadEnServidorAsync(SolicitudAmistad Solicitud)
         {
-            string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad/aceptar";
+            string url = $"http://{Config.IP}:{Config.Puerto}/friend_list/solicitudes_amistad/aceptar";
 
             try
             {
@@ -379,7 +379,7 @@ namespace Cliente_TFG.Pages
 
         private async Task RechazarSolicitudAmistadEnServidorAsync(SolicitudAmistad solicitud)
         {
-            string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad/rechazar";
+            string url = $"http://{Config.IP}:{Config.Puerto}/friend_list/solicitudes_amistad/rechazar";
 
             try
             {
@@ -599,7 +599,7 @@ namespace Cliente_TFG.Pages
 
         private async Task ObtenerSolicitudesDelServidorAsync()
         {
-            string url = $"http://{ventanaPrincipal.IP}:50000/users/?id={ventanaPrincipal.Usuario.id_usuario}&solicitudes&estado_solicitudes=pendiente";
+            string url = $"http://{Config.IP}:{Config.Puerto}/users/?id={ventanaPrincipal.Usuario.id_usuario}&solicitudes&estado_solicitudes=pendiente";
 
             try
             {
@@ -645,7 +645,7 @@ namespace Cliente_TFG.Pages
 
         private async Task ObtenerAmigosDelServidorAsync()
         {
-            string url = $"http://{ventanaPrincipal.IP}:50000/users/?id={ventanaPrincipal.Usuario.id_usuario}&amigos";
+            string url = $"http://{Config.IP}:{Config.Puerto}/users/?id={ventanaPrincipal.Usuario.id_usuario}&amigos";
 
             try
             {
@@ -876,7 +876,7 @@ namespace Cliente_TFG.Pages
         //TODO
         private async Task BuscarChatEnComunConAmigo(string idAmigo)
         {
-            string url = $"http://{ventanaPrincipal.IP}:50000/chats/chat_en_comun?id_usuario_1={ventanaPrincipal.Usuario.id_usuario}&id_usuario_2={idAmigo}";
+            string url = $"http://{Config.IP}:{Config.Puerto}/chats/chat_en_comun?id_usuario_1={ventanaPrincipal.Usuario.id_usuario}&id_usuario_2={idAmigo}";
 
             try
             {
@@ -907,7 +907,7 @@ namespace Cliente_TFG.Pages
 
         private async Task CargarHistorialChatDesdeElServidorAsync(string idAmigo)
         {
-            string url = $"http://{ventanaPrincipal.IP}:50000/chats/mensajes_chat?id_chat={idChatActual}";
+            string url = $"http://{Config.IP}:{Config.Puerto}/chats/mensajes_chat?id_chat={idChatActual}";
 
             try
             {
@@ -1126,7 +1126,7 @@ namespace Cliente_TFG.Pages
 
         private async void MandarSolicitudDeAmistadAsync(SolicitudAmistad user)
         {
-            string url = $"http://{ventanaPrincipal.IP}:50000/friend_list/solicitudes_amistad";
+            string url = $"http://{Config.IP}:{Config.Puerto}/friend_list/solicitudes_amistad";
             try
             {
                 // Validar inputs
@@ -1179,7 +1179,7 @@ namespace Cliente_TFG.Pages
                 {
                     return null;
                 }
-                var url = $"http://" + ventanaPrincipal.IP + $":50000/users/friend_code/{friendCode}";
+                var url = $"http://" + Config.IP + $":"+Config.Puerto+"/users/friend_code/{friendCode}";
                 using (var webClient = new WebClient())
                 {
                     string jsonString;

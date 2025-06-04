@@ -120,7 +120,7 @@ namespace Cliente_TFG.UserControls
 
                 try
                 {
-                    string url = "http://" + Config.IP + ":50000/users/";
+                    string url = "http://" + Config.IP + ":"+Config.Puerto+"/users/";
 
                     HttpResponseMessage response = await client.PostAsync(url, contenido);
 

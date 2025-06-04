@@ -128,7 +128,7 @@ namespace Cliente_TFG.Pages
             {
                 try
                 {
-                    string url = "http://" + Config.IP + $":50000/library/" + ventanaPrincipal.Usuario.IdUsuario;
+                    string url = "http://" + Config.IP + $":"+Config.Puerto+"/library/" + ventanaPrincipal.Usuario.IdUsuario;
                     //MessageBox.Show($"Llamando a API: {url}");
 
                     string json = await client.GetStringAsync(url);

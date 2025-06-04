@@ -40,7 +40,7 @@ namespace Cliente_TFG
 
                     try
                     {
-                        HttpResponseMessage resp = await client.PostAsync($"http://{ip}:50000/login/validar_token", contenido);
+                        HttpResponseMessage resp = await client.PostAsync($"http://{ip}:{Config.Puerto}/login/validar_token", contenido);
 
                         if (resp.IsSuccessStatusCode)
                         {

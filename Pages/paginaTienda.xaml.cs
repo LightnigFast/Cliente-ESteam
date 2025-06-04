@@ -128,7 +128,7 @@ namespace Cliente_TFG.Pages
             {
                 try
                 {
-                    string json = await client.GetStringAsync("http://" + ventanaPrincipal.IP + ":50000/store/carrusel");
+                    string json = await client.GetStringAsync("http://" + Config.IP + ":"+Config.Puerto+"/store/carrusel");
                     var response = JsonConvert.DeserializeObject<CarruselResponse>(json);
 
                     bool primeraImagenCargada = false;
@@ -650,7 +650,7 @@ namespace Cliente_TFG.Pages
             {
                 try
                 {
-                    string json = await client.GetStringAsync("http://" + ventanaPrincipal.IP + ":50000/store/ofertas");
+                    string json = await client.GetStringAsync("http://" + Config.IP + ":"+Config.Puerto+"/store/ofertas");
                     var response = JsonConvert.DeserializeObject<CarruselResponseOferta>(json);
 
 
@@ -913,7 +913,7 @@ namespace Cliente_TFG.Pages
             {
                 try
                 {
-                    string json = await client.GetStringAsync("http://" + ventanaPrincipal.IP + ":50000/store/10.00");
+                    string json = await client.GetStringAsync("http://" + Config.IP + ":"+Config.Puerto+"/store/10.00");
                     var response = JsonConvert.DeserializeObject<OfertaEspeciallResponse>(json);
 
 
@@ -1126,7 +1126,7 @@ namespace Cliente_TFG.Pages
             {
                 try
                 {
-                    string json = await client.GetStringAsync("http://" + ventanaPrincipal.IP + ":50000/store/nuevos_lanzamientos");
+                    string json = await client.GetStringAsync("http://" + Config.IP + ":"+Config.Puerto+"/store/nuevos_lanzamientos");
                     var response = JsonConvert.DeserializeObject<NuevosLanzamientosResponse>(json);
 
 
@@ -1323,7 +1323,7 @@ namespace Cliente_TFG.Pages
                 _searchCts.CancelAfter(TimeSpan.FromSeconds(3)); //TIMER DE 3 SEGUNODS
 
                 var response = await _client.GetAsync(
-                    $"http://" + ventanaPrincipal.IP + $":50000/games/?name={Uri.EscapeDataString(texto)}&limit=10",
+                    $"http://" + Config.IP + $":"+Config.Puerto+"/games/?name={Uri.EscapeDataString(texto)}&limit=10",
                     _searchCts.Token
                 );
 

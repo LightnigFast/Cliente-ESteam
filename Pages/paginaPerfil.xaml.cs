@@ -107,7 +107,7 @@ namespace Cliente_TFG.Pages
         {
             using (HttpClient client = new HttpClient())
             {
-                string url = $"http://{ventanaPrincipal.IP}:50000/users/?id={idUsuario}&amigos";
+                string url = $"http://{Config.IP}:{Config.Puerto}/users/?id={idUsuario}&amigos";
                 HttpResponseMessage response = await client.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
@@ -176,7 +176,7 @@ namespace Cliente_TFG.Pages
             new KeyValuePair<string, string>("foto_perfil", urlImagen)
         });
 
-            var response = await httpClient.PostAsync($"http://" + ventanaPrincipal.IP + ":50000/user_profile/actualizar_foto", content);
+            var response = await httpClient.PostAsync($"http://" + Config.IP + ":"+ Config.Puerto + "/user_profile/actualizar_foto", content);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -228,7 +228,7 @@ namespace Cliente_TFG.Pages
             {
                 try
                 {
-                    string url = $"http://" + ventanaPrincipal.IP + $":50000/users/{idUsuario}";
+                    string url = $"http://" + Config.IP + $":{Config.Puerto}/users/{idUsuario}";
                     HttpResponseMessage response = await client.GetAsync(url);
 
                     if (response.IsSuccessStatusCode)
@@ -283,7 +283,7 @@ namespace Cliente_TFG.Pages
             try
             {
                 int idUsuario = ventanaPrincipal.user.IdUsuario;
-                string url = $"http://{ventanaPrincipal.IP}:50000/library/{idUsuario}/ultimos_juegos";
+                string url = $"http://{Config.IP}:{Config.Puerto}/library/{idUsuario}/ultimos_juegos";
 
                 using (HttpClient client = new HttpClient())
                 {
@@ -496,7 +496,7 @@ namespace Cliente_TFG.Pages
 
             try
             {
-                string url = $"http://{ventanaPrincipal.IP}:50000/user_profile/{idUsuario}";
+                string url = $"http://{Config.IP}:{Config.Puerto}/user_profile/{idUsuario}";
                 var client = new HttpClient();
                 var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
                 {

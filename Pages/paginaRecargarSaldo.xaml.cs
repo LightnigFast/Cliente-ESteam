@@ -179,7 +179,7 @@ namespace Cliente_TFG.Pages
                 decimal monto= new decimal();
                 monto = montoSeleccionado;
 
-                string url = $"http://{ventanaPrincipal.IP}:50000/users/{userId}/recargar?cantidad={montoSeleccionado}";
+                string url = $"http://{Config.IP}:{Config.Puerto}/users/{userId}/recargar?cantidad={montoSeleccionado}";
 
 
                 //HACER PUT

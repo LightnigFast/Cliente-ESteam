@@ -34,7 +34,7 @@ namespace Cliente_TFG.Classes
 
         public void CargarDatos(int idUser)
         {
-            var url = $"http://" + ventanaPrincipal.IP + $":50000/users/{idUser}";
+            var url = $"http://" + Config.IP + $":{Config.Puerto}/users/{idUser}";
             using (var webClient = new WebClient())
             {
                 string jsonString = webClient.DownloadString(url);
@@ -59,28 +59,26 @@ namespace Cliente_TFG.Classes
 
         public void CargarBiblioteca(int idUser)
         {
-            if (ventanaPrincipal != null)
+            var url = $"http://" + Config.IP + $":{Config.Puerto}/library/{idUser}";
+            using (var webClient = new WebClient())
             {
-                var url = $"http://" + ventanaPrincipal.IP + $":50000/library/{idUser}";
-                using (var webClient = new WebClient())
+                string jsonString = webClient.DownloadString(url);
+
+                var jsonObj = JObject.Parse(jsonString);
+                var juegosArray = jsonObj["juegos"] as JArray;
+
+                bibliotecaJuegos.Clear();
+
+                foreach (var juego in juegosArray)
                 {
-                    string jsonString = webClient.DownloadString(url);
+                    int appId = (int)juego["app_id"];
+                    bibliotecaJuegos.Add(appId);
 
-                    var jsonObj = JObject.Parse(jsonString);
-                    var juegosArray = jsonObj["juegos"] as JArray;
-
-                    bibliotecaJuegos.Clear();
-
-                    foreach (var juego in juegosArray)
-                    {
-                        int appId = (int)juego["app_id"];
-                        bibliotecaJuegos.Add(appId);
-
-                        string nombreJuego = (string)juego["nombre"];
-                        bibliotecaJuegosNombres.Add(nombreJuego);
-                    }
+                    string nombreJuego = (string)juego["nombre"];
+                    bibliotecaJuegosNombres.Add(nombreJuego);
                 }
             }
+            
         }
 
 

@@ -73,7 +73,7 @@ namespace Cliente_TFG.UserControls
 
                 try
                 {
-                    HttpResponseMessage response = await client.PostAsync("http://" + ip + ":50000/login/", contenido);
+                    HttpResponseMessage response = await client.PostAsync("http://" + ip + ":"+Config.Puerto+"/login/", contenido);
 
                     if (response.IsSuccessStatusCode)
                     {
