@@ -1244,7 +1244,9 @@ namespace Cliente_TFG.Pages
             //BUCLE DE LOS JUEGOS DE LA TIENDA
             for (int i = 0; i < imagenVerticalJuegos.Count; i++)
             {
-                if (i < nombresJuegos.Count && nombresJuegos[i].ToLower().Contains(filtro))
+                var juego = bibliotecaTotal.juegos[i];
+
+                if (!string.IsNullOrWhiteSpace(juego.nombre) && juego.nombre.ToLower().Contains(filtro))
                 {
                     hayCoincidencias = true;
 
