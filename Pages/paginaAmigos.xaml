@@ -439,12 +439,15 @@
 
                 <!-- Encabezado del chat -->
                 <TextBlock Grid.Row="0" 
+                           Name="cabeceraNombreChat"
                            Text="CHAT" 
                            Foreground="{Binding TextoPrincipal, Source={StaticResource AppTheme}}" 
                            FontSize="36" 
                            FontWeight="Bold" 
                            HorizontalAlignment="Center" 
-                           Margin="0,20,0,0"/>
+                           Margin="0,20,0,0" Visibility="Collapsed"/>
+                
+
 
                 <!-- Área de mensajes -->
                 <ScrollViewer Grid.Row="1" 
@@ -457,8 +460,20 @@
                     </StackPanel>
                 </ScrollViewer>
 
+                <!-- Encabezado del chat -->
+                <TextBlock Grid.Row="1" 
+                   Name="cabeceraAdvertencia"
+                   Text="Haz click en un amigo para ver su chat" 
+                   Foreground="{Binding TextoSecundario, Source={StaticResource AppTheme}}" 
+                   FontSize="36" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"/>
+
+
+
                 <!-- Área de entrada de mensajes -->
-                <Grid Grid.Row="2" Margin="20,0,20,20">
+                <Grid Grid.Row="2" Margin="20,0,20,20" Name="gridMensajes" Visibility="Collapsed">
                     <TextBox x:Name="txtMensaje" 
                              Height="40" 
                              Width="Auto" 

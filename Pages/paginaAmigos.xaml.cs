@@ -771,6 +771,7 @@ namespace Cliente_TFG.Pages
             // Nombre del amigo
             TextBlock textoNombre = new TextBlock
             {
+                Tag = amigo.NombreUsuario,
                 Text = amigo.NombreUsuario,
                 Foreground = AppTheme.Actual.TextoPrincipal,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -817,18 +818,44 @@ namespace Cliente_TFG.Pages
             if (sender is Border border)
             {
                 string idAmigo = "";
+                string nombreAmigo = "";
 
                 // Obtener el nombre del amigo
                 if (border.Tag != null)
                 {
                     idAmigo = border.Tag.ToString();
+                    nombreAmigo = ObtenerNombreAmigoDeUnBorder(border);
                 }
+
 
                 // Cambiar el amigo actual y cargar su historial de chat
                 amigoActual = idAmigo;
+                cabeceraAdvertencia.Visibility = Visibility.Collapsed;
+                cabeceraNombreChat.Visibility = Visibility.Visible;
+                gridMensajes.Visibility = Visibility.Visible;
+                cabeceraNombreChat.Text = $"Chat con {nombreAmigo}";
                 Dispatcher.Invoke(() => CargarHistorialChat(idAmigo));
                 
             }
+        }
+
+        private string ObtenerNombreAmigoDeUnBorder(Border border)
+        {
+            // Obtener el Grid que es el hijo del Border
+            Grid gridAmigo = border.Child as Grid;
+            if (gridAmigo == null)
+                return null; // O manejar el error según tu lógica
+
+            // Buscar el TextBlock entre los hijos del Grid
+            foreach (var child in gridAmigo.Children)
+            {
+                if (child is TextBlock textoNombre)
+                {
+                    return textoNombre.Text;
+                }
+            }
+
+            return null; // O manejar el caso en que no se encuentre el TextBlock
         }
 
         private async Task CargarHistorialChat(string IdAmigo)
