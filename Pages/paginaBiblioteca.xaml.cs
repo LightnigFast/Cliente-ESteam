@@ -584,7 +584,10 @@ namespace Cliente_TFG.Pages
             }
             else
             {
-                MessageBox.Show("Ruta del ejecutable no válida. Cámbiala primero.");
+                var ventanaError = new ErrorWindow("Ruta del ejecutable no válida. Cámbiala primero.");
+                //ventanaError.Owner = Application.Current.MainWindow; //opcional para centrar
+                ventanaError.ShowDialog();
+                //MessageBox.Show("Ruta del ejecutable no válida. Cámbiala primero.");
             }
         }
 
@@ -1158,7 +1161,13 @@ namespace Cliente_TFG.Pages
                 if (System.IO.File.Exists(juegoManualSeleccionado.RutaEjecutable))
                     Process.Start(juegoManualSeleccionado.RutaEjecutable);
                 else
-                    MessageBox.Show("No se encontró el ejecutable del juego.");
+                {
+                    var ventanaError = new ErrorWindow("No se encontró el ejecutable del juego.");
+                    ventanaError.Owner = Application.Current.MainWindow;
+                    ventanaError.ShowDialog();
+                    //MessageBox.Show("No se encontró el ejecutable del juego.");
+                }
+                
             }
         }
 
@@ -1170,7 +1179,13 @@ namespace Cliente_TFG.Pages
                 if (System.IO.File.Exists(juego.RutaEjecutable))
                     Process.Start(juego.RutaEjecutable);
                 else
-                    MessageBox.Show("No se encontró el ejecutable del juego.");
+                {
+                    var ventanaError = new ErrorWindow("No se encontró el ejecutable del juego.");
+                    ventanaError.Owner = Application.Current.MainWindow; //opcional para centrar
+                    ventanaError.ShowDialog();
+                    //MessageBox.Show("No se encontró el ejecutable del juego.");
+                }
+                    
             }
         }
 
@@ -1179,7 +1194,7 @@ namespace Cliente_TFG.Pages
             if (sender is MenuItem item && item.Tag is JuegoInfo juego)
             {
                 var ventanaConfirmacion = new VEliminarJuego();
-                ventanaConfirmacion.Owner = Application.Current.MainWindow; // opcional para centrar
+                ventanaConfirmacion.Owner = Application.Current.MainWindow; //opcional para centrar
                 ventanaConfirmacion.ShowDialog();
 
                 if (ventanaConfirmacion.Confirmado)
