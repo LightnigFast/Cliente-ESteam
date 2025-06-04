@@ -9,9 +9,9 @@ namespace Cliente_TFG.Classes
     public static class Config
     {
         public static string Puerto { get; set; } = "50000";
-        public static string IP { get; set; } = "127.0.0.1";
+        //public static string IP { get; set; } = "127.0.0.1";
 
-        //public static string IP { get; set; } = "26.84.183.227"; //JESUS PC
+        public static string IP { get; set; } = "26.84.183.227"; //JESUS PC
         //public static string IP { get; set; } = "26.254.119.213"; //JESUS LAPTOP
 
         //public static string IP { get; set; } = "26.75.134.118"; //RUBEN PC

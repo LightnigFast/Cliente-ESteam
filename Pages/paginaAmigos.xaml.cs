@@ -1206,7 +1206,7 @@ namespace Cliente_TFG.Pages
                 {
                     return null;
                 }
-                var url = $"http://" + Config.IP + $":"+Config.Puerto+"/users/friend_code/{friendCode}";
+                var url = $"http://" + Config.IP + $":"+Config.Puerto + $"/users/friend_code/{friendCode}";
                 using (var webClient = new WebClient())
                 {
                     string jsonString;

@@ -237,7 +237,7 @@ namespace Cliente_TFG.UserControls
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    var url = $"http://" + Config.IP + $":"+Config.Puerto+"/user_profile/{IdUser}/estado";
+                    var url = $"http://" + Config.IP + $":"+Config.Puerto + $"/user_profile/{IdUser}/estado";
 
                     var json = JsonConvert.SerializeObject(new { estado = nuevoEstado });
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
