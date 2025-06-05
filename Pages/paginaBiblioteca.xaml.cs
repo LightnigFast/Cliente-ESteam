@@ -53,6 +53,9 @@ namespace Cliente_TFG.Pages
             juegos = new List<Juego>()
         };
 
+        //PARA LAS DESCARGAS
+        private Dictionary<int, bool> cacheDescargables = new Dictionary<int, bool>();
+
         //PARA IDENTIFICAR EL JUEGO QUE SE ESTA VIENDO
         private int appidActual;
 
@@ -809,10 +812,17 @@ namespace Cliente_TFG.Pages
                     ImagenLogo.Tag = index;
                     imgFondo.Tag = index;
 
+                    appidActual = listaAppids[index.Value];
+
+                    //COMRPOBAMOS SI EL JUEGO ES DESCARGABLE
+                    bool esDescargable = EsDescargable(ventanaPrincipal.Usuario.IdUsuario, appidActual);
+                    //MessageBox.Show(esDescargable.ToString());
+
                     //CAMBIAR ESTADO DEL BOTÓN SEGÚN RUTA
                     var juegoSeleccionado = juegosGuardados[index.Value];
-                    appidActual = listaAppids[index.Value];
                     ActualizarEstadoBotonJuego(BotonJugar, juegoSeleccionado);
+
+                   
 
                     //ASIGNAMOS MANEJADORES DE NUEVO
                     imgFondo.ImageFailed += ImgFondo_ImageFailed;
@@ -844,6 +854,27 @@ namespace Cliente_TFG.Pages
                 BotonJugar.BeginAnimation(UIElement.OpacityProperty, fadeOutSimple);
             }
 
+        }
+
+        public bool EsDescargable(int userId, int appId)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    string url = $"http://{Config.IP}:{Config.Puerto}/library/{userId}/downloadable/{appId}";
+                    var response = client.GetAsync(url).Result; // llamada síncrona
+                    if (!response.IsSuccessStatusCode) return false;
+
+                    string json = response.Content.ReadAsStringAsync().Result;
+                    dynamic result = JsonConvert.DeserializeObject(json);
+                    return result.descargable == true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
         }
 
         //METODO PARA ACTUALIZAR EL ESTADO DEL BOTON DEPENDIENDO DE SI TIENE RUTA COLOCADA EN EL ARCHIVO O NO
