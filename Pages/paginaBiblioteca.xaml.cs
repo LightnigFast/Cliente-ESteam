@@ -564,16 +564,22 @@ namespace Cliente_TFG.Pages
                 Header = "Ver detalles",
                 Style = (Style)FindResource("EstiloMenuItem")
             };
-
+            MenuItem desinstalarItem = new MenuItem
+            {
+                Header = "Desinstalar",
+                Style = (Style)FindResource("EstiloMenuItem")
+            };
 
             //ASIGNAR OPCIONES
             jugarItem.Click += (s, e) => IniciarJuego(index);
             cambiarEjecutableItem.Click += (s, e) => cambiarEjecutableJuego(index);
             detallesItem.Click += (s, e) => MostrarDetallesJuego(index);
+            desinstalarItem.Click += (s, e) => DesinstalarJuego(index);
 
             menu.Items.Add(jugarItem);
             menu.Items.Add(cambiarEjecutableItem);
             menu.Items.Add(detallesItem);
+            menu.Items.Add(desinstalarItem);
 
             return menu;
         }
@@ -620,7 +626,7 @@ namespace Cliente_TFG.Pages
             return juego != null && !string.IsNullOrWhiteSpace(juego.RutaEjecutable);
         }
 
-
+        //METODO PARA MOSTRAR LOS DETALLES DEL JUEGO EN LA TIENDA
         private async void MostrarDetallesJuego(int index)
         {
             await FadeOutATodo();
@@ -628,6 +634,78 @@ namespace Cliente_TFG.Pages
             ventanaPrincipal.framePrincipal.Navigate(newPage);
             
         }
+
+        //METODO PARA DESINSTALAR UN JUEGO PREVIAMENTE INSTALADO
+        private void DesinstalarJuego(int index)
+        {
+            if (index < 0 || index >= juegosGuardados.Count)
+            {
+                var ventanaError = new ErrorWindow("Índice de juego inválido.");
+                ventanaError.Owner = Application.Current.MainWindow;
+                ventanaError.ShowDialog();
+                //MessageBox.Show("Índice de juego inválido.");
+                return;
+            }
+
+            var juego = juegosGuardados[index];
+
+            if (string.IsNullOrEmpty(juego.RutaEjecutable) || !System.IO.File.Exists(juego.RutaEjecutable))
+            {
+                var ventanaError = new ErrorWindow("El juego no está instalado o no se encontró la ruta de instalación.");
+                ventanaError.Owner = Application.Current.MainWindow;
+                ventanaError.ShowDialog();
+                //MessageBox.Show("El juego no está instalado o no se encontró la ruta de instalación.");
+                return;
+            }
+
+            try
+            {
+                // Obtener carpeta raíz de la instalación (la carpeta que contiene el ejecutable)
+                string carpetaInstalacion = System.IO.Path.GetDirectoryName(juego.RutaEjecutable);
+
+                // Opcional: Confirmar con el usuario
+                var resultado = MessageBox.Show($"¿Quieres desinstalar el juego \"{juego.Nombre}\" y eliminar todos sus archivos?",
+                                                "Confirmar desinstalación",
+                                                MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (resultado != MessageBoxResult.Yes)
+                    return;
+
+                // Eliminar carpeta de instalación y todo su contenido
+                if (Directory.Exists(carpetaInstalacion))
+                {
+                    Directory.Delete(carpetaInstalacion, true); // true para borrar recursivamente
+                }
+
+                // Limpiar ruta ejecutable
+                juego.RutaEjecutable = null;
+
+                // Guardar cambios en JSON
+                GuardarJuegosEnJson();
+
+                QuitarHandlersClickDeBoton();
+
+                // Actualizar estado botón a "Instalar"
+                ActualizarBotonInstalacion(BotonJugar, juego);
+
+                // Cambiar handler para que ejecute la instalación, si tienes uno
+                //BotonJugar.Click += BotonInstalar_Click;
+
+                string mensaje = $"El juego \"{juego.Nombre}\" ha sido desinstalado correctamente.";
+                var ventanaError = new ErrorWindow(mensaje);
+                ventanaError.Owner = Application.Current.MainWindow;
+                ventanaError.ShowDialog();
+                //MessageBox.Show($"El juego \"{juego.Nombre}\" ha sido desinstalado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                string mensaje = $"Error al desinstalar el juego:\n{ex.Message}";
+                var ventanaError = new ErrorWindow(mensaje);
+                ventanaError.Owner = Application.Current.MainWindow;
+                ventanaError.ShowDialog();
+                //MessageBox.Show($"Error al desinstalar el juego:\n{ex.Message}");
+            }
+        }
+
 
 
         //METODO PARA GENERAR LA IMAGEN SI NO SE CARGA CORRECTAMENTE POR QUE NO EXISTE
@@ -948,7 +1026,10 @@ namespace Cliente_TFG.Pages
             {
                 if (juegoSteamSeleccionado == null)
                 {
-                    MessageBox.Show("No se ha seleccionado ningún juego.");
+                    var ventanaError = new ErrorWindow("No se ha seleccionado ningún juego.");
+                    ventanaError.Owner = Application.Current.MainWindow;
+                    ventanaError.ShowDialog();
+                    //MessageBox.Show("No se ha seleccionado ningún juego.");
                     return;
                 }
 
@@ -990,17 +1071,28 @@ namespace Cliente_TFG.Pages
                             BotonJugar.Click -= BotonInstalar_Click;
                         }
 
-                        MessageBox.Show("Juego descargado e instalado correctamente.");
+                        var ventanaError = new ErrorWindow("Juego descargado e instalado correctamente.");
+                        ventanaError.Owner = Application.Current.MainWindow;
+                        ventanaError.ShowDialog();
+                        //MessageBox.Show("Juego descargado e instalado correctamente.");
                     }
                     else
                     {
-                        MessageBox.Show($"Error al descargar el juego:\n{response.ReasonPhrase}");
+                        string mensaje = $"Error al descargar el juego:\n{response.ReasonPhrase}";
+                        var ventanaError = new ErrorWindow(mensaje);
+                        ventanaError.Owner = Application.Current.MainWindow;
+                        ventanaError.ShowDialog();
+                        //MessageBox.Show($"Error al descargar el juego:\n{response.ReasonPhrase}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error inesperado:\n{ex.Message}");
+                string mensaje = $"Error inesperado:\n{ex.Message}";
+                var ventanaError = new ErrorWindow(mensaje);
+                ventanaError.Owner = Application.Current.MainWindow;
+                ventanaError.ShowDialog();
+                //MessageBox.Show($"Error inesperado:\n{ex.Message}");
             }
         }
 
