@@ -24,6 +24,7 @@ using Cliente_TFG.Classes;
 using Cliente_TFG.Windows;
 using Newtonsoft.Json;
 using static System.Net.WebRequestMethods;
+using System.IO.Compression;
 namespace Cliente_TFG.Pages
 {
     /// <summary>
@@ -822,7 +823,18 @@ namespace Cliente_TFG.Pages
                     var juegoSeleccionado = juegosGuardados[index.Value];
                     ActualizarEstadoBotonJuego(BotonJugar, juegoSeleccionado);
 
-                   
+                    //SI YA ESTÁ INSTALADO, NO MOSTRAR BOTÓN DE INSTALACIÓN
+                    if (!string.IsNullOrWhiteSpace(juegoSeleccionado.RutaEjecutable) && System.IO.File.Exists(juegoSeleccionado.RutaEjecutable))
+                    {
+                        //EL JUEGO YA ESTÁ INSTALADO, OCULTAR BOTÓN DE INSTALAR
+                        BotonJugar.Content = "JUGAR";
+                    }
+                    else if (esDescargable)
+                    {
+                        ActualizarBotonInstalacion(BotonJugar, juegoSeleccionado);
+                    }
+
+
 
                     //ASIGNAMOS MANEJADORES DE NUEVO
                     imgFondo.ImageFailed += ImgFondo_ImageFailed;
@@ -863,7 +875,7 @@ namespace Cliente_TFG.Pages
                 try
                 {
                     string url = $"http://{Config.IP}:{Config.Puerto}/library/{userId}/downloadable/{appId}";
-                    var response = client.GetAsync(url).Result; // llamada síncrona
+                    var response = client.GetAsync(url).Result; 
                     if (!response.IsSuccessStatusCode) return false;
 
                     string json = response.Content.ReadAsStringAsync().Result;
@@ -903,6 +915,21 @@ namespace Cliente_TFG.Pages
             }
         }
 
+        //METODO PARA CAMBIAR EL BOTON A INSTALAR JUEGO
+        private void ActualizarBotonInstalacion(Button boton, JuegoInfo juego)
+        {
+            QuitarHandlersClickDeBoton();
+
+            boton.Tag = "Install";
+            boton.Content = "Instalar";
+
+            boton.Click += BotonInstalar_Click;
+
+            juegoSteamSeleccionado = juego;
+
+        }
+
+
         //EVENTO DE CLICK DE LOS JUEGOS AGREGADOS POR LA TIENDA
         private void BotonJugar_Click(object sender, RoutedEventArgs e)
         {
@@ -913,6 +940,71 @@ namespace Cliente_TFG.Pages
                     IniciarJuego(index);
             }
         }
+
+        //EVENTO PARA DESCARGAR UN JUEGO
+        private async void BotonInstalar_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (juegoSteamSeleccionado == null)
+                {
+                    MessageBox.Show("No se ha seleccionado ningún juego.");
+                    return;
+                }
+
+                //PEDIR RUTA DE DESCARGA AL USUARIO
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    return;
+
+                string carpetaDestino = dialog.SelectedPath;
+                string url = $"http://{Config.IP}:{Config.Puerto}/library/{ventanaPrincipal.Usuario.IdUsuario}/download/{juegoSteamSeleccionado.AppId}";
+
+                string archivoZip = System.IO.Path.Combine(carpetaDestino, $"{juegoSteamSeleccionado.AppId}.zip");
+                string rutaDescomprimida = carpetaDestino;
+
+                using (HttpClient client = new HttpClient())
+                using (HttpResponseMessage response = await client.GetAsync(url))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        using (FileStream fs = new FileStream(archivoZip, FileMode.Create))
+                        {
+                            await response.Content.CopyToAsync(fs);
+                        }
+
+
+                        ZipFile.ExtractToDirectory(archivoZip, rutaDescomprimida);
+                        System.IO.File.Delete(archivoZip);
+
+                        //GUARDAR LA RUTA DEL EJECUTABLE (puedes mejorar esta parte si conoces el nombre exacto)
+                        string posibleExe = Directory.GetFiles(rutaDescomprimida, "*.exe", SearchOption.AllDirectories).FirstOrDefault();
+                        if (posibleExe != null)
+                        {
+                            QuitarHandlersClickDeBoton();
+                            juegoSteamSeleccionado.RutaEjecutable = posibleExe;
+                            GuardarJuegosEnJson();
+                            ActualizarEstadoBotonJuego(BotonJugar, juegoSteamSeleccionado); //Esto pone el botón en modo "JUGAR"
+
+                            //AHORA CAMBIA EL HANDLER PARA QUE EJECUTE EL JUEGO
+                            BotonJugar.Click -= BotonInstalar_Click;
+                        }
+
+                        MessageBox.Show("Juego descargado e instalado correctamente.");
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Error al descargar el juego:\n{response.ReasonPhrase}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error inesperado:\n{ex.Message}");
+            }
+        }
+
+
 
         private async void ImgFondo_ImageFailed(object sender, ExceptionRoutedEventArgs e)
         {

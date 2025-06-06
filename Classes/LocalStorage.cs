@@ -5,6 +5,7 @@ using System;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Cliente_TFG.Classes
 {
@@ -56,7 +57,8 @@ namespace Cliente_TFG.Classes
 
         public static void GuardarBibliotecaNombreJuegos(List<string> nombreJuego)
         {
-            var json = JsonConvert.SerializeObject(nombreJuego);
+            var nombresUnicos = nombreJuego.Distinct().ToList(); // ELIMINA DUPLICADOS
+            var json = JsonConvert.SerializeObject(nombresUnicos, Formatting.Indented);
             File.WriteAllText(rutaBibliotecaNombres, json);
         }
 

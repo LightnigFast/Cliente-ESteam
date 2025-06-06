@@ -68,18 +68,23 @@ namespace Cliente_TFG.Classes
                 var juegosArray = jsonObj["juegos"] as JArray;
 
                 bibliotecaJuegos.Clear();
+                bibliotecaJuegosNombres.Clear();
 
                 foreach (var juego in juegosArray)
                 {
                     int appId = (int)juego["app_id"];
-                    bibliotecaJuegos.Add(appId);
-
                     string nombreJuego = (string)juego["nombre"];
+
+                    bibliotecaJuegos.Add(appId);
                     bibliotecaJuegosNombres.Add(nombreJuego);
                 }
+
+                //GUARDAR JSONS SIN DUPLICADOS Y EN ORDEN CORRECTO
+                LocalStorage.GuardarBiblioteca(bibliotecaJuegos);
+                LocalStorage.GuardarBibliotecaNombreJuegos(bibliotecaJuegosNombres);
             }
-            
         }
+
 
 
 

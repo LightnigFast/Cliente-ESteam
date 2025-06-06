@@ -717,8 +717,8 @@ namespace Cliente_TFG.Pages
 
                     notificacion.MostrarNotificacion("Compra realizada con éxito.", NotificationType.Success);
 
-                    ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
-                    ventanaPrincipal.GuardarDatosLocal();
+                    //ventanaPrincipal.Usuario.CargarBiblioteca(ventanaPrincipal.Usuario.IdUsuario);
+                    //ventanaPrincipal.GuardarDatosLocal();
                     CargarBotonCompra();
 
                     return true;
