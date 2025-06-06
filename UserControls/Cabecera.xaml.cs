@@ -24,7 +24,7 @@ namespace Cliente_TFG.UserControls
     /// <summary>
     /// Lógica de interacción para Cabezera.xaml
     /// </summary>
-    public partial class Cabezera : UserControl, INotifyPropertyChanged
+    public partial class Cabecera : UserControl, INotifyPropertyChanged
     {
         //PARA LAS OPCIONES
         public event RoutedEventHandler AtrasPresionado;
@@ -87,7 +87,7 @@ namespace Cliente_TFG.UserControls
         public event RoutedEventHandler VerPerfilPresionado;
         public event RoutedEventHandler RecargarSaldoPresionado;
 
-        public Cabezera()
+        public Cabecera()
         {
             InitializeComponent();
             this.DataContext = this;
