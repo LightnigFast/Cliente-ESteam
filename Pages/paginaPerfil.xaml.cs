@@ -322,7 +322,7 @@ namespace Cliente_TFG.Pages
                                 Juego juego = juegos[i];
 
                                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                                string rutaImagen = System.IO.Path.Combine(appData, "ClienteTFG", "imagenes", $"{juego.AppId}_vertical.jpg");
+                                string rutaImagen = System.IO.Path.Combine(appData, "Osiris", "imagenes", $"{juego.AppId}_vertical.jpg");
                                 string urlHeader = itemJson["header"].Value<string>();
 
                                 BitmapImage bitmap = new BitmapImage();
@@ -417,7 +417,7 @@ namespace Cliente_TFG.Pages
             {
                 string ruta = System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "ClienteTFG", "imagenes", $"{juego.AppId}_fondo.jpg");
+                    "Osiris", "imagenes", $"{juego.AppId}_fondo.jpg");
 
                 CambiarFondo(ruta);
             }

@@ -85,14 +85,14 @@ namespace Cliente_TFG.UserControls
                         //GUARDAMOS TOKEN EN LOCAL
                         string rutaToken = System.IO.Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                            "ClienteTFG", "token.txt"
+                            "Osiris", "token.txt"
                         );
                         Directory.CreateDirectory(System.IO.Path.GetDirectoryName(rutaToken));
                         File.WriteAllText(rutaToken, token);
 
                         string rutaJsonJuegos = System.IO.Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                            "ClienteTFG", "juegos_biblioteca.json"
+                            "Osiris", "juegos_biblioteca.json"
                         );
                         BorrarJuegosBibliotecaJson(rutaJsonJuegos);
 

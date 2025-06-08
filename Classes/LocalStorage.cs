@@ -11,10 +11,10 @@ namespace Cliente_TFG.Classes
 {
     public static class LocalStorage
     {
-        private static string rutaUsuario = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "usuario.json");
-        private static string rutaBiblioteca = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "biblioteca.json");
-        private static string rutaBibliotecaNombres = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "bibliotecaNombres.json");
-        private static string rutaImagenes = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ClienteTFG", "imagenes");
+        private static string rutaUsuario = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Osiris", "usuario.json");
+        private static string rutaBiblioteca = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Osiris", "biblioteca.json");
+        private static string rutaBibliotecaNombres = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Osiris", "bibliotecaNombres.json");
+        private static string rutaImagenes = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Osiris", "imagenes");
 
 
         static LocalStorage()
@@ -129,7 +129,7 @@ namespace Cliente_TFG.Classes
             {
                 string ruta = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "ClienteTFG",
+                    "Osiris",
                     "usuario.json"
                 );
 

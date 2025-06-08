@@ -26,7 +26,7 @@ namespace Cliente_TFG
         {
             string rutaToken = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "ClienteTFG", "token.txt"
+                "Osiris", "token.txt"
             );
 
             if (File.Exists(rutaToken))

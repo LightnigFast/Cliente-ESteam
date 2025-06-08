@@ -518,7 +518,7 @@ namespace Cliente_TFG.Pages
 
         private string rutaJsonJuegos = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "ClienteTFG", "juegos_biblioteca.json");
+            "Osiris", "juegos_biblioteca.json");
 
 
         //METODO PARA GUARDAR LOS JUEGOS EN EL JSON
@@ -1044,6 +1044,7 @@ namespace Cliente_TFG.Pages
                 string archivoZip = System.IO.Path.Combine(carpetaDestino, $"{juegoSteamSeleccionado.AppId}.zip");
                 string rutaDescomprimida = carpetaDestino;
 
+
                 using (HttpClient client = new HttpClient())
                 using (HttpResponseMessage response = await client.GetAsync(url))
                 {
@@ -1062,6 +1063,7 @@ namespace Cliente_TFG.Pages
                         string posibleExe = Directory.GetFiles(rutaDescomprimida, "*.exe", SearchOption.AllDirectories).FirstOrDefault();
                         if (posibleExe != null)
                         {
+
                             QuitarHandlersClickDeBoton();
                             juegoSteamSeleccionado.RutaEjecutable = posibleExe;
                             GuardarJuegosEnJson();
@@ -1161,7 +1163,7 @@ namespace Cliente_TFG.Pages
 
         private string rutaJsonJuegosAgregados = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "ClienteTFG", "juegos_agregados_biblioteca.json");
+            "Osiris", "juegos_agregados_biblioteca.json");
 
 
 

@@ -339,7 +339,7 @@ namespace Cliente_TFG.UserControls
             //BORRAMOS EL TOKEN
             string rutaToken = System.IO.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "ClienteTFG", "token.txt"
+                "Osiris", "token.txt"
             );
 
             if (File.Exists(rutaToken))
@@ -357,7 +357,7 @@ namespace Cliente_TFG.UserControls
             //BORRAMOS LOS JUEGOS AGREGADOS
             string rutaJuegosGuardados = System.IO.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "ClienteTFG", "juegos_agregados_biblioteca.json"
+                "Osiris", "juegos_agregados_biblioteca.json"
             );
 
             if (File.Exists(rutaJuegosGuardados))
