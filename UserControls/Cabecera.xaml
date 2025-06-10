@@ -212,7 +212,7 @@
                         </MenuItem.Header>
                     </MenuItem>
 
-                    <MenuItem Click="StatusMenuItem_Click" Tag="Desconectado" Style="{StaticResource EstiloMenuItem}">
+                    <MenuItem Click="StatusMenuItem_Click" Tag="Ocupado" Style="{StaticResource EstiloMenuItem}">
                         <MenuItem.Header>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <Ellipse Width="8" Height="8" Margin="0,0,5,0"

@@ -697,6 +697,10 @@ namespace Cliente_TFG.Pages
                             AgregarAmigoALista(nuevoAmigo);
                             //notificacion.MostrarNotificacion($"Se ha agregado el usuario {nuevoAmigo.NombreUsuario} a la lista de amigos", NotificationType.Info);
                         }
+                        else if (listaDeAmigos.Exists(s => s.IdUsuario == nuevoAmigo.IdUsuario))
+                        {
+                            ActualizarEstadoDeLista(nuevoAmigo);
+                        }
 
                     }
                 }
@@ -711,6 +715,34 @@ namespace Cliente_TFG.Pages
                 notificacion.MostrarNotificacion("Hubo un error obteniendo la lista de amigos: " + ex, NotificationType.Error);
                 return;
             }
+        }
+
+        private void ActualizarEstadoDeLista(Amigo nuevoAmigo)
+        {
+            Border border = ObtenerIndicadorEstado(nuevoAmigo.IdUsuario);
+            border.Background = getColorEstado(nuevoAmigo.Estado);
+        }
+
+        // ESte es un metodo auxiliar para poder actualizar el estado de la lista
+        private Border ObtenerIndicadorEstado(string idUsuario)
+        {
+            // Buscar el Border correspondiente al amigo en listaAmigos
+            foreach (UIElement elemento in listaAmigos.Children)
+            {
+                if (elemento is Border bordeAmigo && bordeAmigo.Tag?.ToString() == idUsuario)
+                {
+                    // Obtener el Grid dentro del Border
+                    if (bordeAmigo.Child is Grid gridAmigo)
+                    {
+                        // El indicadorEstado es el primer hijo del Grid
+                        if (gridAmigo.Children.Count > 0 && gridAmigo.Children[0] is Border indicadorEstado)
+                        {
+                            return indicadorEstado;
+                        }
+                    }
+                }
+            }
+            return null; // Retorna null si no se encuentra el indicador
         }
 
         private void AgregarSolicitudSimulada()
@@ -760,7 +792,7 @@ namespace Cliente_TFG.Pages
             {
                 Width = 10,
                 Height = 10,
-                Background = new SolidColorBrush(Color.FromRgb(76, 175, 80)), // Verde para conectado
+                Background = getColorEstado(amigo.Estado),
                 CornerRadius = new CornerRadius(5),
                 Margin = new Thickness(5, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center
@@ -1292,6 +1324,23 @@ namespace Cliente_TFG.Pages
             Ausente,
             Ocupado,
             Desconectado
+        }
+
+        public SolidColorBrush getColorEstado(EstadoAmigo estado)
+        {
+            switch (estado)
+            {
+                case EstadoAmigo.Conectado:
+                    return new SolidColorBrush(Color.FromRgb(76, 175, 80));
+                case EstadoAmigo.Ausente:
+                    return new SolidColorBrush(Color.FromRgb(243, 156, 18));
+                case EstadoAmigo.Ocupado:
+                    return new SolidColorBrush(Color.FromRgb(231, 76, 60));
+                case EstadoAmigo.Desconectado:
+                default:
+                    return new SolidColorBrush(Color.FromRgb(127, 140, 141));
+            }
+
         }
     }
 }

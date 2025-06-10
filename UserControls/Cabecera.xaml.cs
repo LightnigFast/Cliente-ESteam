@@ -293,7 +293,7 @@ namespace Cliente_TFG.UserControls
                         EstadoTexto = "Ausente";
                         EstadoColor = (Color)ColorConverter.ConvertFromString("#FFE6B905");
                         break;
-                    case "Desconectado":
+                    case "Ocupado":
                         EstadoTexto = "Ocupado";
                         EstadoColor = (Color)ColorConverter.ConvertFromString("#FFBD3E3E");
                         break;
