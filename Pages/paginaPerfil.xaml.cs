@@ -134,7 +134,7 @@ namespace Cliente_TFG.Pages
 
         private async Task<string> SubirImagenAImgurAsync(string ruta)
         {
-            string clientId = "9a3f4409fb9efc2";
+            string clientId = "8411e4db861247d";
 
             using (var httpClient = new HttpClient())
             {
