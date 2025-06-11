@@ -1050,6 +1050,10 @@ namespace Cliente_TFG.Pages
                 {
                     if (response.IsSuccessStatusCode)
                     {
+                        BotonJugar.Tag = "Downloading";
+                        BotonJugar.Content = "Descargando...";
+                        BotonJugar.IsEnabled = false;
+
                         using (FileStream fs = new FileStream(archivoZip, FileMode.Create))
                         {
                             await response.Content.CopyToAsync(fs);
@@ -1063,7 +1067,7 @@ namespace Cliente_TFG.Pages
                         string posibleExe = Directory.GetFiles(rutaDescomprimida, "*.exe", SearchOption.AllDirectories).FirstOrDefault();
                         if (posibleExe != null)
                         {
-
+                            BotonJugar.IsEnabled = true;
                             QuitarHandlersClickDeBoton();
                             juegoSteamSeleccionado.RutaEjecutable = posibleExe;
                             GuardarJuegosEnJson();

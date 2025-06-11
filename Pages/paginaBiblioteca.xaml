@@ -135,6 +135,13 @@
                                 <Setter Property="IsEnabled" Value="False"/>
                             </Trigger>
 
+                            <Trigger Property="Tag" Value="Downloading">
+                                <Setter Property="Background" Value="#3a94e8"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter TargetName="StateIcon" Property="Data" 
+                                    Value="M12 4V1L8 5l4 4V6a6 6 0 0 1 0 12 6 6 0 0 1 0-12"/>
+                            </Trigger>
+
                             <!--EFECTOS DE INTERACCION-->
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="MainBorder" Property="RenderTransform">
