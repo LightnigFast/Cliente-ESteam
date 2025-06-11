@@ -254,9 +254,9 @@ namespace Cliente_TFG.Pages
                     //IMAGEN INVÁLIDA PARA FORZAR IMAGEFAILED
                     imagenFondo = GenerarImagenFondoFallback(appidJuego, nombreFondo);
                 }
-                else
+                if (imagenFondo != null)
                 {
-                    
+
                     imagenesFondo.Add(imagenFondo);
                 }
 
